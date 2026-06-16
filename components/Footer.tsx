@@ -12,8 +12,8 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold text-white">Contact</h4>
           <ul className="mt-2 space-y-1 text-sm">
-            <li>Phone: +91 00000 00000</li>
-            <li>Email: info@oneobuildcon.com</li>
+            <li>Phone: +91 88060 29907</li>
+             <li>Email: oneobuildcon@gmail.com</li>
             <li>Address: Your City, India</li>
           </ul>
         </div>
