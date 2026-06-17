@@ -1,15 +1,5 @@
 export type PackageId = string;
-export type CategoryId =
-  | "designs"
-  | "earthwork"
-  | "structure"
-  | "flooring"
-  | "kitchen"
-  | "bathroom"
-  | "doors"
-  | "window"
-  | "plumbing"
-  | "electrical";
+export type CategoryId = string;
 
 export interface PackageMeta {
   id: PackageId;

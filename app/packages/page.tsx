@@ -28,6 +28,7 @@ const popularIds = ["basic", "standard"];
 export default function Packages() {
   const [content, setContent] = useState<PackageContent>(defaultPackageContent);
   const [pkgMeta, setPkgMeta] = useState<PackageMeta[]>(defaultPkgs.map((p) => ({ ...p })));
+  const [catMeta, setCatMeta] = useState(categories.map((c) => ({ ...c })));
   const [selectedPkg, setSelectedPkg] = useState<PackageId>("basic");
   const [selectedCat, setSelectedCat] = useState<CategoryId>("designs");
 
@@ -36,6 +37,8 @@ export default function Packages() {
     if (stored) { try { setContent(JSON.parse(stored)); } catch { /* ignore */ } }
     const storedMeta = localStorage.getItem("oneo_packages_meta");
     if (storedMeta) { try { setPkgMeta(JSON.parse(storedMeta)); } catch { /* ignore */ } }
+    const storedCat = localStorage.getItem("oneo_categories_meta");
+    if (storedCat) { try { setCatMeta(JSON.parse(storedCat)); } catch { /* ignore */ } }
   }, []);
 
   const items = content[selectedPkg]?.[selectedCat] ?? [];
@@ -124,8 +127,8 @@ export default function Packages() {
 
           {/* Category tabs - horizontal scroll */}
           <div className="flex gap-2 overflow-x-auto pb-2 mb-8 scrollbar-hide">
-            {categories.map((cat) => {
-              const Icon = categoryIcons[cat.id as CategoryId];
+            {catMeta.map((cat) => {
+              const Icon = categoryIcons[cat.id as CategoryId] ?? PencilRuler;
               const isActive = selectedCat === cat.id;
               return (
                 <button
