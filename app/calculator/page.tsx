@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { HardHat, Calculator, CheckCircle2, Phone, ArrowRight, Info } from "lucide-react";
+import { HardHat, Calculator, Phone, ArrowRight, Info } from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -28,14 +28,6 @@ const floors = [
   { id: "g3", label: "G + 3 Floors", multiplier: 3.6 },
 ];
 
-const extras = [
-  { id: "parking", label: "Car Parking / Stilt", cost: 85000 },
-  { id: "terrace", label: "Terrace Garden", cost: 60000 },
-  { id: "lift", label: "Lift Provision", cost: 250000 },
-  { id: "solar", label: "Solar Panel Provision", cost: 120000 },
-  { id: "cctv", label: "CCTV & Security System", cost: 45000 },
-  { id: "landscaping", label: "Landscaping & Garden", cost: 75000 },
-];
 
 function formatINR(num: number) {
   if (num >= 10000000) return `₹${(num / 10000000).toFixed(2)} Cr`;
@@ -47,36 +39,25 @@ export default function CalculatorPage() {
   const [sqft, setSqft] = useState<string>("");
   const [selectedPkg, setSelectedPkg] = useState(packages[1]);
   const [selectedFloor, setSelectedFloor] = useState(floors[0]);
-  const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [gst, setGst] = useState(true);
   const [result, setResult] = useState<null | {
-    base: number; extrasCost: number; gstAmount: number; total: number; perMonth: number;
+    base: number; gstAmount: number; total: number;
   }>(null);
-  const [, setAnimateResult] = useState(false);
-
-  function toggleExtra(id: string) {
-    setSelectedExtras((prev) => prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id]);
-  }
 
   function calculate() {
     const area = parseFloat(sqft);
     if (!area || area <= 0) return;
     const base = Math.round(area * selectedPkg.price * selectedFloor.multiplier);
-    const extrasCost = extras.filter((e) => selectedExtras.includes(e.id)).reduce((s, e) => s + e.cost, 0);
-    const subtotal = base + extrasCost;
-    const gstAmount = gst ? Math.round(subtotal * 0.18) : 0;
-    const total = subtotal + gstAmount;
-    const perMonth = Math.round(total / 24);
-    setResult({ base, extrasCost, gstAmount, total, perMonth });
-    setAnimateResult(true);
-    setTimeout(() => setAnimateResult(false), 600);
+    const gstAmount = gst ? Math.round(base * 0.18) : 0;
+    const total = base + gstAmount;
+    setResult({ base, gstAmount, total });
   }
 
   // Auto-recalculate when inputs change
   useEffect(() => {
     if (sqft && parseFloat(sqft) > 0) calculate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sqft, selectedPkg, selectedFloor, selectedExtras, gst]);
+  }, [sqft, selectedPkg, selectedFloor, gst]);
 
   const sqftNum = parseFloat(sqft) || 0;
 
@@ -190,29 +171,9 @@ export default function CalculatorPage() {
                 </div>
               </motion.div>
 
-              {/* Extras */}
+              {/* GST toggle */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
-                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Add-ons (Optional)</label>
-                <div className="space-y-2">
-                  {extras.map((extra) => (
-                    <motion.button
-                      key={extra.id}
-                      onClick={() => toggleExtra(extra.id)}
-                      whileHover={{ x: 4 }}
-                      className={`w-full flex items-center justify-between rounded-xl border px-4 py-3 transition-all ${selectedExtras.includes(extra.id) ? "border-amber bg-amber/10" : "border-black/8 bg-gray-50 hover:border-amber/30"}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`h-4 w-4 rounded border-2 flex items-center justify-center transition-all ${selectedExtras.includes(extra.id) ? "border-amber bg-amber" : "border-black/20"}`}>
-                          {selectedExtras.includes(extra.id) && <CheckCircle2 className="h-3 w-3 text-white" />}
-                        </div>
-                        <span className="text-sm font-medium text-navy">{extra.label}</span>
-                      </div>
-                      <span className="text-xs font-semibold text-amber">+{formatINR(extra.cost)}</span>
-                    </motion.button>
-                  ))}
-                </div>
-                {/* GST toggle */}
-                <div className="mt-4 flex items-center justify-between rounded-xl border border-black/8 bg-gray-50 px-4 py-3">
+                <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-navy">Include GST (18%)</span>
                   <button onClick={() => setGst(!gst)} className={`relative h-6 w-11 rounded-full transition-colors ${gst ? "bg-amber" : "bg-gray-300"}`}>
                     <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${gst ? "translate-x-5" : "translate-x-0.5"}`} />
@@ -254,12 +215,6 @@ export default function CalculatorPage() {
                             <span className="text-white/60">Base construction cost</span>
                             <span className="font-semibold">{formatINR(result.base)}</span>
                           </div>
-                          {result.extrasCost > 0 && (
-                            <div className="flex justify-between text-sm">
-                              <span className="text-white/60">Add-ons</span>
-                              <span className="font-semibold">+{formatINR(result.extrasCost)}</span>
-                            </div>
-                          )}
                           {gst && (
                             <div className="flex justify-between text-sm">
                               <span className="text-white/60">GST (18%)</span>
@@ -273,10 +228,6 @@ export default function CalculatorPage() {
                           </div>
                         </div>
 
-                        <div className="mt-4 rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-center">
-                          <p className="text-xs text-white/50">Approx. EMI over 2 years</p>
-                          <p className="text-xl font-bold text-amber mt-0.5">{formatINR(result.perMonth)}<span className="text-sm font-normal text-white/50">/month</span></p>
-                        </div>
                       </div>
                     </div>
 
