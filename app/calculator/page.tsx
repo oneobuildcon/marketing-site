@@ -22,10 +22,13 @@ const packages = [
 ];
 
 const floors = [
-  { id: "g", label: "Ground Floor (G)", multiplier: 1 },
-  { id: "g1", label: "G + 1 Floor", multiplier: 1.9 },
+  { id: "g",  label: "Ground (G)",   multiplier: 1 },
+  { id: "g1", label: "G + 1 Floor",  multiplier: 1.9 },
   { id: "g2", label: "G + 2 Floors", multiplier: 2.75 },
   { id: "g3", label: "G + 3 Floors", multiplier: 3.6 },
+  { id: "g4", label: "G + 4 Floors", multiplier: 4.4 },
+  { id: "g5", label: "G + 5 Floors", multiplier: 5.2 },
+  { id: "g6", label: "G + 6 Floors", multiplier: 6.0 },
 ];
 
 
