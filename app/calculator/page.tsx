@@ -461,16 +461,22 @@ export default function CalculatorPage() {
     try {
       const { auth } = await import("@/lib/firebase");
       const { signInWithPhoneNumber, RecaptchaVerifier } = await import("firebase/auth");
-      if (!(window as Window & { recaptchaVerifier?: unknown }).recaptchaVerifier) {
-        (window as Window & { recaptchaVerifier?: unknown }).recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
-      }
-      const verifier = (window as Window & { recaptchaVerifier?: unknown }).recaptchaVerifier as import("firebase/auth").ApplicationVerifier;
+      type WinWithCaptcha = Window & { recaptchaVerifier?: { clear?: () => void } };
+      const win = window as WinWithCaptcha;
+      // Always create a fresh verifier to avoid stale reCAPTCHA state
+      if (win.recaptchaVerifier?.clear) win.recaptchaVerifier.clear();
+      win.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
+      const verifier = win.recaptchaVerifier as import("firebase/auth").ApplicationVerifier;
       const confirmation = await signInWithPhoneNumber(auth, `+91${phone}`, verifier);
       confirmRef.current = confirmation;
       setOtpStep(true);
     } catch (e) {
-      setLeadError("Failed to send OTP. Please check the number and try again.");
+      // Clear verifier so next attempt starts fresh
+      const win = window as Window & { recaptchaVerifier?: { clear?: () => void } };
+      if (win.recaptchaVerifier?.clear) win.recaptchaVerifier.clear();
+      win.recaptchaVerifier = undefined;
       console.error(e);
+      setLeadError("Failed to send OTP. Please try again.");
     }
     setOtpSending(false);
   }
