@@ -149,6 +149,7 @@ export default function CalculatorPage() {
                     >
                       <p className="font-bold text-sm text-navy">{pkg.name}</p>
                       <p className="text-xs text-amber font-semibold mt-0.5">₹{pkg.price}/sqft</p>
+                      <p className="text-[10px] text-navy/40 mt-0.5">excl. GST</p>
                     </motion.button>
                   ))}
                 </div>
