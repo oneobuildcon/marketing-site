@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SHEET_URL = process.env.GOOGLE_SHEET_URL ?? "";
+const SHEET_URL =
+  process.env.GOOGLE_SHEET_URL ??
+  "https://script.google.com/macros/s/AKfycbwiY9eBuBDMQKFjr4kgyaXL9ewqLmRsUvCtRLnyO2UJfRja1Bw5XmBIW5Hh63y2ogjkRw/exec";
 
 export async function POST(req: NextRequest) {
   try {
