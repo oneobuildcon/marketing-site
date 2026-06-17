@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { HardHat, Calculator, Phone, ArrowRight, Info, FileText, FileSpreadsheet } from "lucide-react";
@@ -413,12 +413,7 @@ export default function CalculatorPage() {
   const [leadName, setLeadName] = useState("");
   const [leadPhone, setLeadPhone] = useState("");
   const [leadError, setLeadError] = useState("");
-  const [otpStep, setOtpStep] = useState(false);
-  const [otp, setOtp] = useState("");
   const [otpSending, setOtpSending] = useState(false);
-  const [otpVerifying, setOtpVerifying] = useState(false);
-  const [captchaDone, setCaptchaDone] = useState(false);
-  const confirmRef = useRef<import("firebase/auth").ConfirmationResult | null>(null);
 
   // Load package content and categories from localStorage on mount
   useEffect(() => {
@@ -450,105 +445,56 @@ export default function CalculatorPage() {
     });
   }, [upperFloors, parking]);
 
-  // Init visible reCAPTCHA when modal opens on step 1
-  useEffect(() => {
-    if (leadModal && !otpStep) {
-      setCaptchaDone(false);
-      setTimeout(() => initRecaptcha(), 100);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leadModal, otpStep]);
-
-  async function initRecaptcha() {
-    const { auth } = await import("@/lib/firebase");
-    const { RecaptchaVerifier } = await import("firebase/auth");
-    type WinWithCaptcha = Window & { recaptchaVerifier?: { clear?: () => void } };
-    const win = window as WinWithCaptcha;
-    if (win.recaptchaVerifier?.clear) win.recaptchaVerifier.clear();
-    win.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-      size: "normal",
-      callback: () => setCaptchaDone(true),
-      "expired-callback": () => setCaptchaDone(false),
-    });
-    (win.recaptchaVerifier as unknown as { render: () => Promise<void> }).render();
-  }
-
-  async function handleSendOtp() {
+  async function handleSubmitLead() {
     const phone = leadPhone.replace(/\D/g, "");
     if (!leadName.trim()) { setLeadError("Please enter your name."); return; }
     if (phone.length !== 10 || !/^[6-9]/.test(phone)) {
       setLeadError("Enter a valid 10-digit Indian mobile number.");
       return;
     }
-    if (!captchaDone) { setLeadError("Please complete the reCAPTCHA above."); return; }
+    if (!result) return;
     setLeadError("");
     setOtpSending(true);
+
+    // Build lead record
+    const leadData = {
+      name: leadName.trim(),
+      phone: `+91${phone}`,
+      package: selectedPkg.name,
+      rate: selectedPkg.price,
+      config: upperFloors === 0 ? "G" : `G+${upperFloors}`,
+      ground: parking ? "Parking" : "House",
+      totalArea: result.totalArea,
+      totalCost: result.total,
+      gst,
+      location: projectLocation || "",
+      date: new Date().toLocaleString("en-IN"),
+    };
+    // Save to localStorage for admin/leads page
     try {
-      const { auth } = await import("@/lib/firebase");
-      const { signInWithPhoneNumber } = await import("firebase/auth");
-      type WinWithCaptcha = Window & { recaptchaVerifier?: unknown };
-      const verifier = (window as WinWithCaptcha).recaptchaVerifier as import("firebase/auth").ApplicationVerifier;
-      const confirmation = await signInWithPhoneNumber(auth, `+91${phone}`, verifier);
-      confirmRef.current = confirmation;
-      setOtpStep(true);
-    } catch (e) {
-      console.error(e);
-      setCaptchaDone(false);
-      setLeadError("Failed to send OTP. Please refresh the page and try again.");
+      const existing = JSON.parse(localStorage.getItem("oneo_leads") || "[]");
+      existing.push(leadData);
+      localStorage.setItem("oneo_leads", JSON.stringify(existing));
+    } catch {}
+    // Also save to Google Sheet if configured
+    fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(leadData) }).catch(() => {});
+
+    // Notify owner on WhatsApp
+    const msg = encodeURIComponent(
+      `*New Lead*\n\nName: ${leadData.name}\nPhone: ${leadData.phone}\nPackage: ${selectedPkg.name} (Rs.${selectedPkg.price}/sqft)\nConfig: ${leadData.config} | Ground: ${leadData.ground}\nTotal Area: ${result.totalArea.toLocaleString()} sqft\nEstimated Cost: ${formatINR(result.total)}${gst ? " (incl. GST)" : ""}\nLocation: ${leadData.location || "Not specified"}`
+    );
+    window.open(`https://wa.me/918806029907?text=${msg}`, "_blank");
+
+    // Download file
+    if (leadModal === "pdf") {
+      exportPDF(result, selectedPkg, upperFloors, parking, gst, clientName || leadName, projectLocation, pkgContent, cats);
+    } else {
+      exportExcel(result, selectedPkg, upperFloors, parking, gst, clientName || leadName, projectLocation, pkgContent, cats);
     }
+
     setOtpSending(false);
-  }
-
-  async function handleVerifyOtp() {
-    if (otp.length !== 6) { setLeadError("Enter the 6-digit OTP."); return; }
-    if (!confirmRef.current || !result) return;
-    setLeadError("");
-    setOtpVerifying(true);
-    try {
-      await confirmRef.current.confirm(otp);
-
-      // Save lead to localStorage + Google Sheet
-      const leadData = {
-        name: leadName.trim(),
-        phone: `+91${leadPhone.replace(/\D/g, "")}`,
-        package: selectedPkg.name,
-        rate: selectedPkg.price,
-        config: upperFloors === 0 ? "G" : `G+${upperFloors}`,
-        ground: parking ? "Parking" : "House",
-        totalArea: result.totalArea,
-        totalCost: result.total,
-        gst,
-        location: projectLocation || "",
-        date: new Date().toLocaleString("en-IN"),
-      };
-      // Save to localStorage for admin/leads page
-      try {
-        const existing = JSON.parse(localStorage.getItem("oneo_leads") || "[]");
-        existing.push(leadData);
-        localStorage.setItem("oneo_leads", JSON.stringify(existing));
-      } catch {}
-      // Also save to Google Sheet if configured
-      fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(leadData) }).catch(() => {});
-
-      // Notify owner on WhatsApp
-      const msg = encodeURIComponent(
-        `*New Verified Lead*\n\nName: ${leadData.name}\nPhone: ${leadData.phone}\nPackage: ${selectedPkg.name} (Rs.${selectedPkg.price}/sqft)\nConfig: ${leadData.config} | Ground: ${leadData.ground}\nTotal Area: ${result.totalArea.toLocaleString()} sqft\nEstimated Cost: ${formatINR(result.total)}${gst ? " (incl. GST)" : ""}\nLocation: ${leadData.location || "Not specified"}`
-      );
-      window.open(`https://wa.me/918806029907?text=${msg}`, "_blank");
-
-      // Download file
-      if (leadModal === "pdf") {
-        exportPDF(result, selectedPkg, upperFloors, parking, gst, clientName || leadName, projectLocation, pkgContent, cats);
-      } else {
-        exportExcel(result, selectedPkg, upperFloors, parking, gst, clientName || leadName, projectLocation, pkgContent, cats);
-      }
-
-      setLeadModal(null);
-      setLeadName(""); setLeadPhone(""); setOtp(""); setOtpStep(false);
-    } catch {
-      setLeadError("Incorrect OTP. Please try again.");
-    }
-    setOtpVerifying(false);
+    setLeadModal(null);
+    setLeadName(""); setLeadPhone("");
   }
 
   function updateSlab(index: number, value: string) {
@@ -860,66 +806,45 @@ export default function CalculatorPage() {
               {/* Modal header */}
               <div className="bg-navy px-6 py-5">
                 <p className="text-xs font-semibold uppercase tracking-widest text-amber mb-1">
-                  {otpStep ? "Step 2 of 2 — Verify OTP" : "Step 1 of 2 — Your Details"}
+                  Almost there
                 </p>
                 <h3 className="text-xl font-bold text-white">
-                  {otpStep ? "Enter the OTP sent to your phone" : "Enter your details to download"}
+                  Enter your details to download
                 </h3>
                 <p className="text-white/60 text-sm mt-1">
-                  {otpStep ? `OTP sent to +91 ${leadPhone}` : "Verify your number to get the quotation."}
+                  Get your detailed quotation as {leadModal === "pdf" ? "PDF" : "Excel"}.
                 </p>
               </div>
 
               <div className="px-6 py-6 space-y-4">
-                {!otpStep ? (
-                  <>
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1.5">Your Name *</label>
-                      <input type="text" value={leadName} onChange={(e) => setLeadName(e.target.value)}
-                        placeholder="e.g. Rahul Sharma"
-                        className="w-full rounded-xl border border-black/15 px-4 py-3 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1.5">Mobile Number *</label>
-                      <div className="flex gap-2">
-                        <span className="flex items-center rounded-xl border border-black/15 px-3 text-navy/60 font-medium text-sm bg-gray-50">+91</span>
-                        <input type="tel" value={leadPhone} onChange={(e) => setLeadPhone(e.target.value)}
-                          placeholder="98765 43210" maxLength={10}
-                          className="flex-1 rounded-xl border border-black/15 px-4 py-3 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20" />
-                      </div>
-                    </div>
-                    {/* visible reCAPTCHA renders here */}
-                    <div id="recaptcha-container" className="flex justify-center" />
-                    {leadError && <p className="text-red-500 text-xs font-medium">{leadError}</p>}
-                    <div className="flex gap-3 pt-1">
-                      <button onClick={() => { setLeadModal(null); setOtpStep(false); setLeadError(""); setCaptchaDone(false); }}
-                        className="flex-1 rounded-xl border-2 border-black/10 py-3 text-sm font-semibold text-navy/60 hover:border-navy/30 transition">
-                        Cancel
-                      </button>
-                      <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                        onClick={handleSendOtp} disabled={otpSending}
-                        className="flex-1 rounded-xl bg-amber py-3 text-sm font-bold text-navy-dark hover:bg-amber/90 transition disabled:opacity-60">
-                        {otpSending ? "Sending OTP..." : "Send OTP →"}
-                      </motion.button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1.5">Enter 6-digit OTP *</label>
-                      <input type="number" value={otp} onChange={(e) => setOtp(e.target.value)}
-                        placeholder="• • • • • •" maxLength={6}
-                        className="w-full rounded-xl border border-black/15 px-4 py-3 text-navy text-2xl font-bold tracking-widest text-center focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20" />
-                      <p className="text-xs text-navy/40 mt-2">Didn&apos;t receive? <button onClick={() => { setOtpStep(false); setOtp(""); }} className="text-amber font-semibold underline">Change number</button></p>
-                    </div>
-                    {leadError && <p className="text-red-500 text-xs font-medium">{leadError}</p>}
-                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                      onClick={handleVerifyOtp} disabled={otpVerifying}
-                      className="w-full rounded-xl bg-amber py-3 text-sm font-bold text-navy-dark hover:bg-amber/90 transition disabled:opacity-60">
-                      {otpVerifying ? "Verifying..." : `Verify & Download ${leadModal === "pdf" ? "PDF" : "Excel"} →`}
-                    </motion.button>
-                  </>
-                )}
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1.5">Your Name *</label>
+                  <input type="text" value={leadName} onChange={(e) => setLeadName(e.target.value)}
+                    placeholder="e.g. Rahul Sharma"
+                    className="w-full rounded-xl border border-black/15 px-4 py-3 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1.5">Mobile Number *</label>
+                  <div className="flex gap-2">
+                    <span className="flex items-center rounded-xl border border-black/15 px-3 text-navy/60 font-medium text-sm bg-gray-50">+91</span>
+                    <input type="tel" value={leadPhone} onChange={(e) => setLeadPhone(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleSubmitLead()}
+                      placeholder="98765 43210" maxLength={10}
+                      className="flex-1 rounded-xl border border-black/15 px-4 py-3 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20" />
+                  </div>
+                </div>
+                {leadError && <p className="text-red-500 text-xs font-medium">{leadError}</p>}
+                <div className="flex gap-3 pt-1">
+                  <button onClick={() => { setLeadModal(null); setLeadError(""); }}
+                    className="flex-1 rounded-xl border-2 border-black/10 py-3 text-sm font-semibold text-navy/60 hover:border-navy/30 transition">
+                    Cancel
+                  </button>
+                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                    onClick={handleSubmitLead} disabled={otpSending}
+                    className="flex-1 rounded-xl bg-amber py-3 text-sm font-bold text-navy-dark hover:bg-amber/90 transition disabled:opacity-60">
+                    {otpSending ? "Preparing..." : `Download ${leadModal === "pdf" ? "PDF" : "Excel"} →`}
+                  </motion.button>
+                </div>
                 <p className="text-center text-xs text-navy/30">Your details are only used to follow up on your enquiry.</p>
               </div>
             </motion.div>
