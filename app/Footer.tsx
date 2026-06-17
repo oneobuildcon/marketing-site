@@ -14,7 +14,7 @@ export default function Footer() {
           <ul className="mt-2 space-y-1 text-sm">
             <li>Phone: +91 88060 29907</li>
             <li>Email: oneobuildcon@gmail.com</li>
-            <li>Address: Your City, India</li>
+            <li>Address: Pune, Maharashtra, India</li>
           </ul>
         </div>
 

@@ -24,7 +24,7 @@ export default function Contact() {
             <ul className="mt-4 space-y-2 text-navy/70">
               <li>Phone: +91 88060 29907</li>
               <li>Email: oneobuildcon@gmail.com</li>
-              <li>Address: Your City, India</li>
+              <li>Address: Pune, Maharashtra, India</li>
               <li>Hours: Mon - Sat, 9am - 6pm</li>
             </ul>
           </div>
