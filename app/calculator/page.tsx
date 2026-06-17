@@ -4,6 +4,12 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { HardHat, Calculator, Phone, ArrowRight, Info, FileText, FileSpreadsheet } from "lucide-react";
+import {
+  defaultPackageContent,
+  categories as defaultCategories,
+  type PackageContent,
+  type CategoryMeta,
+} from "@/data/packagesData";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -38,16 +44,45 @@ type ResultData = {
   base: number; gstAmount: number; total: number;
 };
 
-async function exportPDF(result: ResultData, pkg: { name: string; price: number }, upperFloors: number, parking: boolean, gst: boolean) {
+async function exportPDF(
+  result: ResultData,
+  pkg: { id: string; name: string; price: number },
+  upperFloors: number,
+  parking: boolean,
+  gst: boolean,
+  clientName: string,
+  projectLocation: string,
+  pkgContent: PackageContent,
+  cats: CategoryMeta[],
+) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const navy = [13, 27, 62] as const;
   const amber = [245, 158, 11] as const;
   const W = 210;
+  const C1 = 18, C2 = 118, C3 = 152, C4 = 196;
+  const quotationNo = `QT-${Date.now()}`;
+  const dateStr = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+
+  // Helper: draw page footer
+  function drawFooter(pageNum: number) {
+    const footerY = 288;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, footerY - 3, W - 14, footerY - 3);
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(150, 150, 150);
+    doc.text("One O Buildcon  |  +91 88060 29907  |  oneobuildcon@gmail.com", W / 2, footerY + 2, { align: "center" });
+    doc.text(`Page ${pageNum}`, W - 14, footerY + 2, { align: "right" });
+  }
+
+  // ════════════════════════════════
+  // PAGE 1 — Quotation / Cost Sheet
+  // ════════════════════════════════
 
   // Header bar
   doc.setFillColor(...navy);
-  doc.rect(0, 0, W, 36, "F");
+  doc.rect(0, 0, W, 38, "F");
   doc.setTextColor(245, 158, 11);
   doc.setFontSize(20);
   doc.setFont("helvetica", "bold");
@@ -55,20 +90,38 @@ async function exportPDF(result: ResultData, pkg: { name: string; price: number 
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(255, 255, 255);
-  doc.text("Construction Cost Estimate", 14, 24);
-  doc.text(`Generated: ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}`, 14, 30);
+  doc.text("Pune, Maharashtra  |  +91 88060 29907  |  oneobuildcon@gmail.com", 14, 24);
+  // Quotation label on right
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(245, 158, 11);
+  doc.text("QUOTATION", W - 14, 16, { align: "right" });
+  doc.setFontSize(8.5);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(255, 255, 255);
+  doc.text(`No: ${quotationNo}`, W - 14, 23, { align: "right" });
+  doc.text(`Date: ${dateStr}`, W - 14, 29, { align: "right" });
 
-  // Project summary box
+  // Client info box
   doc.setFillColor(249, 250, 251);
-  doc.roundedRect(14, 42, W - 28, 28, 3, 3, "F");
+  doc.roundedRect(14, 44, W - 28, 28, 3, 3, "F");
   doc.setTextColor(...navy);
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
-  doc.text("Project Summary", 20, 51);
+  doc.text("Client Details", 20, 53);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.text(`Package: ${pkg.name}  |  Rate: Rs.${pkg.price}/sqft (excl. GST)  |  Config: ${upperFloors === 0 ? "G" : `G+${upperFloors}`}  |  Ground: ${parking ? "Parking" : "House"}`, 20, 59);
-  doc.text(`Contact: +91 88060 29907  |  oneobuildcon@gmail.com  |  Pune, Maharashtra`, 20, 65);
+  doc.text(`Client Name:  ${clientName || "—"}`, 20, 61);
+  doc.text(`Project Location:  ${projectLocation || "—"}`, 20, 67);
+  // Package / config on right side of box
+  doc.setFont("helvetica", "bold");
+  doc.text("Package:", W - 100, 53);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${pkg.name}  @  Rs.${pkg.price}/sqft (excl. GST)`, W - 85, 53);
+  doc.setFont("helvetica", "bold");
+  doc.text("Config:", W - 100, 61);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${upperFloors === 0 ? "G" : `G+${upperFloors}`}  |  Ground: ${parking ? "Parking" : "House"}`, W - 85, 61);
 
   // Area breakdown table
   let y = 82;
@@ -78,10 +131,6 @@ async function exportPDF(result: ResultData, pkg: { name: string; price: number 
   doc.text("Built-up Area Breakdown", 14, y);
   y += 6;
 
-  // col x positions
-  const C1 = 18, C2 = 118, C3 = 152, C4 = 196;
-
-  // Table header
   doc.setFillColor(...navy);
   doc.rect(14, y, W - 28, 8, "F");
   doc.setTextColor(255, 255, 255);
@@ -129,7 +178,6 @@ async function exportPDF(result: ResultData, pkg: { name: string; price: number 
   doc.text("Cost Breakdown", 14, y);
   y += 6;
 
-  // cost col headers
   doc.setFillColor(...navy);
   doc.rect(14, y, W - 28, 8, "F");
   doc.setTextColor(255, 255, 255);
@@ -165,49 +213,179 @@ async function exportPDF(result: ResultData, pkg: { name: string; price: number 
   doc.text(`Rs. ${result.total.toLocaleString("en-IN")}`, C4, y + 7, { align: "right" });
   y += 19;
 
-  // Disclaimer
+  // Disclaimer on page 1
   doc.setFontSize(7.5);
   doc.setFont("helvetica", "italic");
   doc.setTextColor(150, 150, 150);
   doc.text("Disclaimer: This is an approximate estimate based on standard construction rates in Pune, Maharashtra. Actual costs may vary", 14, y);
   doc.text("depending on site conditions, material choices, design complexity, and current market rates. Contact us for an accurate quotation.", 14, y + 4);
 
-  doc.save(`OneO_Buildcon_Estimate_${Date.now()}.pdf`);
+  drawFooter(1);
+
+  // ════════════════════════════════
+  // PAGE 2+ — Package Inclusions
+  // ════════════════════════════════
+  const pkgCategories = pkgContent[pkg.id] ?? {};
+  let pageNum = 2;
+
+  doc.addPage();
+
+  function drawInclusionsHeader() {
+    doc.setFillColor(...navy);
+    doc.rect(0, 0, W, 28, "F");
+    doc.setTextColor(245, 158, 11);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Package Inclusions - ${pkg.name}`, 14, 13);
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(255, 255, 255);
+    doc.text(`ONE O BUILDCON  |  Quotation: ${quotationNo}`, 14, 22);
+    doc.text(`Client: ${clientName || "—"}  |  ${projectLocation || "—"}`, W - 14, 22, { align: "right" });
+  }
+
+  drawInclusionsHeader();
+  let py = 38;
+
+  cats.forEach((cat) => {
+    const items: string[] = pkgCategories[cat.id] ?? [];
+    const neededSpace = 10 + items.length * 6.5 + 5;
+
+    if (py + neededSpace > 272) {
+      drawFooter(pageNum);
+      pageNum++;
+      doc.addPage();
+      drawInclusionsHeader();
+      py = 38;
+    }
+
+    // Category header (navy background, white text)
+    doc.setFillColor(...navy);
+    doc.rect(14, py, W - 28, 9, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9.5);
+    doc.setFont("helvetica", "bold");
+    doc.text(cat.name.toUpperCase(), C1, py + 6);
+    py += 9;
+
+    // Items
+    items.forEach((item, idx) => {
+      if (py > 272) {
+        drawFooter(pageNum);
+        pageNum++;
+        doc.addPage();
+        drawInclusionsHeader();
+        py = 38;
+      }
+      doc.setFillColor(idx % 2 === 0 ? 255 : 248, idx % 2 === 0 ? 255 : 249, idx % 2 === 0 ? 255 : 250);
+      doc.rect(14, py, W - 28, 6.5, "F");
+      doc.setTextColor(...navy);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.text("*  " + item, C1, py + 4.5);
+      py += 6.5;
+    });
+
+    py += 5;
+  });
+
+  // Final disclaimer at end
+  if (py + 20 > 272) {
+    drawFooter(pageNum);
+    pageNum++;
+    doc.addPage();
+    drawInclusionsHeader();
+    py = 38;
+  }
+  py += 4;
+  doc.setFontSize(7.5);
+  doc.setFont("helvetica", "italic");
+  doc.setTextColor(150, 150, 150);
+  doc.text("Disclaimer: Package inclusions are indicative. Exact specifications may be discussed and finalised during project consultation.", 14, py);
+  doc.text("One O Buildcon reserves the right to substitute equivalent materials without affecting quality standards.", 14, py + 4);
+
+  drawFooter(pageNum);
+
+  doc.save(`OneO_Buildcon_Quotation_${quotationNo}.pdf`);
 }
 
-async function exportExcel(result: ResultData, pkg: { name: string; price: number }, upperFloors: number, parking: boolean, gst: boolean) {
+async function exportExcel(
+  result: ResultData,
+  pkg: { id: string; name: string; price: number },
+  upperFloors: number,
+  parking: boolean,
+  gst: boolean,
+  clientName: string,
+  projectLocation: string,
+  pkgContent: PackageContent,
+  cats: CategoryMeta[],
+) {
   const XLSX = await import("xlsx");
   const wb = XLSX.utils.book_new();
-
+  const quotationNo = `QT-${Date.now()}`;
   const date = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 
-  const areaRows = [
-    ["ONE O BUILDCON — Construction Cost Estimate"],
+  // Sheet 1: Cost Estimate
+  const areaRows: (string | number)[][] = [
+    ["ONE O BUILDCON — Construction Cost Quotation"],
+    [`Quotation No: ${quotationNo}`],
     [`Date: ${date}`],
-    [`Package: ${pkg.name} @ ₹${pkg.price}/sqft (excl. GST)`],
-    [`Configuration: ${upperFloors === 0 ? "G" : `G+${upperFloors}`} | Ground Floor: ${parking ? "Parking" : "House"}`],
+    [],
+    ["CLIENT DETAILS"],
+    ["Client Name:", clientName || "—"],
+    ["Project Location:", projectLocation || "—"],
+    [],
+    ["PROJECT DETAILS"],
+    ["Package:", `${pkg.name} @ Rs.${pkg.price}/sqft (excl. GST)`],
+    ["Configuration:", `${upperFloors === 0 ? "G" : `G+${upperFloors}`} | Ground Floor: ${parking ? "Parking" : "House"}`],
     [],
     ["BUILT-UP AREA BREAKDOWN"],
     ["Floor / Component", "Slab Area (sqft)", "% Applied", "Built-up Area (sqft)"],
     [`Plinth (Ground slab)`, result.plinthSlab, "50%", result.plinthArea],
-    ...result.rows.map((r, i) => [r.label, r.slab, i === 0 && parking ? "50%" : "100%", r.builtUp]),
+    ...result.rows.map((r, i): (string | number)[] => [r.label, r.slab, i === 0 && parking ? "50%" : "100%", r.builtUp]),
     [`Terrace (Highest slab)`, result.topSlab, "35%", result.terraceArea],
     ["TOTAL BUILT-UP AREA", "", "", result.totalArea],
     [],
     ["COST BREAKDOWN"],
-    ["Description", "", "", "Amount (₹)"],
-    [`Construction Cost (${result.totalArea.toLocaleString()} sqft × ₹${pkg.price})`, "", "", result.base],
-    ...(gst ? [["GST @ 18%", "", "", result.gstAmount]] : []),
+    ["Description", "", "", "Amount (Rs.)"],
+    [`Construction Cost (${result.totalArea.toLocaleString()} sqft x Rs.${pkg.price})`, "", "", result.base],
+    ...(gst ? [["GST @ 18%", "", "", result.gstAmount] as (string | number)[]] : []),
     ["TOTAL ESTIMATED COST", "", "", result.total],
     [],
     ["Disclaimer: This is an approximate estimate. Contact One O Buildcon for an accurate site-specific quotation."],
     ["Phone: +91 88060 29907 | Email: oneobuildcon@gmail.com | Pune, Maharashtra"],
   ];
 
-  const ws = XLSX.utils.aoa_to_sheet(areaRows);
-  ws["!cols"] = [{ wch: 45 }, { wch: 18 }, { wch: 12 }, { wch: 22 }];
-  XLSX.utils.book_append_sheet(wb, ws, "Estimate");
-  XLSX.writeFile(wb, `OneO_Buildcon_Estimate_${Date.now()}.xlsx`);
+  const ws1 = XLSX.utils.aoa_to_sheet(areaRows);
+  ws1["!cols"] = [{ wch: 45 }, { wch: 18 }, { wch: 12 }, { wch: 22 }];
+  XLSX.utils.book_append_sheet(wb, ws1, "Cost Estimate");
+
+  // Sheet 2: Package Details
+  const pkgCategories = pkgContent[pkg.id] ?? {};
+  const detailRows: (string | number)[][] = [
+    [`Package Inclusions - ${pkg.name}`],
+    [`Quotation No: ${quotationNo}  |  Date: ${date}`],
+    [`Client: ${clientName || "—"}  |  Location: ${projectLocation || "—"}`],
+    [],
+  ];
+
+  cats.forEach((cat) => {
+    const items: string[] = pkgCategories[cat.id] ?? [];
+    detailRows.push([cat.name.toUpperCase()]);
+    items.forEach((item) => {
+      detailRows.push(["", `* ${item}`]);
+    });
+    detailRows.push([]);
+  });
+
+  detailRows.push(["Disclaimer: Package inclusions are indicative. Exact specifications may be finalised during project consultation."]);
+  detailRows.push(["One O Buildcon | +91 88060 29907 | oneobuildcon@gmail.com | Pune, Maharashtra"]);
+
+  const ws2 = XLSX.utils.aoa_to_sheet(detailRows);
+  ws2["!cols"] = [{ wch: 30 }, { wch: 70 }];
+  XLSX.utils.book_append_sheet(wb, ws2, "Package Details");
+
+  XLSX.writeFile(wb, `OneO_Buildcon_Quotation_${quotationNo}.xlsx`);
 }
 
 function buildFloorRows(upperFloors: number, parking: boolean): FloorRow[] {
@@ -226,12 +404,33 @@ export default function CalculatorPage() {
   const [parking, setParking] = useState(false);
   const [gst, setGst] = useState(true);
   const [floorRows, setFloorRows] = useState<FloorRow[]>(buildFloorRows(0, false));
-  const [result, setResult] = useState<null | {
-    rows: { label: string; slab: number; builtUp: number }[];
-    plinthSlab: number; topSlab: number; plinthArea: number;
-    terraceArea: number; totalArea: number;
-    base: number; gstAmount: number; total: number;
-  }>(null);
+  const [clientName, setClientName] = useState("");
+  const [projectLocation, setProjectLocation] = useState("");
+  const [pkgContent, setPkgContent] = useState<PackageContent>(defaultPackageContent);
+  const [cats, setCats] = useState<CategoryMeta[]>(defaultCategories);
+  const [result, setResult] = useState<null | ResultData>(null);
+
+  // Load package content and categories from localStorage on mount
+  useEffect(() => {
+    try {
+      const storedContent = localStorage.getItem("oneo_packages_content");
+      if (storedContent) {
+        const parsed = JSON.parse(storedContent) as PackageContent;
+        setPkgContent(parsed);
+      }
+    } catch {
+      // fallback to default already set
+    }
+    try {
+      const storedCats = localStorage.getItem("oneo_categories_meta");
+      if (storedCats) {
+        const parsed = JSON.parse(storedCats) as CategoryMeta[];
+        setCats(parsed);
+      }
+    } catch {
+      // fallback to default already set
+    }
+  }, []);
 
   // Rebuild floor rows when floor count or parking changes, preserve existing slab values
   useEffect(() => {
@@ -318,6 +517,33 @@ export default function CalculatorPage() {
 
             {/* LEFT — Inputs */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="space-y-6">
+
+              {/* Client Details */}
+              <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
+                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Client Details</label>
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-navy">Client Name</label>
+                    <input
+                      type="text"
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
+                      placeholder="e.g. Rajesh Sharma"
+                      className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-navy">Project Location</label>
+                    <input
+                      type="text"
+                      value={projectLocation}
+                      onChange={(e) => setProjectLocation(e.target.value)}
+                      placeholder="e.g. Kothrud, Pune"
+                      className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                    />
+                  </div>
+                </div>
+              </motion.div>
 
               {/* Package selector */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
@@ -460,14 +686,14 @@ export default function CalculatorPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => exportPDF(result, selectedPkg, upperFloors, parking, gst)}
+                        onClick={() => exportPDF(result, selectedPkg, upperFloors, parking, gst, clientName, projectLocation, pkgContent, cats)}
                         className="flex items-center justify-center gap-2 rounded-xl bg-navy py-3 font-semibold text-white hover:bg-navy/90 transition text-sm"
                       >
                         <FileText className="h-4 w-4" /> Download PDF
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => exportExcel(result, selectedPkg, upperFloors, parking, gst)}
+                        onClick={() => exportExcel(result, selectedPkg, upperFloors, parking, gst, clientName, projectLocation, pkgContent, cats)}
                         className="flex items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 transition text-sm"
                       >
                         <FileSpreadsheet className="h-4 w-4" /> Download Excel
