@@ -67,7 +67,7 @@ async function exportPDF(result: ResultData, pkg: { name: string; price: number 
   doc.text("Project Summary", 20, 51);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.text(`Package: ${pkg.name}  |  Rate: ₹${pkg.price}/sqft (excl. GST)  |  Configuration: ${upperFloors === 0 ? "G" : `G+${upperFloors}`}  |  Ground: ${parking ? "Parking" : "House"}`, 20, 59);
+  doc.text(`Package: ${pkg.name}  |  Rate: Rs.${pkg.price}/sqft (excl. GST)  |  Config: ${upperFloors === 0 ? "G" : `G+${upperFloors}`}  |  Ground: ${parking ? "Parking" : "House"}`, 20, 59);
   doc.text(`Contact: +91 88060 29907  |  oneobuildcon@gmail.com  |  Pune, Maharashtra`, 20, 65);
 
   // Area breakdown table
@@ -78,16 +78,19 @@ async function exportPDF(result: ResultData, pkg: { name: string; price: number 
   doc.text("Built-up Area Breakdown", 14, y);
   y += 6;
 
+  // col x positions
+  const C1 = 18, C2 = 118, C3 = 152, C4 = 196;
+
   // Table header
   doc.setFillColor(...navy);
   doc.rect(14, y, W - 28, 8, "F");
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setFont("helvetica", "bold");
-  doc.text("Floor / Component", 18, y + 5.5);
-  doc.text("Slab Area (sqft)", 100, y + 5.5);
-  doc.text("% Applied", 140, y + 5.5);
-  doc.text("Built-up Area (sqft)", 168, y + 5.5, { align: "right" });
+  doc.text("Floor / Component", C1, y + 5.5);
+  doc.text("Slab Area (sqft)", C2, y + 5.5, { align: "right" });
+  doc.text("% Applied", C3, y + 5.5, { align: "right" });
+  doc.text("Built-up Area (sqft)", C4, y + 5.5, { align: "right" });
   y += 8;
 
   const tableRows = [
@@ -101,11 +104,11 @@ async function exportPDF(result: ResultData, pkg: { name: string; price: number 
     doc.rect(14, y, W - 28, 7, "F");
     doc.setTextColor(...navy);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.text(row.label, 18, y + 4.8);
-    doc.text(row.slab.toLocaleString(), 100, y + 4.8);
-    doc.text(row.pct, 140, y + 4.8);
-    doc.text(row.builtUp.toLocaleString(), 196, y + 4.8, { align: "right" });
+    doc.setFontSize(8.5);
+    doc.text(row.label, C1, y + 4.8);
+    doc.text(row.slab.toLocaleString(), C2, y + 4.8, { align: "right" });
+    doc.text(row.pct, C3, y + 4.8, { align: "right" });
+    doc.text(row.builtUp.toLocaleString(), C4, y + 4.8, { align: "right" });
     y += 7;
   });
 
@@ -115,8 +118,8 @@ async function exportPDF(result: ResultData, pkg: { name: string; price: number 
   doc.setTextColor(...navy);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
-  doc.text("Total Built-up Area", 18, y + 5.5);
-  doc.text(result.totalArea.toLocaleString(), 196, y + 5.5, { align: "right" });
+  doc.text("Total Built-up Area", C1, y + 5.5);
+  doc.text(`${result.totalArea.toLocaleString()} sqft`, C4, y + 5.5, { align: "right" });
   y += 16;
 
   // Cost breakdown
@@ -126,31 +129,41 @@ async function exportPDF(result: ResultData, pkg: { name: string; price: number 
   doc.text("Cost Breakdown", 14, y);
   y += 6;
 
+  // cost col headers
+  doc.setFillColor(...navy);
+  doc.rect(14, y, W - 28, 8, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Description", C1, y + 5.5);
+  doc.text("Amount (INR)", C4, y + 5.5, { align: "right" });
+  y += 8;
+
   const costRows = [
-    { label: `Construction Cost (${result.totalArea.toLocaleString()} sqft × ₹${pkg.price})`, value: `₹${result.base.toLocaleString("en-IN")}` },
-    ...(gst ? [{ label: "GST @ 18%", value: `₹${result.gstAmount.toLocaleString("en-IN")}` }] : []),
+    { label: `Construction Cost (${result.totalArea.toLocaleString()} sqft x Rs.${pkg.price}/sqft)`, value: `Rs. ${result.base.toLocaleString("en-IN")}` },
+    ...(gst ? [{ label: "GST @ 18%", value: `Rs. ${result.gstAmount.toLocaleString("en-IN")}` }] : []),
   ];
 
   costRows.forEach((row, idx) => {
     doc.setFillColor(idx % 2 === 0 ? 255 : 248, idx % 2 === 0 ? 255 : 249, idx % 2 === 0 ? 255 : 250);
     doc.rect(14, y, W - 28, 7, "F");
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
+    doc.setFontSize(8.5);
     doc.setTextColor(...navy);
-    doc.text(row.label, 18, y + 4.8);
-    doc.text(row.value, 196, y + 4.8, { align: "right" });
+    doc.text(row.label, C1, y + 4.8);
+    doc.text(row.value, C4, y + 4.8, { align: "right" });
     y += 7;
   });
 
   // Total cost
   doc.setFillColor(...navy);
-  doc.rect(14, y, W - 28, 10, "F");
+  doc.rect(14, y, W - 28, 11, "F");
   doc.setTextColor(...amber);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("TOTAL ESTIMATED COST", 18, y + 6.8);
-  doc.text(`₹${result.total.toLocaleString("en-IN")}`, 196, y + 6.8, { align: "right" });
-  y += 18;
+  doc.text("TOTAL ESTIMATED COST", C1, y + 7);
+  doc.text(`Rs. ${result.total.toLocaleString("en-IN")}`, C4, y + 7, { align: "right" });
+  y += 19;
 
   // Disclaimer
   doc.setFontSize(7.5);
@@ -351,18 +364,18 @@ export default function CalculatorPage() {
               {/* Per-floor slab inputs */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
                 <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1">Slab Area per Floor (sq ft)</label>
-                <p className="text-xs text-navy/40 mb-4">Plinth &amp; Terrace will use the largest slab area automatically.</p>
+                <p className="text-xs text-navy/40 mb-4">Plinth &amp; Terrace calculated from the largest slab area automatically.</p>
                 <div className="space-y-3">
                   {floorRows.map((row, i) => (
-                    <div key={row.id} className="flex items-center gap-3">
-                      <span className="w-44 shrink-0 text-sm font-medium text-navy">{row.label}</span>
+                    <div key={row.id} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
+                      <span className="text-sm font-medium text-navy sm:w-44 sm:shrink-0">{row.label}</span>
                       <input
                         type="number"
                         value={row.slab}
                         onChange={(e) => updateSlab(i, e.target.value)}
-                        placeholder="sqft"
+                        placeholder="Enter sqft"
                         min={0}
-                        className="flex-1 rounded-xl border border-black/15 px-3 py-2 text-base font-bold text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                        className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base font-bold text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
                       />
                     </div>
                   ))}
