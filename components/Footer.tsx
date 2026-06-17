@@ -28,8 +28,9 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10 px-6 py-4 text-center text-xs">
-        © {new Date().getFullYear()} One O Buildcon. All rights reserved.
+      <div className="border-t border-white/10 px-6 py-4 text-center text-xs flex items-center justify-center gap-4">
+        <span>© {new Date().getFullYear()} One O Buildcon. All rights reserved.</span>
+        <a href="/admin" className="text-white/20 hover:text-white/40 transition text-xs">Admin</a>
       </div>
     </footer>
   );
