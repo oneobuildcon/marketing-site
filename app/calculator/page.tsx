@@ -21,15 +21,17 @@ const packages = [
   { id: "luxury",    name: "Luxury",         price: 2499, color: "border-yellow-300 bg-yellow-50", badge: "bg-yellow-100 text-yellow-700" },
 ];
 
-const floors = [
-  { id: "g",  label: "Ground (G)",   multiplier: 1 },
-  { id: "g1", label: "G + 1 Floor",  multiplier: 1.9 },
-  { id: "g2", label: "G + 2 Floors", multiplier: 2.75 },
-  { id: "g3", label: "G + 3 Floors", multiplier: 3.6 },
-  { id: "g4", label: "G + 4 Floors", multiplier: 4.4 },
-  { id: "g5", label: "G + 5 Floors", multiplier: 5.2 },
-  { id: "g6", label: "G + 6 Floors", multiplier: 6.0 },
-];
+const upperFloorOptions = [0, 1, 2, 3, 4, 5, 6];
+
+// Total built-up area factor (× slab area):
+// Plinth (always 0.50) + Ground (0.50 parking / 1.00 house) + upper floors (1.00 each) + Terrace (always 0.35)
+function totalAreaFactor(upperFloors: number, parking: boolean) {
+  const plinth = 0.50;
+  const ground = parking ? 0.50 : 1.00;
+  const upper = upperFloors * 1.00;
+  const terrace = 0.35;
+  return plinth + ground + upper + terrace;
+}
 
 
 function formatINR(num: number) {
@@ -41,26 +43,33 @@ function formatINR(num: number) {
 export default function CalculatorPage() {
   const [sqft, setSqft] = useState<string>("");
   const [selectedPkg, setSelectedPkg] = useState(packages[1]);
-  const [selectedFloor, setSelectedFloor] = useState(floors[0]);
+  const [upperFloors, setUpperFloors] = useState(0);
+  const [parking, setParking] = useState(false);
   const [gst, setGst] = useState(true);
   const [result, setResult] = useState<null | {
-    base: number; gstAmount: number; total: number;
+    totalArea: number; base: number; gstAmount: number; total: number;
+    plinthArea: number; groundArea: number; upperArea: number; terraceArea: number;
   }>(null);
 
   function calculate() {
-    const area = parseFloat(sqft);
-    if (!area || area <= 0) return;
-    const base = Math.round(area * selectedPkg.price * selectedFloor.multiplier);
+    const slab = parseFloat(sqft);
+    if (!slab || slab <= 0) return;
+    const factor = totalAreaFactor(upperFloors, parking);
+    const plinthArea  = Math.round(slab * 0.50);
+    const groundArea  = Math.round(slab * (parking ? 0.50 : 1.00));
+    const upperArea   = Math.round(slab * upperFloors);
+    const terraceArea = Math.round(slab * 0.35);
+    const totalArea   = Math.round(slab * factor);
+    const base = Math.round(totalArea * selectedPkg.price);
     const gstAmount = gst ? Math.round(base * 0.18) : 0;
     const total = base + gstAmount;
-    setResult({ base, gstAmount, total });
+    setResult({ totalArea, base, gstAmount, total, plinthArea, groundArea, upperArea, terraceArea });
   }
 
-  // Auto-recalculate when inputs change
   useEffect(() => {
     if (sqft && parseFloat(sqft) > 0) calculate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sqft, selectedPkg, selectedFloor, gst]);
+  }, [sqft, selectedPkg, upperFloors, parking, gst]);
 
   const sqftNum = parseFloat(sqft) || 0;
 
@@ -158,21 +167,40 @@ export default function CalculatorPage() {
                 </div>
               </motion.div>
 
-              {/* Floor selector */}
+              {/* Ground floor type */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
-                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Number of Floors</label>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Ground Floor Usage</label>
                 <div className="grid grid-cols-2 gap-3">
-                  {floors.map((f) => (
+                  {[{ label: "House / Residential", value: false }, { label: "Parking", value: true }].map((opt) => (
                     <motion.button
-                      key={f.id}
-                      onClick={() => setSelectedFloor(f)}
+                      key={String(opt.value)}
+                      onClick={() => setParking(opt.value)}
                       whileHover={{ scale: 1.02 }}
-                      className={`rounded-xl border-2 p-3 text-left transition-all ${selectedFloor.id === f.id ? "border-amber bg-amber/10 shadow-md" : "border-black/10 bg-gray-50 hover:border-amber/40"}`}
+                      className={`rounded-xl border-2 p-3 text-center transition-all ${parking === opt.value ? "border-amber bg-amber/10 shadow-md" : "border-black/10 bg-gray-50 hover:border-amber/40"}`}
                     >
-                      <p className="font-semibold text-sm text-navy">{f.label}</p>
+                      <p className="font-semibold text-sm text-navy">{opt.label}</p>
+                      <p className="text-[11px] text-navy/40 mt-0.5">{opt.value ? "50% of slab" : "100% of slab"}</p>
                     </motion.button>
                   ))}
                 </div>
+              </motion.div>
+
+              {/* Upper floors selector */}
+              <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
+                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Upper Floors (above Ground)</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {upperFloorOptions.map((n) => (
+                    <motion.button
+                      key={n}
+                      onClick={() => setUpperFloors(n)}
+                      whileHover={{ scale: 1.04 }}
+                      className={`rounded-xl border-2 py-3 text-center font-bold transition-all ${upperFloors === n ? "border-amber bg-amber/10 shadow-md text-navy" : "border-black/10 bg-gray-50 text-navy/60 hover:border-amber/40"}`}
+                    >
+                      {n === 0 ? "G" : `+${n}`}
+                    </motion.button>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-navy/40">G = Ground only · +1 = G+1 floor · etc.</p>
               </motion.div>
 
               {/* GST toggle */}
@@ -201,7 +229,7 @@ export default function CalculatorPage() {
                     <div className="rounded-2xl bg-navy text-white shadow-xl overflow-hidden">
                       <div className="bg-amber/20 px-6 py-4 border-b border-white/10">
                         <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">Your Estimate</p>
-                        <p className="text-sm text-white/60 mt-0.5">{sqftNum.toLocaleString()} sqft · {selectedPkg.name} · {selectedFloor.label}</p>
+                        <p className="text-sm text-white/60 mt-0.5">{sqftNum.toLocaleString()} sqft slab · {selectedPkg.name} · {upperFloors === 0 ? "G" : `G+${upperFloors}`} · {parking ? "Parking" : "House"}</p>
                       </div>
                       <div className="px-6 py-6">
                         <motion.p
@@ -214,13 +242,24 @@ export default function CalculatorPage() {
                         </motion.p>
                         <p className="text-white/50 text-sm mt-1">Total estimated cost {gst ? "(incl. 18% GST)" : "(excl. GST)"}</p>
 
-                        <div className="mt-6 space-y-3">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-white/60">Base construction cost</span>
+                        {/* Area breakdown */}
+                        <div className="mt-5 rounded-xl bg-white/5 border border-white/10 p-4 space-y-1.5 text-xs">
+                          <p className="text-white/40 font-semibold uppercase tracking-widest mb-2">Built-up Area Breakdown</p>
+                          <div className="flex justify-between"><span className="text-white/60">Plinth (50%)</span><span>{result.plinthArea.toLocaleString()} sqft</span></div>
+                          <div className="flex justify-between"><span className="text-white/60">Ground Floor ({parking ? "Parking 50%" : "House 100%"})</span><span>{result.groundArea.toLocaleString()} sqft</span></div>
+                          {upperFloors > 0 && <div className="flex justify-between"><span className="text-white/60">Upper Floors (×{upperFloors} @ 100%)</span><span>{result.upperArea.toLocaleString()} sqft</span></div>}
+                          <div className="flex justify-between"><span className="text-white/60">Terrace (35%)</span><span>{result.terraceArea.toLocaleString()} sqft</span></div>
+                          <div className="h-px bg-white/10 my-1" />
+                          <div className="flex justify-between font-bold"><span>Total Built-up Area</span><span className="text-amber">{result.totalArea.toLocaleString()} sqft</span></div>
+                        </div>
+
+                        <div className="mt-4 space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-white/60">Construction cost ({result.totalArea.toLocaleString()} × ₹{selectedPkg.price})</span>
                             <span className="font-semibold">{formatINR(result.base)}</span>
                           </div>
                           {gst && (
-                            <div className="flex justify-between text-sm">
+                            <div className="flex justify-between">
                               <span className="text-white/60">GST (18%)</span>
                               <span className="font-semibold">+{formatINR(result.gstAmount)}</span>
                             </div>
