@@ -476,14 +476,8 @@ export default function CalculatorPage() {
       existing.push(leadData);
       localStorage.setItem("oneo_leads", JSON.stringify(existing));
     } catch {}
-    // Also save to Google Sheet if configured
+    // Save lead to Google Sheet + email owner (via Apps Script)
     fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(leadData) }).catch(() => {});
-
-    // Notify owner on WhatsApp
-    const msg = encodeURIComponent(
-      `*New Lead*\n\nName: ${leadData.name}\nPhone: ${leadData.phone}\nPackage: ${selectedPkg.name} (Rs.${selectedPkg.price}/sqft)\nConfig: ${leadData.config} | Ground: ${leadData.ground}\nTotal Area: ${result.totalArea.toLocaleString()} sqft\nEstimated Cost: ${formatINR(result.total)}${gst ? " (incl. GST)" : ""}\nLocation: ${leadData.location || "Not specified"}`
-    );
-    window.open(`https://wa.me/918806029907?text=${msg}`, "_blank");
 
     // Download file
     if (leadModal === "pdf") {
