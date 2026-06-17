@@ -1,4 +1,4 @@
-export type PackageId = "structure" | "basic" | "standard" | "premium" | "royal" | "luxury";
+export type PackageId = string;
 export type CategoryId =
   | "designs"
   | "earthwork"
