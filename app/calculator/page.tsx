@@ -409,6 +409,10 @@ export default function CalculatorPage() {
   const [pkgContent, setPkgContent] = useState<PackageContent>(defaultPackageContent);
   const [cats, setCats] = useState<CategoryMeta[]>(defaultCategories);
   const [result, setResult] = useState<null | ResultData>(null);
+  const [leadModal, setLeadModal] = useState<null | "pdf" | "excel">(null);
+  const [leadName, setLeadName] = useState("");
+  const [leadPhone, setLeadPhone] = useState("");
+  const [leadError, setLeadError] = useState("");
 
   // Load package content and categories from localStorage on mount
   useEffect(() => {
@@ -439,6 +443,32 @@ export default function CalculatorPage() {
       return newRows.map((r, i) => ({ ...r, slab: prev[i]?.slab ?? "" }));
     });
   }, [upperFloors, parking]);
+
+  function handleLeadSubmit() {
+    const phone = leadPhone.replace(/\D/g, "");
+    if (!leadName.trim()) { setLeadError("Please enter your name."); return; }
+    if (phone.length < 10) { setLeadError("Please enter a valid 10-digit WhatsApp number."); return; }
+    setLeadError("");
+
+    if (!result) return;
+    const msg = encodeURIComponent(
+      `*New Quotation Lead*\n\nName: ${leadName.trim()}\nWhatsApp: +91 ${leadPhone.trim()}\nPackage: ${selectedPkg.name} (Rs.${selectedPkg.price}/sqft)\nConfig: ${upperFloors === 0 ? "G" : `G+${upperFloors}`} | Ground: ${parking ? "Parking" : "House"}\nTotal Built-up: ${result.totalArea.toLocaleString()} sqft\nEstimated Cost: ${formatINR(result.total)}${gst ? " (incl. GST)" : ""}\nProject Location: ${projectLocation || "Not specified"}`
+    );
+
+    // trigger file download
+    if (leadModal === "pdf") {
+      exportPDF(result, selectedPkg, upperFloors, parking, gst, clientName || leadName, projectLocation, pkgContent, cats);
+    } else {
+      exportExcel(result, selectedPkg, upperFloors, parking, gst, clientName || leadName, projectLocation, pkgContent, cats);
+    }
+
+    // notify owner on WhatsApp
+    window.open(`https://wa.me/918806029907?text=${msg}`, "_blank");
+
+    setLeadModal(null);
+    setLeadName("");
+    setLeadPhone("");
+  }
 
   function updateSlab(index: number, value: string) {
     setFloorRows((prev) => prev.map((r, i) => i === index ? { ...r, slab: value } : r));
@@ -686,14 +716,14 @@ export default function CalculatorPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => exportPDF(result, selectedPkg, upperFloors, parking, gst, clientName, projectLocation, pkgContent, cats)}
+                        onClick={() => setLeadModal("pdf")}
                         className="flex items-center justify-center gap-2 rounded-xl bg-navy py-3 font-semibold text-white hover:bg-navy/90 transition text-sm"
                       >
                         <FileText className="h-4 w-4" /> Download PDF
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => exportExcel(result, selectedPkg, upperFloors, parking, gst, clientName, projectLocation, pkgContent, cats)}
+                        onClick={() => setLeadModal("excel")}
                         className="flex items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 transition text-sm"
                       >
                         <FileSpreadsheet className="h-4 w-4" /> Download Excel
@@ -732,6 +762,75 @@ export default function CalculatorPage() {
           </div>
         </div>
       </section>
+
+      {/* Lead capture modal */}
+      <AnimatePresence>
+        {leadModal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+            onClick={() => setLeadModal(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden"
+            >
+              {/* Modal header */}
+              <div className="bg-navy px-6 py-5">
+                <p className="text-xs font-semibold uppercase tracking-widest text-amber mb-1">Almost there!</p>
+                <h3 className="text-xl font-bold text-white">Enter your details to download</h3>
+                <p className="text-white/60 text-sm mt-1">We&apos;ll send you the quotation and our team will follow up.</p>
+              </div>
+
+              {/* Modal body */}
+              <div className="px-6 py-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1.5">Your Name *</label>
+                  <input
+                    type="text"
+                    value={leadName}
+                    onChange={(e) => setLeadName(e.target.value)}
+                    placeholder="e.g. Rahul Sharma"
+                    className="w-full rounded-xl border border-black/15 px-4 py-3 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1.5">WhatsApp Number *</label>
+                  <div className="flex gap-2">
+                    <span className="flex items-center rounded-xl border border-black/15 px-3 text-navy/60 font-medium text-sm bg-gray-50">+91</span>
+                    <input
+                      type="tel"
+                      value={leadPhone}
+                      onChange={(e) => setLeadPhone(e.target.value)}
+                      placeholder="98765 43210"
+                      maxLength={10}
+                      className="flex-1 rounded-xl border border-black/15 px-4 py-3 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                    />
+                  </div>
+                </div>
+                {leadError && <p className="text-red-500 text-xs font-medium">{leadError}</p>}
+
+                <div className="flex gap-3 pt-1">
+                  <button onClick={() => setLeadModal(null)}
+                    className="flex-1 rounded-xl border-2 border-black/10 py-3 text-sm font-semibold text-navy/60 hover:border-navy/30 transition">
+                    Cancel
+                  </button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                    onClick={handleLeadSubmit}
+                    className="flex-1 rounded-xl bg-amber py-3 text-sm font-bold text-navy-dark hover:bg-amber/90 transition"
+                  >
+                    Download {leadModal === "pdf" ? "PDF" : "Excel"} →
+                  </motion.button>
+                </div>
+                <p className="text-center text-xs text-navy/30">Your details are only used to follow up on your enquiry.</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Disclaimer */}
       <section className="bg-white py-8 border-t border-black/5">
