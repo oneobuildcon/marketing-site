@@ -140,16 +140,6 @@ const tools = [
   },
 ];
 
-const brands = [
-  { name: "UltraTech Cement", color: "#003087" },
-  { name: "JSW Steel", color: "#cc0000" },
-  { name: "Asian Paints", color: "#e31837" },
-  { name: "Kajaria Tiles", color: "#1a1a2e" },
-  { name: "Havells", color: "#e31837" },
-  { name: "Pidilite", color: "#003087" },
-  { name: "Fenesta", color: "#2c5f2e" },
-  { name: "Somany", color: "#c8a951" },
-];
 
 const projects = [
   { name: "Premium Bungalow", img: "https://picsum.photos/seed/proj1/400/300" },
@@ -366,26 +356,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trusted Brands */}
-      <section className="bg-white py-14">
-        <div className="mx-auto max-w-6xl px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-10">
-            <p className="text-xs font-semibold uppercase tracking-widest text-amber">Quality You Can Trust</p>
-            <h2 className="mt-2 text-3xl font-bold text-navy">Brands & Materials We Use</h2>
-            <p className="mt-2 text-navy/60 text-sm">We source only from India&apos;s most trusted construction material brands.</p>
-          </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
-            {brands.map((brand) => (
-              <motion.div key={brand.name} variants={fadeUp} whileHover={{ scale: 1.05, y: -2 }} className="flex items-center justify-center rounded-xl border border-black/8 px-3 py-4 shadow-sm hover:shadow-md hover:border-amber/40 transition-all">
-                <div className="text-center">
-                  <div className="h-2 w-8 rounded-full mx-auto mb-2" style={{ backgroundColor: brand.color }} />
-                  <p className="text-xs font-semibold text-navy/80 leading-tight">{brand.name}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
 
       <section className="bg-white py-20">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 lg:grid-cols-2 items-center">
