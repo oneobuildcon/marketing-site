@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { HardHat, Calculator, Phone, ArrowRight, Info } from "lucide-react";
+import { HardHat, Calculator, Phone, ArrowRight, Info, FileText, FileSpreadsheet } from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -30,6 +30,172 @@ function formatINR(num: number) {
 }
 
 type FloorRow = { id: string; label: string; slab: string };
+
+type ResultData = {
+  rows: { label: string; slab: number; builtUp: number }[];
+  plinthSlab: number; topSlab: number; plinthArea: number;
+  terraceArea: number; totalArea: number;
+  base: number; gstAmount: number; total: number;
+};
+
+async function exportPDF(result: ResultData, pkg: { name: string; price: number }, upperFloors: number, parking: boolean, gst: boolean) {
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const navy = [13, 27, 62] as const;
+  const amber = [245, 158, 11] as const;
+  const W = 210;
+
+  // Header bar
+  doc.setFillColor(...navy);
+  doc.rect(0, 0, W, 36, "F");
+  doc.setTextColor(245, 158, 11);
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.text("ONE O BUILDCON", 14, 16);
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(255, 255, 255);
+  doc.text("Construction Cost Estimate", 14, 24);
+  doc.text(`Generated: ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}`, 14, 30);
+
+  // Project summary box
+  doc.setFillColor(249, 250, 251);
+  doc.roundedRect(14, 42, W - 28, 28, 3, 3, "F");
+  doc.setTextColor(...navy);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.text("Project Summary", 20, 51);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text(`Package: ${pkg.name}  |  Rate: ₹${pkg.price}/sqft (excl. GST)  |  Configuration: ${upperFloors === 0 ? "G" : `G+${upperFloors}`}  |  Ground: ${parking ? "Parking" : "House"}`, 20, 59);
+  doc.text(`Contact: +91 88060 29907  |  oneobuildcon@gmail.com  |  Pune, Maharashtra`, 20, 65);
+
+  // Area breakdown table
+  let y = 82;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...navy);
+  doc.text("Built-up Area Breakdown", 14, y);
+  y += 6;
+
+  // Table header
+  doc.setFillColor(...navy);
+  doc.rect(14, y, W - 28, 8, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "bold");
+  doc.text("Floor / Component", 18, y + 5.5);
+  doc.text("Slab Area (sqft)", 100, y + 5.5);
+  doc.text("% Applied", 140, y + 5.5);
+  doc.text("Built-up Area (sqft)", 168, y + 5.5, { align: "right" });
+  y += 8;
+
+  const tableRows = [
+    { label: `Plinth (Ground slab: ${result.plinthSlab.toLocaleString()} sqft)`, slab: result.plinthSlab, pct: "50%", builtUp: result.plinthArea },
+    ...result.rows.map((r, i) => ({ label: r.label, slab: r.slab, pct: i === 0 && parking ? "50%" : "100%", builtUp: r.builtUp })),
+    { label: `Terrace (Highest slab: ${result.topSlab.toLocaleString()} sqft)`, slab: result.topSlab, pct: "35%", builtUp: result.terraceArea },
+  ];
+
+  tableRows.forEach((row, idx) => {
+    doc.setFillColor(idx % 2 === 0 ? 255 : 248, idx % 2 === 0 ? 255 : 249, idx % 2 === 0 ? 255 : 250);
+    doc.rect(14, y, W - 28, 7, "F");
+    doc.setTextColor(...navy);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text(row.label, 18, y + 4.8);
+    doc.text(row.slab.toLocaleString(), 100, y + 4.8);
+    doc.text(row.pct, 140, y + 4.8);
+    doc.text(row.builtUp.toLocaleString(), 196, y + 4.8, { align: "right" });
+    y += 7;
+  });
+
+  // Total row
+  doc.setFillColor(...amber);
+  doc.rect(14, y, W - 28, 8, "F");
+  doc.setTextColor(...navy);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text("Total Built-up Area", 18, y + 5.5);
+  doc.text(result.totalArea.toLocaleString(), 196, y + 5.5, { align: "right" });
+  y += 16;
+
+  // Cost breakdown
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...navy);
+  doc.text("Cost Breakdown", 14, y);
+  y += 6;
+
+  const costRows = [
+    { label: `Construction Cost (${result.totalArea.toLocaleString()} sqft × ₹${pkg.price})`, value: `₹${result.base.toLocaleString("en-IN")}` },
+    ...(gst ? [{ label: "GST @ 18%", value: `₹${result.gstAmount.toLocaleString("en-IN")}` }] : []),
+  ];
+
+  costRows.forEach((row, idx) => {
+    doc.setFillColor(idx % 2 === 0 ? 255 : 248, idx % 2 === 0 ? 255 : 249, idx % 2 === 0 ? 255 : 250);
+    doc.rect(14, y, W - 28, 7, "F");
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...navy);
+    doc.text(row.label, 18, y + 4.8);
+    doc.text(row.value, 196, y + 4.8, { align: "right" });
+    y += 7;
+  });
+
+  // Total cost
+  doc.setFillColor(...navy);
+  doc.rect(14, y, W - 28, 10, "F");
+  doc.setTextColor(...amber);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("TOTAL ESTIMATED COST", 18, y + 6.8);
+  doc.text(`₹${result.total.toLocaleString("en-IN")}`, 196, y + 6.8, { align: "right" });
+  y += 18;
+
+  // Disclaimer
+  doc.setFontSize(7.5);
+  doc.setFont("helvetica", "italic");
+  doc.setTextColor(150, 150, 150);
+  doc.text("Disclaimer: This is an approximate estimate based on standard construction rates in Pune, Maharashtra. Actual costs may vary", 14, y);
+  doc.text("depending on site conditions, material choices, design complexity, and current market rates. Contact us for an accurate quotation.", 14, y + 4);
+
+  doc.save(`OneO_Buildcon_Estimate_${Date.now()}.pdf`);
+}
+
+async function exportExcel(result: ResultData, pkg: { name: string; price: number }, upperFloors: number, parking: boolean, gst: boolean) {
+  const XLSX = await import("xlsx");
+  const wb = XLSX.utils.book_new();
+
+  const date = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+
+  const areaRows = [
+    ["ONE O BUILDCON — Construction Cost Estimate"],
+    [`Date: ${date}`],
+    [`Package: ${pkg.name} @ ₹${pkg.price}/sqft (excl. GST)`],
+    [`Configuration: ${upperFloors === 0 ? "G" : `G+${upperFloors}`} | Ground Floor: ${parking ? "Parking" : "House"}`],
+    [],
+    ["BUILT-UP AREA BREAKDOWN"],
+    ["Floor / Component", "Slab Area (sqft)", "% Applied", "Built-up Area (sqft)"],
+    [`Plinth (Ground slab)`, result.plinthSlab, "50%", result.plinthArea],
+    ...result.rows.map((r, i) => [r.label, r.slab, i === 0 && parking ? "50%" : "100%", r.builtUp]),
+    [`Terrace (Highest slab)`, result.topSlab, "35%", result.terraceArea],
+    ["TOTAL BUILT-UP AREA", "", "", result.totalArea],
+    [],
+    ["COST BREAKDOWN"],
+    ["Description", "", "", "Amount (₹)"],
+    [`Construction Cost (${result.totalArea.toLocaleString()} sqft × ₹${pkg.price})`, "", "", result.base],
+    ...(gst ? [["GST @ 18%", "", "", result.gstAmount]] : []),
+    ["TOTAL ESTIMATED COST", "", "", result.total],
+    [],
+    ["Disclaimer: This is an approximate estimate. Contact One O Buildcon for an accurate site-specific quotation."],
+    ["Phone: +91 88060 29907 | Email: oneobuildcon@gmail.com | Pune, Maharashtra"],
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(areaRows);
+  ws["!cols"] = [{ wch: 45 }, { wch: 18 }, { wch: 12 }, { wch: 22 }];
+  XLSX.utils.book_append_sheet(wb, ws, "Estimate");
+  XLSX.writeFile(wb, `OneO_Buildcon_Estimate_${Date.now()}.xlsx`);
+}
 
 function buildFloorRows(upperFloors: number, parking: boolean): FloorRow[] {
   const rows: FloorRow[] = [
@@ -275,6 +441,24 @@ export default function CalculatorPage() {
                           </div>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Export buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <motion.button
+                        whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                        onClick={() => exportPDF(result, selectedPkg, upperFloors, parking, gst)}
+                        className="flex items-center justify-center gap-2 rounded-xl bg-navy py-3 font-semibold text-white hover:bg-navy/90 transition text-sm"
+                      >
+                        <FileText className="h-4 w-4" /> Download PDF
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                        onClick={() => exportExcel(result, selectedPkg, upperFloors, parking, gst)}
+                        className="flex items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 transition text-sm"
+                      >
+                        <FileSpreadsheet className="h-4 w-4" /> Download Excel
+                      </motion.button>
                     </div>
 
                     {/* CTA */}
