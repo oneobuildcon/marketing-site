@@ -417,6 +417,7 @@ export default function CalculatorPage() {
   const [otp, setOtp] = useState("");
   const [otpSending, setOtpSending] = useState(false);
   const [otpVerifying, setOtpVerifying] = useState(false);
+  const [captchaDone, setCaptchaDone] = useState(false);
   const confirmRef = useRef<import("firebase/auth").ConfirmationResult | null>(null);
 
   // Load package content and categories from localStorage on mount
@@ -449,6 +450,29 @@ export default function CalculatorPage() {
     });
   }, [upperFloors, parking]);
 
+  // Init visible reCAPTCHA when modal opens on step 1
+  useEffect(() => {
+    if (leadModal && !otpStep) {
+      setCaptchaDone(false);
+      setTimeout(() => initRecaptcha(), 100);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leadModal, otpStep]);
+
+  async function initRecaptcha() {
+    const { auth } = await import("@/lib/firebase");
+    const { RecaptchaVerifier } = await import("firebase/auth");
+    type WinWithCaptcha = Window & { recaptchaVerifier?: { clear?: () => void } };
+    const win = window as WinWithCaptcha;
+    if (win.recaptchaVerifier?.clear) win.recaptchaVerifier.clear();
+    win.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+      size: "normal",
+      callback: () => setCaptchaDone(true),
+      "expired-callback": () => setCaptchaDone(false),
+    });
+    (win.recaptchaVerifier as unknown as { render: () => Promise<void> }).render();
+  }
+
   async function handleSendOtp() {
     const phone = leadPhone.replace(/\D/g, "");
     if (!leadName.trim()) { setLeadError("Please enter your name."); return; }
@@ -456,27 +480,21 @@ export default function CalculatorPage() {
       setLeadError("Enter a valid 10-digit Indian mobile number.");
       return;
     }
+    if (!captchaDone) { setLeadError("Please complete the reCAPTCHA above."); return; }
     setLeadError("");
     setOtpSending(true);
     try {
       const { auth } = await import("@/lib/firebase");
-      const { signInWithPhoneNumber, RecaptchaVerifier } = await import("firebase/auth");
-      type WinWithCaptcha = Window & { recaptchaVerifier?: { clear?: () => void } };
-      const win = window as WinWithCaptcha;
-      // Always create a fresh verifier to avoid stale reCAPTCHA state
-      if (win.recaptchaVerifier?.clear) win.recaptchaVerifier.clear();
-      win.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
-      const verifier = win.recaptchaVerifier as import("firebase/auth").ApplicationVerifier;
+      const { signInWithPhoneNumber } = await import("firebase/auth");
+      type WinWithCaptcha = Window & { recaptchaVerifier?: unknown };
+      const verifier = (window as WinWithCaptcha).recaptchaVerifier as import("firebase/auth").ApplicationVerifier;
       const confirmation = await signInWithPhoneNumber(auth, `+91${phone}`, verifier);
       confirmRef.current = confirmation;
       setOtpStep(true);
     } catch (e) {
-      // Clear verifier so next attempt starts fresh
-      const win = window as Window & { recaptchaVerifier?: { clear?: () => void } };
-      if (win.recaptchaVerifier?.clear) win.recaptchaVerifier.clear();
-      win.recaptchaVerifier = undefined;
       console.error(e);
-      setLeadError("Failed to send OTP. Please try again.");
+      setCaptchaDone(false);
+      setLeadError("Failed to send OTP. Please refresh the page and try again.");
     }
     setOtpSending(false);
   }
@@ -826,8 +844,6 @@ export default function CalculatorPage() {
         </div>
       </section>
 
-      {/* Invisible recaptcha container for Firebase */}
-      <div id="recaptcha-container" />
 
       {/* Lead capture + OTP modal */}
       <AnimatePresence>
@@ -872,9 +888,11 @@ export default function CalculatorPage() {
                           className="flex-1 rounded-xl border border-black/15 px-4 py-3 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20" />
                       </div>
                     </div>
+                    {/* visible reCAPTCHA renders here */}
+                    <div id="recaptcha-container" className="flex justify-center" />
                     {leadError && <p className="text-red-500 text-xs font-medium">{leadError}</p>}
                     <div className="flex gap-3 pt-1">
-                      <button onClick={() => { setLeadModal(null); setOtpStep(false); setLeadError(""); }}
+                      <button onClick={() => { setLeadModal(null); setOtpStep(false); setLeadError(""); setCaptchaDone(false); }}
                         className="flex-1 rounded-xl border-2 border-black/10 py-3 text-sm font-semibold text-navy/60 hover:border-navy/30 transition">
                         Cancel
                       </button>
