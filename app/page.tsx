@@ -18,6 +18,9 @@ import {
   Clock,
   HardHat,
   CheckCircle2,
+  MessageSquare,
+  PencilRuler,
+  KeyRound,
 } from "lucide-react";
 
 const services = [
@@ -43,6 +46,109 @@ const whyChooseUs = [
   { label: "High-Quality Materials", icon: Package },
   { label: "On-Time Delivery", icon: Clock },
   { label: "Transparent Pricing", icon: CheckCircle2 },
+];
+
+const processSteps = [
+  { step: "01", title: "Consultation", desc: "We understand your vision, budget, and site requirements in a free initial meeting.", icon: MessageSquare },
+  { step: "02", title: "Design & Planning", desc: "Our team prepares detailed blueprints, 3D layouts, and material estimates.", icon: PencilRuler },
+  { step: "03", title: "Construction", desc: "Skilled workers execute with precision using quality materials and modern equipment.", icon: HardHat },
+  { step: "04", title: "Handover", desc: "Final inspection, finishing touches, and keys handed over on schedule.", icon: KeyRound },
+];
+
+const tools = [
+  {
+    name: "Tower Crane",
+    svg: (
+      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
+        <line x1="32" y1="4" x2="32" y2="56" />
+        <line x1="32" y1="16" x2="58" y2="16" />
+        <line x1="32" y1="16" x2="14" y2="16" />
+        <line x1="58" y1="16" x2="58" y2="28" />
+        <line x1="32" y1="4" x2="58" y2="16" />
+        <rect x="54" y="28" width="8" height="6" rx="1" />
+        <line x1="32" y1="56" x2="24" y2="56" />
+        <line x1="32" y1="56" x2="40" y2="56" />
+      </svg>
+    ),
+  },
+  {
+    name: "Excavator",
+    svg: (
+      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
+        <rect x="8" y="36" width="30" height="14" rx="2" />
+        <circle cx="14" cy="52" r="5" />
+        <circle cx="32" cy="52" r="5" />
+        <line x1="8" y1="44" x2="38" y2="44" />
+        <rect x="28" y="28" width="16" height="12" rx="2" />
+        <line x1="36" y1="28" x2="48" y2="18" />
+        <line x1="48" y1="18" x2="56" y2="30" />
+        <path d="M56 30 L60 38 L48 40 L44 32" />
+      </svg>
+    ),
+  },
+  {
+    name: "Concrete Mixer",
+    svg: (
+      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
+        <ellipse cx="32" cy="30" rx="14" ry="18" transform="rotate(-20 32 30)" />
+        <line x1="18" y1="48" x2="14" y2="58" />
+        <line x1="46" y1="48" x2="50" y2="58" />
+        <line x1="14" y1="58" x2="50" y2="58" />
+        <line x1="32" y1="12" x2="32" y2="4" />
+        <circle cx="32" cy="30" r="5" />
+      </svg>
+    ),
+  },
+  {
+    name: "Bulldozer",
+    svg: (
+      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
+        <rect x="10" y="30" width="36" height="14" rx="2" />
+        <rect x="16" y="22" width="20" height="10" rx="1" />
+        <line x1="4" y1="38" x2="10" y2="38" />
+        <line x1="4" y1="30" x2="4" y2="46" />
+        <line x1="4" y1="46" x2="10" y2="44" />
+        <circle cx="18" cy="46" r="4" />
+        <circle cx="38" cy="46" r="4" />
+        <line x1="18" y1="46" x2="38" y2="46" />
+      </svg>
+    ),
+  },
+  {
+    name: "Laser Level",
+    svg: (
+      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
+        <rect x="20" y="24" width="24" height="16" rx="3" />
+        <circle cx="32" cy="32" r="4" />
+        <line x1="4" y1="32" x2="20" y2="32" strokeDasharray="3 2" />
+        <line x1="44" y1="32" x2="60" y2="32" strokeDasharray="3 2" />
+        <line x1="32" y1="8" x2="32" y2="24" strokeDasharray="3 2" />
+        <line x1="32" y1="40" x2="32" y2="56" strokeDasharray="3 2" />
+      </svg>
+    ),
+  },
+  {
+    name: "Power Drill",
+    svg: (
+      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
+        <rect x="8" y="26" width="28" height="14" rx="3" />
+        <path d="M36 30 L50 28 L52 36 L36 36" />
+        <line x1="52" y1="32" x2="60" y2="32" />
+        <rect x="14" y="40" width="12" height="8" rx="1" />
+      </svg>
+    ),
+  },
+];
+
+const brands = [
+  { name: "UltraTech Cement", color: "#003087" },
+  { name: "JSW Steel", color: "#cc0000" },
+  { name: "Asian Paints", color: "#e31837" },
+  { name: "Kajaria Tiles", color: "#1a1a2e" },
+  { name: "Havells", color: "#e31837" },
+  { name: "Pidilite", color: "#003087" },
+  { name: "Fenesta", color: "#2c5f2e" },
+  { name: "Somany", color: "#c8a951" },
 ];
 
 const projects = [
@@ -203,6 +309,80 @@ export default function Home() {
                 </motion.div>
               );
             })}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Construction Process */}
+      <section className="bg-gray-50 py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
+            <p className="text-xs font-semibold uppercase tracking-widest text-amber">How We Work</p>
+            <h2 className="mt-2 text-3xl font-bold text-navy">Our Construction Process</h2>
+            <p className="mt-3 text-navy/60 max-w-xl mx-auto">From first conversation to final handover — a transparent, structured process you can trust.</p>
+          </motion.div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {processSteps.map((step, i) => {
+              const Icon = step.icon;
+              return (
+                <motion.div key={step.step} variants={fadeUp} whileHover={{ y: -6 }} className="relative rounded-2xl bg-white border border-black/8 p-6 shadow-sm hover:shadow-md hover:border-amber/40 transition-all">
+                  <div className="absolute -top-4 left-6 rounded-lg bg-amber px-3 py-1">
+                    <span className="text-xs font-bold text-navy-dark">{step.step}</span>
+                  </div>
+                  <div className="mt-4 flex h-12 w-12 items-center justify-center rounded-xl bg-navy/5 border border-navy/10">
+                    <Icon className="h-6 w-6 text-navy" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="mt-4 font-bold text-navy text-lg">{step.title}</h3>
+                  <p className="mt-2 text-sm text-navy/60 leading-relaxed">{step.desc}</p>
+                  {i < processSteps.length - 1 && (
+                    <div className="hidden lg:block absolute top-1/2 -right-3 z-10">
+                      <svg className="h-6 w-6 text-amber" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Construction Equipment Strip */}
+      <section className="bg-navy py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-10">
+            <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">On Every Site</p>
+            <h2 className="mt-2 text-3xl font-bold text-white">Equipment & Tools We Use</h2>
+          </motion.div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-3 gap-6 sm:grid-cols-6">
+            {tools.map((tool) => (
+              <motion.div key={tool.name} variants={fadeUp} whileHover={{ y: -4, scale: 1.05 }} className="flex flex-col items-center gap-3 rounded-xl bg-white/5 border border-white/10 p-4 hover:bg-amber/10 hover:border-amber/40 transition-all cursor-default">
+                <div className="text-amber">{tool.svg}</div>
+                <span className="text-xs font-medium text-white/70 text-center">{tool.name}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Trusted Brands */}
+      <section className="bg-white py-14">
+        <div className="mx-auto max-w-6xl px-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-10">
+            <p className="text-xs font-semibold uppercase tracking-widest text-amber">Quality You Can Trust</p>
+            <h2 className="mt-2 text-3xl font-bold text-navy">Brands & Materials We Use</h2>
+            <p className="mt-2 text-navy/60 text-sm">We source only from India&apos;s most trusted construction material brands.</p>
+          </motion.div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
+            {brands.map((brand) => (
+              <motion.div key={brand.name} variants={fadeUp} whileHover={{ scale: 1.05, y: -2 }} className="flex items-center justify-center rounded-xl border border-black/8 px-3 py-4 shadow-sm hover:shadow-md hover:border-amber/40 transition-all">
+                <div className="text-center">
+                  <div className="h-2 w-8 rounded-full mx-auto mb-2" style={{ backgroundColor: brand.color }} />
+                  <p className="text-xs font-semibold text-navy/80 leading-tight">{brand.name}</p>
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
