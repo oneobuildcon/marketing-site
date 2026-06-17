@@ -71,9 +71,9 @@ export default function CalculatorPage() {
     if (slabs.every((s) => s <= 0)) return;
 
     const groundSlab = slabs[0];
-    const topSlab = slabs[slabs.length - 1];
+    const maxSlab = Math.max(...slabs);
     const plinthArea = Math.round(groundSlab * 0.50);
-    const terraceArea = Math.round(topSlab * 0.35);
+    const terraceArea = Math.round(maxSlab * 0.35);
 
     const rows = floorRows.map((r, i) => {
       const slab = parseFloat(r.slab) || 0;
@@ -87,7 +87,7 @@ export default function CalculatorPage() {
     const gstAmount = gst ? Math.round(base * 0.18) : 0;
     const total = base + gstAmount;
 
-    setResult({ rows, plinthSlab: groundSlab, topSlab, plinthArea, terraceArea, totalArea, base, gstAmount, total });
+    setResult({ rows, plinthSlab: groundSlab, topSlab: maxSlab, plinthArea, terraceArea, totalArea, base, gstAmount, total });
   }
 
   useEffect(() => {
@@ -246,7 +246,7 @@ export default function CalculatorPage() {
                             </div>
                           ))}
                           <div className="flex justify-between">
-                            <span className="text-white/60">Terrace (35% of top floor {result.topSlab.toLocaleString()} sqft)</span>
+                            <span className="text-white/60">Terrace (35% of highest slab {result.topSlab.toLocaleString()} sqft)</span>
                             <span>{result.terraceArea.toLocaleString()} sqft</span>
                           </div>
                           <div className="h-px bg-white/10 my-1" />
