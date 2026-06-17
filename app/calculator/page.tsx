@@ -49,7 +49,7 @@ export default function CalculatorPage() {
   const [floorRows, setFloorRows] = useState<FloorRow[]>(buildFloorRows(0, false));
   const [result, setResult] = useState<null | {
     rows: { label: string; slab: number; builtUp: number }[];
-    plinthSlab: number; plinthArea: number;
+    plinthSlab: number; topSlab: number; plinthArea: number;
     terraceArea: number; totalArea: number;
     base: number; gstAmount: number; total: number;
   }>(null);
@@ -70,9 +70,10 @@ export default function CalculatorPage() {
     const slabs = floorRows.map((r) => parseFloat(r.slab) || 0);
     if (slabs.every((s) => s <= 0)) return;
 
-    const maxSlab = Math.max(...slabs);
-    const plinthArea = Math.round(maxSlab * 0.50);
-    const terraceArea = Math.round(maxSlab * 0.35);
+    const groundSlab = slabs[0];
+    const topSlab = slabs[slabs.length - 1];
+    const plinthArea = Math.round(groundSlab * 0.50);
+    const terraceArea = Math.round(topSlab * 0.35);
 
     const rows = floorRows.map((r, i) => {
       const slab = parseFloat(r.slab) || 0;
@@ -86,7 +87,7 @@ export default function CalculatorPage() {
     const gstAmount = gst ? Math.round(base * 0.18) : 0;
     const total = base + gstAmount;
 
-    setResult({ rows, plinthSlab: maxSlab, plinthArea, terraceArea, totalArea, base, gstAmount, total });
+    setResult({ rows, plinthSlab: groundSlab, topSlab, plinthArea, terraceArea, totalArea, base, gstAmount, total });
   }
 
   useEffect(() => {
@@ -235,7 +236,7 @@ export default function CalculatorPage() {
                         <div className="mt-5 rounded-xl bg-white/5 border border-white/10 p-4 space-y-1.5 text-xs">
                           <p className="text-white/40 font-semibold uppercase tracking-widest mb-2">Built-up Area Breakdown</p>
                           <div className="flex justify-between">
-                            <span className="text-white/60">Plinth (50% of {result.plinthSlab.toLocaleString()} sqft)</span>
+                            <span className="text-white/60">Plinth (50% of ground {result.plinthSlab.toLocaleString()} sqft)</span>
                             <span>{result.plinthArea.toLocaleString()} sqft</span>
                           </div>
                           {result.rows.map((r) => (
@@ -245,7 +246,7 @@ export default function CalculatorPage() {
                             </div>
                           ))}
                           <div className="flex justify-between">
-                            <span className="text-white/60">Terrace (35% of {result.plinthSlab.toLocaleString()} sqft)</span>
+                            <span className="text-white/60">Terrace (35% of top floor {result.topSlab.toLocaleString()} sqft)</span>
                             <span>{result.terraceArea.toLocaleString()} sqft</span>
                           </div>
                           <div className="h-px bg-white/10 my-1" />
