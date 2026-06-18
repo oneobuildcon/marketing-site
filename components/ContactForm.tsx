@@ -1,76 +1,147 @@
 "use client";
 
 import { useState } from "react";
+import { Loader2, CheckCircle2 } from "lucide-react";
+
+type Status = "idle" | "sending" | "success" | "error";
 
 export default function ContactForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<Status>("idle");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const name = (form.elements.namedItem("name") as HTMLInputElement).value;
-    const email = (form.elements.namedItem("email") as HTMLInputElement)
-      .value;
-    const message = (
-      form.elements.namedItem("message") as HTMLTextAreaElement
-    ).value;
+    if (status === "sending") return;
 
-    const subject = encodeURIComponent(`New inquiry from ${name}`);
-    const body = encodeURIComponent(`${message}\n\nFrom: ${name} (${email})`);
-    window.location.href = `mailto:info@oneobuildcon.com?subject=${subject}&body=${body}`;
-    setSubmitted(true);
+    const form = e.currentTarget;
+    const name = (form.elements.namedItem("name") as HTMLInputElement).value.trim();
+    const phone = (form.elements.namedItem("phone") as HTMLInputElement).value.trim();
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim();
+    const message = (form.elements.namedItem("message") as HTMLTextAreaElement).value.trim();
+
+    const leadData = {
+      name,
+      phone,
+      email,
+      message,
+      source: "Contact Form",
+      date: new Date().toLocaleString("en-IN"),
+    };
+
+    setStatus("sending");
+
+    // Save to localStorage so it appears in the admin leads page
+    try {
+      const existing = JSON.parse(localStorage.getItem("oneo_leads") || "[]");
+      existing.push(leadData);
+      localStorage.setItem("oneo_leads", JSON.stringify(existing));
+    } catch {}
+
+    // Save to Google Sheet + email owner (same pipeline as the calculator)
+    try {
+      await fetch("/api/save-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(leadData),
+      });
+      setStatus("success");
+      form.reset();
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber/15">
+          <CheckCircle2 className="h-8 w-8 text-amber" />
+        </div>
+        <h3 className="mt-4 text-xl font-bold text-navy">Message sent!</h3>
+        <p className="mt-2 text-sm text-navy/70 max-w-xs">
+          Thanks for reaching out. Our team will get back to you within one business day.
+        </p>
+        <button
+          type="button"
+          onClick={() => setStatus("idle")}
+          className="mt-6 text-sm font-semibold text-amber hover:text-amber-light transition cursor-pointer"
+        >
+          Send another message
+        </button>
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-navy">
-          Name
+          Name <span className="text-amber">*</span>
         </label>
         <input
           id="name"
           name="name"
           type="text"
           required
-          className="mt-1 w-full rounded-md border border-black/10 px-4 py-2 text-sm focus:border-amber focus:outline-none"
+          autoComplete="name"
+          className="mt-1 w-full rounded-md border border-black/10 px-4 py-2 text-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30"
+        />
+      </div>
+      <div>
+        <label htmlFor="phone" className="block text-sm font-medium text-navy">
+          Phone <span className="text-amber">*</span>
+        </label>
+        <input
+          id="phone"
+          name="phone"
+          type="tel"
+          inputMode="tel"
+          required
+          autoComplete="tel"
+          placeholder="+91 ..."
+          className="mt-1 w-full rounded-md border border-black/10 px-4 py-2 text-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30"
         />
       </div>
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-navy">
-          Email
+          Email <span className="text-navy/40 font-normal">(optional)</span>
         </label>
         <input
           id="email"
           name="email"
           type="email"
-          required
-          className="mt-1 w-full rounded-md border border-black/10 px-4 py-2 text-sm focus:border-amber focus:outline-none"
+          autoComplete="email"
+          className="mt-1 w-full rounded-md border border-black/10 px-4 py-2 text-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30"
         />
       </div>
       <div>
-        <label
-          htmlFor="message"
-          className="block text-sm font-medium text-navy"
-        >
-          Message
+        <label htmlFor="message" className="block text-sm font-medium text-navy">
+          Message <span className="text-amber">*</span>
         </label>
         <textarea
           id="message"
           name="message"
           rows={5}
           required
-          className="mt-1 w-full rounded-md border border-black/10 px-4 py-2 text-sm focus:border-amber focus:outline-none"
+          placeholder="Tell us about your project..."
+          className="mt-1 w-full rounded-md border border-black/10 px-4 py-2 text-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30"
         />
       </div>
       <button
         type="submit"
-        className="rounded-md bg-amber px-6 py-3 font-semibold text-navy-dark transition hover:bg-amber-light"
+        disabled={status === "sending"}
+        className="flex items-center justify-center gap-2 rounded-md bg-amber px-6 py-3 font-semibold text-navy-dark transition hover:bg-amber-light disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
       >
-        Send Message
+        {status === "sending" ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" /> Sending...
+          </>
+        ) : (
+          "Send Message"
+        )}
       </button>
-      {submitted && (
-        <p className="text-sm text-navy/70">
-          Opening your email client to send the message...
+      {status === "error" && (
+        <p role="alert" className="text-sm text-red-600">
+          Something went wrong. Please try again, or call us at +91 88060 29907.
         </p>
       )}
     </form>
