@@ -98,20 +98,20 @@ export default function ProjectDetail() {
         </div>
       </section>
 
-      {/* Gallery — compact grid */}
-      <section className="bg-navy-dark py-6">
+      {/* Gallery — clean proportioned grid */}
+      <section className="bg-navy-dark py-8">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-sm font-bold text-amber mb-3">{t.gallery}</h2>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+          <h2 className="text-lg font-bold text-amber mb-5">{t.gallery}</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {photos.map((src, i) => (
               <button
                 key={src}
                 type="button"
                 onClick={() => setZoom(i)}
-                className="group relative h-20 overflow-hidden rounded-lg bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-amber sm:h-24"
+                className="group relative aspect-[4/3] overflow-hidden rounded-xl bg-black ring-1 ring-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber"
               >
-                <Image src={src} alt={`${c.name} ${i + 1}`} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width:640px) 33vw, 20vw" priority={i === 0} />
-                <div className="absolute inset-0 bg-navy/0 transition group-hover:bg-navy/20" />
+                <Image src={src} alt={`${c.name} ${i + 1}`} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw" priority={i === 0} />
+                <div className="absolute inset-0 bg-navy/0 transition group-hover:bg-navy/25" />
               </button>
             ))}
           </div>
