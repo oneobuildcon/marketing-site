@@ -97,3 +97,20 @@ img {
 @media (prefers-reduced-motion: reduce) {
   .crane-float, .crane-float-slow { animation: none; }
 }
+
+/* Crane: keeps the horizontal flip (jib faces right) while gently
+   swaying from its base and bobbing, like it's slewing on site. */
+.crane-sway {
+  transform-origin: 50% 100%;
+  animation: craneSway 6s ease-in-out infinite;
+}
+@keyframes craneSway {
+  0%   { transform: scaleX(-1) rotate(0deg)    translateY(0); }
+  25%  { transform: scaleX(-1) rotate(1.4deg)  translateY(-4px); }
+  50%  { transform: scaleX(-1) rotate(0deg)    translateY(-7px); }
+  75%  { transform: scaleX(-1) rotate(-1.4deg) translateY(-4px); }
+  100% { transform: scaleX(-1) rotate(0deg)    translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crane-sway { animation: none; transform: scaleX(-1); }
+}
