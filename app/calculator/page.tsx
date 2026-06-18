@@ -557,9 +557,11 @@ export default function CalculatorPage() {
                   <div className="flex flex-col gap-1">
                     <label className="text-sm font-medium text-navy">Client Name <span className="text-red-500">*</span></label>
                     <input
+                      id="calc-name"
                       type="text"
                       value={clientName}
                       onChange={(e) => setClientName(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("calc-location")?.focus(); } }}
                       placeholder="e.g. Rajesh Sharma"
                       className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
                     />
@@ -567,9 +569,11 @@ export default function CalculatorPage() {
                   <div className="flex flex-col gap-1">
                     <label className="text-sm font-medium text-navy">Project Location <span className="text-red-500">*</span></label>
                     <input
+                      id="calc-location"
                       type="text"
                       value={projectLocation}
                       onChange={(e) => setProjectLocation(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("calc-phone")?.focus(); } }}
                       placeholder="e.g. Kothrud, Pune"
                       className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
                     />
@@ -579,9 +583,11 @@ export default function CalculatorPage() {
                     <div className="flex gap-2">
                       <span className="flex items-center rounded-xl border border-black/15 px-3 text-navy/60 font-medium text-sm bg-gray-50">+91</span>
                       <input
+                        id="calc-phone"
                         type="tel"
                         value={clientPhone}
                         onChange={(e) => setClientPhone(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSubmitDetails(); } }}
                         placeholder="98765 43210"
                         maxLength={10}
                         className="flex-1 rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
