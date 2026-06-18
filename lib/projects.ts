@@ -1,0 +1,292 @@
+export type ProjectCategory = "bungalow" | "rowhouse" | "residential" | "farmhouse";
+
+export type ProjectContent = {
+  name: string;
+  type: string;
+  location: string;
+  desc: string;
+  highlights: string[];
+  testimonial?: { quote: string; author: string };
+};
+
+export type Project = {
+  slug: string;
+  count: number;
+  category: ProjectCategory;
+  status: "completed" | "ongoing";
+  area: string;
+  duration: string;
+  budget: string;
+  en: ProjectContent;
+  mr: ProjectContent;
+};
+
+export const projects: Project[] = [
+  {
+    slug: "porwal-road",
+    count: 5,
+    category: "residential",
+    status: "completed",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Nikam Residency",
+      type: "Residential Building",
+      location: "Porwal Road, Pune",
+      desc: "A well-planned 3-storey residential building with a terracotta and cream facade. Built on a strong RCC frame, the project moved from foundation and brickwork through to premium external finishes — delivering a durable, modern home for the Nikam family.",
+      highlights: ["3-storey RCC structure", "Terracotta & cream facade", "Quality brick & plaster work", "Premium external finishes"],
+      testimonial: { quote: "One O Buildcon handled our building from foundation to finishing with complete transparency. The quality of work and timeline management was excellent.", author: "Mr. Nikam" },
+    },
+    mr: {
+      name: "निकम रेसिडेन्सी",
+      type: "निवासी इमारत",
+      location: "पोरवाल रोड, पुणे",
+      desc: "टेराकोटा आणि क्रीम फसाडसह सुनियोजित ३-मजली निवासी इमारत. भक्कम आरसीसी फ्रेमवर बांधलेला हा प्रकल्प पायापासून आणि विटकामापासून प्रीमियम बाह्य फिनिशिंगपर्यंत पूर्ण झाला — निकम कुटुंबासाठी टिकाऊ, आधुनिक घर.",
+      highlights: ["३-मजली आरसीसी संरचना", "टेराकोटा व क्रीम फसाड", "दर्जेदार विट व प्लास्टर काम", "प्रीमियम बाह्य फिनिशिंग"],
+      testimonial: { quote: "वन ओ बिल्डकॉनने आमची इमारत पायापासून फिनिशिंगपर्यंत पूर्ण पारदर्शकतेने हाताळली. कामाचा दर्जा आणि वेळेचे व्यवस्थापन उत्कृष्ट होते.", author: "श्री. निकम" },
+    },
+  },
+  {
+    slug: "baiche",
+    count: 1,
+    category: "residential",
+    status: "ongoing",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Baiche Residency",
+      type: "Residential Building",
+      location: "Vishrantwadi, Pune",
+      desc: "A contemporary apartment building designed with clean lines, wooden-louvre accents and a modern, low-maintenance exterior. A comfortable multi-family residence planned for efficient, modern living.",
+      highlights: ["Contemporary apartment design", "Wooden-louvre facade accents", "Efficient multi-family layout", "Low-maintenance exterior"],
+    },
+    mr: {
+      name: "बैचे रेसिडेन्सी",
+      type: "निवासी इमारत",
+      location: "विश्रांतवाडी, पुणे",
+      desc: "स्वच्छ रेषा, लाकडी लुव्हर अॅक्सेंट आणि आधुनिक, कमी देखभालीच्या बाह्यरूपासह डिझाइन केलेली समकालीन अपार्टमेंट इमारत. कार्यक्षम, आधुनिक राहणीमानासाठी नियोजित आरामदायक बहु-कुटुंब निवास.",
+      highlights: ["समकालीन अपार्टमेंट डिझाइन", "लाकडी लुव्हर फसाड अॅक्सेंट", "कार्यक्षम बहु-कुटुंब आराखडा", "कमी देखभालीचे बाह्यरूप"],
+    },
+  },
+  {
+    slug: "dhere",
+    count: 1,
+    category: "bungalow",
+    status: "ongoing",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Dhere Bungalow",
+      type: "Premium Bungalow",
+      location: "Vadgaon Shinde, Pune",
+      desc: "Premium custom bungalow work featuring detailed decorative inlay flooring and high-quality interior finishing. A focus on craftsmanship and fine detailing throughout the home.",
+      highlights: ["Decorative inlay flooring", "High-quality interior finishing", "Custom craftsmanship", "Attention to detail"],
+    },
+    mr: {
+      name: "ढेरे बंगला",
+      type: "प्रीमियम बंगला",
+      location: "वडगाव शिंदे, पुणे",
+      desc: "तपशीलवार सजावटीच्या इनले फ्लोरिंग आणि उच्च दर्जाच्या इंटेरियर फिनिशिंगसह प्रीमियम कस्टम बंगला काम. संपूर्ण घरात कारागिरी आणि बारीक तपशीलावर भर.",
+      highlights: ["सजावटीचे इनले फ्लोरिंग", "उच्च दर्जाचे इंटेरियर फिनिशिंग", "कस्टम कारागिरी", "बारीक तपशीलाकडे लक्ष"],
+    },
+  },
+  {
+    slug: "gangurde",
+    count: 3,
+    category: "rowhouse",
+    status: "completed",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Gangurde Row House",
+      type: "Row House",
+      location: "Yerwada, Pune",
+      desc: "A modern duplex row house finished with warm wooden cladding, glass balcony railings and elegant evening façade lighting. A stylish twin-home delivered complete from structure to finishing.",
+      highlights: ["Modern duplex design", "Warm wooden cladding", "Glass balcony railings", "Façade lighting"],
+      testimonial: { quote: "Our row house turned out exactly as we imagined. The team's coordination and finishing quality really stood out.", author: "Mr. Gangurde" },
+    },
+    mr: {
+      name: "गांगुर्डे रो हाउस",
+      type: "रो हाउस",
+      location: "येरवडा, पुणे",
+      desc: "उबदार लाकडी क्लॅडिंग, काचेच्या बाल्कनी रेलिंग आणि सुरेख संध्याकाळच्या फसाड प्रकाशयोजनेसह पूर्ण केलेले आधुनिक डुप्लेक्स रो हाउस. संरचनेपासून फिनिशिंगपर्यंत पूर्ण केलेले स्टायलिश ट्विन-होम.",
+      highlights: ["आधुनिक डुप्लेक्स डिझाइन", "उबदार लाकडी क्लॅडिंग", "काचेच्या बाल्कनी रेलिंग", "फसाड प्रकाशयोजना"],
+      testimonial: { quote: "आमचे रो हाउस आम्ही कल्पना केल्याप्रमाणेच झाले. टीमचे समन्वय आणि फिनिशिंगचा दर्जा खरोखरच उठून दिसला.", author: "श्री. गांगुर्डे" },
+    },
+  },
+  {
+    slug: "kamthe",
+    count: 4,
+    category: "bungalow",
+    status: "ongoing",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Kamthe Bungalow",
+      type: "Premium Bungalow",
+      location: "Lohegaon, Pune",
+      desc: "A spacious premium bungalow currently under construction. Built on a solid RCC structure with quality brickwork, executed to exacting engineering standards from foundation upward.",
+      highlights: ["Spacious premium bungalow", "Solid RCC structure", "Quality brickwork", "Engineering-grade execution"],
+    },
+    mr: {
+      name: "कामथे बंगला",
+      type: "प्रीमियम बंगला",
+      location: "लोहेगाव, पुणे",
+      desc: "सध्या बांधकाम सुरू असलेला प्रशस्त प्रीमियम बंगला. भक्कम आरसीसी संरचनेवर दर्जेदार विटकामासह बांधलेला, पायापासून कठोर अभियांत्रिकी मानकांनुसार अंमलात आणलेला.",
+      highlights: ["प्रशस्त प्रीमियम बंगला", "भक्कम आरसीसी संरचना", "दर्जेदार विटकाम", "अभियांत्रिकी दर्जाची अंमलबजावणी"],
+    },
+  },
+  {
+    slug: "patil-dighi",
+    count: 6,
+    category: "residential",
+    status: "ongoing",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Patil Residency",
+      type: "Residential Building",
+      location: "Dighi, Pune",
+      desc: "A multi-storey residential building with a contemporary brown-and-grey façade, balconies and quality finishes. Featuring a striking carved entrance and well-lit common areas.",
+      highlights: ["Multi-storey residential building", "Contemporary façade", "Carved feature entrance", "Quality finishes & balconies"],
+    },
+    mr: {
+      name: "पाटील रेसिडेन्सी",
+      type: "निवासी इमारत",
+      location: "दिघी, पुणे",
+      desc: "समकालीन तपकिरी-राखाडी फसाड, बाल्कनी आणि दर्जेदार फिनिशिंगसह बहुमजली निवासी इमारत. आकर्षक कोरीव प्रवेशद्वार आणि चांगल्या प्रकाशाच्या सामायिक जागा.",
+      highlights: ["बहुमजली निवासी इमारत", "समकालीन फसाड", "कोरीव वैशिष्ट्यपूर्ण प्रवेशद्वार", "दर्जेदार फिनिशिंग व बाल्कनी"],
+    },
+  },
+  {
+    slug: "relekar",
+    count: 3,
+    category: "bungalow",
+    status: "ongoing",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Relekar Bungalow",
+      type: "Premium Bungalow",
+      location: "Charoli, Pune",
+      desc: "A sophisticated 3-storey bungalow with a floor-to-ceiling glass facade, elegant lighting and contemporary architecture. Designed for a striking presence and bright, modern interiors.",
+      highlights: ["3-storey contemporary bungalow", "Floor-to-ceiling glass facade", "Elegant exterior lighting", "Modern, bright interiors"],
+    },
+    mr: {
+      name: "रेलेकर बंगला",
+      type: "प्रीमियम बंगला",
+      location: "चारोली, पुणे",
+      desc: "मजल्यापासून छतापर्यंत काचेचा दर्शनभाग, सुरेख प्रकाशयोजना आणि समकालीन वास्तुकलेसह अत्याधुनिक ३-मजली बंगला. आकर्षक उपस्थिती आणि उज्ज्वल, आधुनिक इंटेरियरसाठी डिझाइन केलेला.",
+      highlights: ["३-मजली समकालीन बंगला", "मजल्यापासून छतापर्यंत काचेचा दर्शनभाग", "सुरेख बाह्य प्रकाशयोजना", "आधुनिक, उज्ज्वल इंटेरियर"],
+    },
+  },
+  {
+    slug: "raskar",
+    count: 4,
+    category: "bungalow",
+    status: "completed",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Raskar Bungalow",
+      type: "Premium Bungalow",
+      location: "Charoli, Pune",
+      desc: "A striking modern bungalow with exposed brick accents, wooden louvers and open balconies — a perfect blend of warmth and contemporary style, completed and handed over to the Raskar family.",
+      highlights: ["Modern bungalow design", "Exposed brick accents", "Wooden louver features", "Open balcony spaces"],
+      testimonial: { quote: "From design to handover, the experience was smooth and professional. We love the warm, modern look of our new home.", author: "Mr. Raskar" },
+    },
+    mr: {
+      name: "रास्कर बंगला",
+      type: "प्रीमियम बंगला",
+      location: "चारोली, पुणे",
+      desc: "एक्सपोज्ड विट अॅक्सेंट, लाकडी लुव्हर्स आणि खुल्या बाल्कनींसह एक आकर्षक आधुनिक बंगला — उबदारपणा आणि समकालीन शैलीचा परिपूर्ण मिलाफ, रास्कर कुटुंबाला पूर्ण करून दिलेला.",
+      highlights: ["आधुनिक बंगला डिझाइन", "एक्सपोज्ड विट अॅक्सेंट", "लाकडी लुव्हर वैशिष्ट्ये", "खुल्या बाल्कनी जागा"],
+      testimonial: { quote: "डिझाइनपासून हस्तांतरणापर्यंत अनुभव सुरळीत आणि व्यावसायिक होता. आम्हाला आमच्या नवीन घराचे उबदार, आधुनिक रूप आवडले.", author: "श्री. रास्कर" },
+    },
+  },
+  {
+    slug: "tapkir",
+    count: 2,
+    category: "residential",
+    status: "ongoing",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Tapkir Residency",
+      type: "Residential Building",
+      location: "Charoli, Pune",
+      desc: "An elegant multi-storey residential building with a grand classical façade, columns and private balconies for every home. A premium address combining classical detailing with modern comfort.",
+      highlights: ["Grand classical façade", "Multi-storey residential", "Columned elevation", "Private balconies"],
+    },
+    mr: {
+      name: "तपकीर रेसिडेन्सी",
+      type: "निवासी इमारत",
+      location: "चारोली, पुणे",
+      desc: "भव्य क्लासिकल फसाड, खांब आणि प्रत्येक घरासाठी खाजगी बाल्कनी असलेली देखणी बहुमजली निवासी इमारत. क्लासिकल तपशील आणि आधुनिक आरामाचा मिलाफ असलेला प्रीमियम पत्ता.",
+      highlights: ["भव्य क्लासिकल फसाड", "बहुमजली निवासी", "खांब असलेले एलिव्हेशन", "खाजगी बाल्कनी"],
+    },
+  },
+  {
+    slug: "shinde",
+    count: 8,
+    category: "bungalow",
+    status: "completed",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Shinde Bungalow",
+      type: "Premium Bungalow",
+      location: "Charoli, Pune",
+      desc: "A beautifully finished modern bungalow with glass balcony railings, terracotta accents and premium interiors — including a stunning double-height living room. Completed and handed over to the Shinde family.",
+      highlights: ["Double-height living room", "Glass balcony railings", "Terracotta facade accents", "Premium interior finishing"],
+      testimonial: { quote: "The double-height living area is the heart of our home. One O Buildcon delivered exactly the premium quality they promised.", author: "Mr. Shinde" },
+    },
+    mr: {
+      name: "शिंदे बंगला",
+      type: "प्रीमियम बंगला",
+      location: "चारोली, पुणे",
+      desc: "काचेच्या बाल्कनी रेलिंग, टेराकोटा अॅक्सेंट आणि प्रीमियम इंटेरियरसह सुंदररित्या पूर्ण केलेला आधुनिक बंगला — आकर्षक डबल-हाइट लिव्हिंग रूमसह. शिंदे कुटुंबाला पूर्ण करून दिलेला.",
+      highlights: ["डबल-हाइट लिव्हिंग रूम", "काचेच्या बाल्कनी रेलिंग", "टेराकोटा फसाड अॅक्सेंट", "प्रीमियम इंटेरियर फिनिशिंग"],
+      testimonial: { quote: "डबल-हाइट लिव्हिंग एरिया हे आमच्या घराचे हृदय आहे. वन ओ बिल्डकॉनने वचन दिल्याप्रमाणे नेमका प्रीमियम दर्जा दिला.", author: "श्री. शिंदे" },
+    },
+  },
+  {
+    slug: "markal-farmhouse",
+    count: 6,
+    category: "farmhouse",
+    status: "completed",
+    area: "On request",
+    duration: "On request",
+    budget: "On request",
+    en: {
+      name: "Markal Farmhouse",
+      type: "Farmhouse",
+      location: "Markal, Pune",
+      desc: "A charming single-storey farmhouse built with red stone and brick, designed to blend with its natural rural surroundings. A peaceful weekend retreat completed with a warm, earthy character.",
+      highlights: ["Single-storey farmhouse", "Red stone & brick build", "Blends with natural setting", "Warm, earthy character"],
+      testimonial: { quote: "Our farmhouse is the perfect weekend escape. The stone work and finishing blend beautifully with the surroundings.", author: "Markal Farmhouse Owner" },
+    },
+    mr: {
+      name: "मार्कळ फार्महाउस",
+      type: "फार्महाउस",
+      location: "मार्कळ, पुणे",
+      desc: "लाल दगड आणि विटांनी बांधलेले एक आकर्षक एकमजली फार्महाउस, नैसर्गिक ग्रामीण परिसराशी मिसळण्यासाठी डिझाइन केलेले. उबदार, मातीच्या वैशिष्ट्यासह पूर्ण केलेले शांत विकेंड रिट्रीट.",
+      highlights: ["एकमजली फार्महाउस", "लाल दगड व विट बांधकाम", "नैसर्गिक परिसराशी मिसळणारे", "उबदार, मातीचे वैशिष्ट्य"],
+      testimonial: { quote: "आमचे फार्महाउस म्हणजे परिपूर्ण विकेंड एस्केप. दगडी काम आणि फिनिशिंग परिसराशी सुंदररित्या मिसळते.", author: "मार्कळ फार्महाउस मालक" },
+    },
+  },
+];
+
+export function getProject(slug: string) {
+  return projects.find((p) => p.slug === slug);
+}

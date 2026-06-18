@@ -12,6 +12,13 @@ body {
   background: var(--background);
 }
 
+/* Reserve space for the mobile sticky quote bar so it never hides footer content */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 4rem;
+  }
+}
+
 @layer base {
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display), var(--font-sans), sans-serif;

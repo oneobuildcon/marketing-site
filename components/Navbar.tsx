@@ -2,18 +2,45 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Languages, Download } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
 
-const links = [
-  { href: "/about", label: "About" },
-  { href: "/services", label: "Services" },
-  { href: "/packages", label: "Packages" },
-  { href: "/projects", label: "Projects" },
-  { href: "/calculator", label: "Calculator" },
-  { href: "/contact", label: "Contact" },
-];
+const navLabels = {
+  en: {
+    about: "About",
+    services: "Services",
+    packages: "Packages",
+    projects: "Projects",
+    calculator: "Calculator",
+    contact: "Contact",
+    getQuote: "Get a Quote",
+    toggleLabel: "मराठी",
+  },
+  mr: {
+    about: "आमच्याबद्दल",
+    services: "सेवा",
+    packages: "पॅकेजेस",
+    projects: "प्रकल्प",
+    calculator: "कॅल्क्युलेटर",
+    contact: "संपर्क करा",
+    getQuote: "कोटेशन मागवा",
+    toggleLabel: "English",
+  },
+};
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { lang, setLang } = useLanguage();
+  const t = navLabels[lang];
+
+  const links = [
+    { href: "/about", label: t.about },
+    { href: "/services", label: t.services },
+    { href: "/packages", label: t.packages },
+    { href: "/projects", label: t.projects },
+    { href: "/calculator", label: t.calculator },
+    { href: "/contact", label: t.contact },
+  ];
 
   return (
     <header className="sticky top-0 z-50 bg-navy text-white shadow-md">
@@ -35,12 +62,31 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <Link
-          href="/contact"
-          className="hidden rounded-md bg-amber px-4 py-2 text-sm font-semibold text-navy-dark transition hover:bg-amber-light md:inline-block"
-        >
-          Get a Quote
-        </Link>
+        <div className="hidden md:flex items-center gap-3">
+          <button
+            onClick={() => setLang(lang === "en" ? "mr" : "en")}
+            className="flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/10 hover:border-amber/40"
+            aria-label="Toggle language"
+          >
+            <Languages className="h-3.5 w-3.5 text-amber" />
+            {t.toggleLabel}
+          </button>
+          <a
+            href="/one-o-buildcon-company-profile.pdf"
+            download
+            className="flex items-center gap-1.5 rounded-full border border-amber/40 px-3 py-1.5 text-xs font-semibold text-amber transition hover:bg-amber/10"
+            aria-label="Download company profile"
+          >
+            <Download className="h-3.5 w-3.5" />
+            {lang === "en" ? "Profile" : "प्रोफाइल"}
+          </a>
+          <Link
+            href="/contact"
+            className="rounded-md bg-amber px-4 py-2 text-sm font-semibold text-navy-dark transition hover:bg-amber-light"
+          >
+            {t.getQuote}
+          </Link>
+        </div>
 
         <button
           aria-label="Toggle menu"
@@ -72,8 +118,28 @@ export default function Navbar() {
               onClick={() => setOpen(false)}
               className="inline-block rounded-md bg-amber px-4 py-2 text-sm font-semibold text-navy-dark"
             >
-              Get a Quote
+              {t.getQuote}
             </Link>
+          </li>
+          <li>
+            <a
+              href="/one-o-buildcon-company-profile.pdf"
+              download
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 rounded-full border border-amber/40 px-4 py-2 text-sm font-semibold text-amber transition hover:bg-amber/10 w-fit"
+            >
+              <Download className="h-4 w-4" />
+              {lang === "en" ? "Company Profile" : "कंपनी प्रोफाइल"}
+            </a>
+          </li>
+          <li>
+            <button
+              onClick={() => { setLang(lang === "en" ? "mr" : "en"); setOpen(false); }}
+              className="flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/10"
+            >
+              <Languages className="h-4 w-4 text-amber" />
+              {t.toggleLabel}
+            </button>
           </li>
         </ul>
       )}
