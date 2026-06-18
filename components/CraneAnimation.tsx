@@ -139,56 +139,78 @@ export default function CraneAnimation({ className = "" }: { className?: string 
         {/* ═══ SINGLE-BAG SITE MIXER (right) ═══ */}
         <ellipse cx="330" cy="432" rx="76" ry="6" fill="#000" opacity="0.2" />
 
-        {/* two big spoked wheels with tyre tread */}
-        {[300, 366].map((cx) => (
+        {/* trolley frame */}
+        <rect x="288" y="398" width="100" height="8" rx="2" fill="url(#rmcChassis)" stroke="#23272c" strokeWidth="1" />
+
+        {/* four trolley wheels with tread */}
+        {[298, 326, 354, 382].map((cx) => (
           <g key={cx}>
-            <circle cx={cx} cy="408" r="23" fill="url(#rmcTyre)" stroke="#000" strokeWidth="2" />
-            {/* tread ticks */}
-            <g stroke="#0c0e10" strokeWidth="2">
-              {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((a) => (
+            <circle cx={cx} cy="414" r="16" fill="url(#rmcTyre)" stroke="#000" strokeWidth="2" />
+            <g stroke="#0c0e10" strokeWidth="1.5">
+              {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
                 <line key={a}
-                  x1={cx + 20 * Math.cos((a * Math.PI) / 180)} y1={408 + 20 * Math.sin((a * Math.PI) / 180)}
-                  x2={cx + 23 * Math.cos((a * Math.PI) / 180)} y2={408 + 23 * Math.sin((a * Math.PI) / 180)} />
+                  x1={cx + 13 * Math.cos((a * Math.PI) / 180)} y1={414 + 13 * Math.sin((a * Math.PI) / 180)}
+                  x2={cx + 16 * Math.cos((a * Math.PI) / 180)} y2={414 + 16 * Math.sin((a * Math.PI) / 180)} />
               ))}
             </g>
-            <circle cx={cx} cy="408" r="15" fill="none" stroke="#7a818a" strokeWidth="3" />
-            <g stroke="#9aa3ad" strokeWidth="2">
-              {[0, 45, 90, 135].map((a) => (
-                <line key={a}
-                  x1={cx - 14 * Math.cos((a * Math.PI) / 180)} y1={408 - 14 * Math.sin((a * Math.PI) / 180)}
-                  x2={cx + 14 * Math.cos((a * Math.PI) / 180)} y2={408 + 14 * Math.sin((a * Math.PI) / 180)} />
-              ))}
-            </g>
-            <circle cx={cx} cy="408" r="5" fill="#5d646d" stroke="#2c3036" strokeWidth="1.5" />
+            <circle cx={cx} cy="414" r="9" fill="none" stroke="#7a818a" strokeWidth="2.5" />
+            <circle cx={cx} cy="414" r="3.5" fill="#5d646d" stroke="#2c3036" strokeWidth="1" />
           </g>
         ))}
 
-        {/* axle + A-frame stand + gussets */}
+        {/* A-frame stand + gussets */}
         <g stroke="url(#rmcChassis)" strokeWidth="7" strokeLinecap="round">
-          <line x1="300" y1="408" x2="366" y2="408" />
-          <line x1="312" y1="406" x2="330" y2="364" />
-          <line x1="356" y1="406" x2="338" y2="364" />
+          <line x1="316" y1="398" x2="330" y2="364" />
+          <line x1="360" y1="398" x2="344" y2="364" />
         </g>
         <rect x="322" y="360" width="26" height="10" rx="3" fill="#3a3f45" />
         <g fill="#23272c">
-          <circle cx="312" cy="406" r="2.5" />
-          <circle cx="356" cy="406" r="2.5" />
+          <circle cx="316" cy="398" r="2.5" />
+          <circle cx="360" cy="398" r="2.5" />
         </g>
         {/* tow handle */}
-        <line x1="290" y1="406" x2="262" y2="418" stroke="url(#rmcChassis)" strokeWidth="5" strokeLinecap="round" />
-        <rect x="254" y="414" width="12" height="6" rx="3" fill="#2c3036" />
+        <line x1="288" y1="400" x2="258" y2="414" stroke="url(#rmcChassis)" strokeWidth="5" strokeLinecap="round" />
+        <rect x="250" y="410" width="12" height="6" rx="3" fill="#2c3036" />
 
-        {/* diesel engine + belt drive */}
-        <rect x="296" y="378" width="24" height="20" rx="3" fill="url(#rmcChassis)" stroke="#23272c" strokeWidth="1.5" />
+        {/* diesel engine / motor */}
+        <rect x="290" y="372" width="26" height="22" rx="3" fill="url(#rmcChassis)" stroke="#23272c" strokeWidth="1.5" />
         <g stroke="#23272c" strokeWidth="1">
-          <line x1="300" y1="380" x2="300" y2="396" />
-          <line x1="304" y1="380" x2="304" y2="396" />
-          <line x1="308" y1="380" x2="308" y2="396" />
+          <line x1="294" y1="374" x2="294" y2="392" />
+          <line x1="298" y1="374" x2="298" y2="392" />
+          <line x1="302" y1="374" x2="302" y2="392" />
+          <line x1="306" y1="374" x2="306" y2="392" />
         </g>
-        <circle cx="316" cy="388" r="5" fill="#6b7178" stroke="#23272c" strokeWidth="1.5" />
-        {/* drive belt to drum */}
-        <line x1="320" y1="384" x2="330" y2="368" stroke="#23272c" strokeWidth="2" />
-        <line x1="320" y1="392" x2="332" y2="372" stroke="#23272c" strokeWidth="2" />
+        {/* exhaust + air filter */}
+        <rect x="288" y="364" width="5" height="10" rx="2" fill="#6b7178" stroke="#23272c" strokeWidth="1" />
+        <circle cx="312" cy="368" r="4" fill="#6b7178" stroke="#23272c" strokeWidth="1.5" />
+
+        {/* drive gears (motor pinion meshing big drum gear) */}
+        <g transform="translate(322 384)">
+          {/* small pinion */}
+          <g transform="translate(-9 0)">
+            <g className="rmc-gear" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <rect key={i} x="-1.5" y="-9" width="3" height="4" fill="#4a5159" transform={`rotate(${i * 36})`} />
+              ))}
+              <circle r="6.5" fill="#6b7178" stroke="#23272c" strokeWidth="1.5" />
+              <circle r="2" fill="#23272c" />
+            </g>
+          </g>
+          {/* big drive gear */}
+          <g transform="translate(6 0)">
+            <g className="rmc-drum" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
+              {Array.from({ length: 16 }).map((_, i) => (
+                <rect key={i} x="-2" y="-15" width="4" height="5" fill="#4a5159" transform={`rotate(${i * 22.5})`} />
+              ))}
+              <circle r="11" fill="#7a818a" stroke="#23272c" strokeWidth="1.5" />
+              <g stroke="#23272c" strokeWidth="1.5">
+                <line x1="-9" y1="0" x2="9" y2="0" />
+                <line x1="0" y1="-9" x2="0" y2="9" />
+              </g>
+              <circle r="3" fill="#3a3f45" />
+            </g>
+          </g>
+        </g>
 
         {/* tilting drum (amber, rotating) */}
         <g transform="translate(334 352) rotate(-24)">

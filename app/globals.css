@@ -80,3 +80,10 @@ img {
 @media (prefers-reduced-motion: reduce) {
   .rmc-drum { animation: none; }
 }
+
+/* Mixer drive gear spin (opposite direction to drum) */
+.rmc-gear { animation: rmcGear 2.4s linear infinite; }
+@keyframes rmcGear {
+  to { transform: rotate(-360deg); }
+}
+@media (prefers-reduced-motion: reduce) { .rmc-gear { animation: none; } }
