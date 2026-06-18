@@ -403,8 +403,8 @@ export default function Home() {
           </div>
         ))}
 
-        {/* Animated tower crane (desktop only) */}
-        <CraneAnimation className="pointer-events-none absolute bottom-0 right-4 hidden h-[90%] w-auto opacity-90 lg:block xl:right-16" />
+        {/* Animated tower crane */}
+        <CraneAnimation className="pointer-events-none absolute bottom-0 right-1 h-[45%] w-auto opacity-30 sm:right-4 sm:h-[65%] sm:opacity-50 lg:h-[90%] lg:opacity-90 xl:right-16" />
 
         <div className="relative mx-auto max-w-6xl px-6 py-28 w-full">
           <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col items-start gap-6">
