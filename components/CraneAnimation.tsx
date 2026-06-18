@@ -16,6 +16,13 @@ export default function CraneAnimation({ className = "" }: { className?: string 
           <stop offset="0" stopColor="#aab2bb" />
           <stop offset="1" stopColor="#545b63" />
         </linearGradient>
+        <linearGradient id="rmcDrum" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#eef1f4" />
+          <stop offset="1" stopColor="#b9c0c8" />
+        </linearGradient>
+        <clipPath id="drumClip">
+          <ellipse cx="0" cy="0" rx="46" ry="27" />
+        </clipPath>
         <filter id="craneShadow" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#000000" floodOpacity="0.35" />
         </filter>
@@ -83,6 +90,42 @@ export default function CraneAnimation({ className = "" }: { className?: string 
             </g>
           ))}
         </g>
+      </g>
+
+      {/* ── RMC cement mixer truck (drum spins) ── */}
+      <g>
+        {/* shadow */}
+        <ellipse cx="350" cy="440" rx="90" ry="7" fill="#000" opacity="0.2" />
+        {/* chassis */}
+        <rect x="282" y="416" width="150" height="14" rx="3" fill="#3a3f45" />
+        {/* cab (front, right) */}
+        <path d="M404 416 v-26 a4 4 0 0 1 4 -4 h20 a6 6 0 0 1 6 5 l4 25 Z" fill="url(#craneSteel)" stroke="#9a5e0c" strokeWidth="2" />
+        <rect x="410" y="390" width="18" height="13" rx="2" fill="#bfe3ef" stroke="#9a5e0c" strokeWidth="1.5" />
+        {/* drum support frame */}
+        <line x1="300" y1="416" x2="312" y2="392" stroke="#3a3f45" strokeWidth="4" />
+        <line x1="395" y1="416" x2="392" y2="392" stroke="#3a3f45" strokeWidth="4" />
+        {/* rotating drum */}
+        <g transform="translate(352 398) rotate(-16)">
+          <ellipse cx="0" cy="0" rx="46" ry="27" fill="url(#rmcDrum)" stroke="#5d646d" strokeWidth="2" />
+          <g clipPath="url(#drumClip)">
+            <g className="rmc-drum" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
+              {[0, 60, 120, 180, 240, 300].map((a) => (
+                <line key={a} x1="0" y1="0" x2={46 * Math.cos((a * Math.PI) / 180)} y2={27 * Math.sin((a * Math.PI) / 180)} stroke="#e8951f" strokeWidth="3" />
+              ))}
+            </g>
+          </g>
+          {/* drum cone end */}
+          <ellipse cx="-44" cy="0" rx="8" ry="15" fill="#9aa3ad" stroke="#5d646d" strokeWidth="1.5" />
+          {/* chute toward the crane bucket */}
+          <path d="M-46 6 l-22 16 l6 5 l20 -13 Z" fill="#c4760f" stroke="#7a4a10" strokeWidth="1.5" />
+        </g>
+        {/* wheels */}
+        {[300, 332, 400].map((cx) => (
+          <g key={cx}>
+            <circle cx={cx} cy="432" r="11" fill="#22262b" stroke="#000" strokeWidth="1.5" />
+            <circle cx={cx} cy="432" r="4" fill="#5d646d" />
+          </g>
+        ))}
       </g>
 
       {/* ── Trolley + hook block + concrete load (animated) ── */}

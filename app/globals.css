@@ -70,3 +70,13 @@ img {
 @media (prefers-reduced-motion: reduce) {
   .crane-trolley, .crane-load { animation: none; }
 }
+
+/* RMC mixer drum spin */
+.rmc-drum { animation: rmcDrum 4s linear infinite; }
+@keyframes rmcDrum {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rmc-drum { animation: none; }
+}
