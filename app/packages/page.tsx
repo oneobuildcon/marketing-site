@@ -16,6 +16,42 @@ import {
   CategoryId,
   PackageMeta,
 } from "@/data/packagesData";
+import { useLanguage } from "@/lib/LanguageContext";
+
+const uiTranslations = {
+  en: {
+    heroBadge: "Transparent Pricing",
+    heroTitle1: "Pick Your",
+    heroTitleHighlight: "Package",
+    heroSub: "Every package is built around quality, honesty, and on-time delivery. Choose what fits your vision.",
+    youSelected: "You selected",
+    packageSuffix: "Package",
+    inclGST: "(Incl. GST)",
+    perSqft: "per sqft",
+    popular: "Popular",
+    getQuote: "Get Free Quote →",
+    ctaTitle: "Not sure which package suits you?",
+    ctaSub: "Talk to our team — we'll help you choose the right one for your budget and requirements.",
+    ctaBtn: "Talk to an Expert →",
+    noItems: "No items listed for this package & category.",
+  },
+  mr: {
+    heroBadge: "पारदर्शक किंमत",
+    heroTitle1: "तुमचे",
+    heroTitleHighlight: "पॅकेज निवडा",
+    heroSub: "प्रत्येक पॅकेज दर्जा, प्रामाणिकता आणि वेळेवर डिलिव्हरीवर आधारित आहे. तुमच्या दृष्टीनुसार योग्य ते निवडा.",
+    youSelected: "तुम्ही निवडले",
+    packageSuffix: "पॅकेज",
+    inclGST: "(GST सह)",
+    perSqft: "प्रति चौ.फू.",
+    popular: "लोकप्रिय",
+    getQuote: "मोफत कोटेशन →",
+    ctaTitle: "कोणते पॅकेज योग्य आहे याची खात्री नाही?",
+    ctaSub: "आमच्या टीमशी बोला — आम्ही तुमच्या बजेट आणि आवश्यकतांसाठी योग्य ते निवडण्यास मदत करू.",
+    ctaBtn: "तज्ञाशी बोला →",
+    noItems: "या पॅकेज आणि श्रेणीसाठी कोणतीही वस्तू सूचीबद्ध नाही.",
+  },
+};
 
 const categoryIcons: Record<CategoryId, React.ElementType> = {
   designs: PencilRuler, earthwork: Shovel, structure: Building2,
@@ -26,6 +62,8 @@ const categoryIcons: Record<CategoryId, React.ElementType> = {
 const popularIds = ["basic", "standard"];
 
 export default function Packages() {
+  const { lang } = useLanguage();
+  const ui = uiTranslations[lang];
   const [content, setContent] = useState<PackageContent>(defaultPackageContent);
   const [pkgMeta, setPkgMeta] = useState<PackageMeta[]>(defaultPkgs.map((p) => ({ ...p })));
   const [catMeta, setCatMeta] = useState(categories.map((c) => ({ ...c })));
@@ -64,11 +102,11 @@ export default function Packages() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} className="relative mx-auto max-w-6xl px-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <HardHat className="h-5 w-5 text-amber" />
-            <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">Transparent Pricing</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">{ui.heroBadge}</p>
           </div>
-          <h1 className="text-4xl font-bold sm:text-5xl">Pick Your <span className="text-amber">Package</span></h1>
+          <h1 className="text-4xl font-bold sm:text-5xl">{ui.heroTitle1} <span className="text-amber">{ui.heroTitleHighlight}</span></h1>
           <p className="mt-4 max-w-xl mx-auto text-white/70 text-lg">
-            Every package is built around quality, honesty, and on-time delivery. Choose what fits your vision.
+            {ui.heroSub}
           </p>
         </motion.div>
       </section>
@@ -94,7 +132,7 @@ export default function Packages() {
                 >
                   {isPopular && !isSelected && (
                     <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-amber px-2 py-0.5 text-[10px] font-bold text-navy-dark whitespace-nowrap">
-                      Popular
+                      {ui.popular}
                     </span>
                   )}
                   <div className={`mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full ${isSelected ? "bg-amber/20" : "bg-navy/5"}`}>
@@ -102,7 +140,7 @@ export default function Packages() {
                   </div>
                   <p className={`font-bold text-sm ${isSelected ? "text-white" : "text-navy"}`}>{pkg.name}</p>
                   <p className={`text-xs mt-1 font-semibold ${isSelected ? "text-amber" : "text-amber"}`}>₹{pkg.price}</p>
-                  <p className={`text-[10px] ${isSelected ? "text-white/50" : "text-navy/40"}`}>per sqft</p>
+                  <p className={`text-[10px] ${isSelected ? "text-white/50" : "text-navy/40"}`}>{ui.perSqft}</p>
                   {isSelected && (
                     <div className="mt-2 flex justify-center">
                       <ChevronDown className="h-4 w-4 text-amber animate-bounce" />
@@ -122,18 +160,18 @@ export default function Packages() {
           {/* Package header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber">You selected</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber">{ui.youSelected}</p>
               <h2 className="text-2xl font-bold text-navy mt-1">
-                {pkgInfo?.name} Package
+                {pkgInfo?.name} {ui.packageSuffix}
                 <span className="ml-3 text-lg font-semibold text-amber">₹{pkgInfo?.price}/sqft</span>
-                <span className="ml-1 text-sm text-navy/40 font-normal">(Incl. GST)</span>
+                <span className="ml-1 text-sm text-navy/40 font-normal">{ui.inclGST}</span>
               </h2>
             </div>
             <Link
               href="/contact"
               className="shrink-0 rounded-xl bg-amber px-6 py-3 font-semibold text-navy-dark transition hover:bg-amber-light hover:scale-105 transform text-sm"
             >
-              Get Free Quote →
+              {ui.getQuote}
             </Link>
           </div>
 
@@ -170,7 +208,7 @@ export default function Packages() {
             >
               {items.length === 0 ? (
                 <div className="rounded-2xl bg-gray-50 border border-black/8 py-16 text-center text-navy/30 text-sm">
-                  No items listed for this package &amp; category.
+                  {ui.noItems}
                 </div>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -205,14 +243,14 @@ export default function Packages() {
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 80% 50%, #F59E0B 0%, transparent 50%)" }} />
         <div className="relative mx-auto max-w-6xl px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
-            <h3 className="text-2xl font-bold">Not sure which package suits you?</h3>
-            <p className="mt-2 text-white/60">Talk to our team — we&apos;ll help you choose the right one for your budget and requirements.</p>
+            <h3 className="text-2xl font-bold">{ui.ctaTitle}</h3>
+            <p className="mt-2 text-white/60">{ui.ctaSub}</p>
           </div>
           <Link
             href="/contact"
             className="shrink-0 rounded-xl bg-amber px-8 py-4 font-semibold text-navy-dark hover:bg-amber-light hover:scale-105 transform transition text-sm"
           >
-            Talk to an Expert →
+            {ui.ctaBtn}
           </Link>
         </div>
       </section>

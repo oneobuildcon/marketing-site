@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { HardHat, MapPin, Tag } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useLanguage } from "@/lib/LanguageContext";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -16,20 +17,53 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.1 } },
 };
 
-const projects = [
-  { name: "Skyline Bungalow", type: "Premium Bungalow", location: "Pune", desc: "A premium bungalow with custom interiors and landscaped grounds.", img: "https://picsum.photos/seed/proj11/500/350" },
-  { name: "Greenfield Row Houses", type: "Row House", location: "Pune", desc: "A gated row house community with modern amenities and shared green spaces.", img: "https://picsum.photos/seed/proj12/500/350" },
-  { name: "The Orchid Residency", type: "Residential Building", location: "Lonavala", desc: "A multi-storey residential building with quality finishes and ample parking.", img: "https://picsum.photos/seed/proj13/500/350" },
-  { name: "Riverside Farmhouse", type: "Farmhouse", location: "Mumbai", desc: "A countryside farmhouse retreat built to blend with its natural surroundings.", img: "https://picsum.photos/seed/proj14/500/350" },
-  { name: "Foundation & Slab Work", type: "RCC Work", location: "Pune", desc: "Structural RCC work covering foundations, columns, and slab casting.", img: "https://picsum.photos/seed/proj15/500/350" },
-  { name: "Hilltop Bungalow", type: "Premium Bungalow", location: "Lonavala", desc: "A luxury hilltop bungalow with panoramic views and premium fittings.", img: "https://picsum.photos/seed/proj16/500/350" },
-];
-
-const filters = ["All", "Premium Bungalow", "Row House", "Residential Building", "Farmhouse", "RCC Work"];
+const translations = {
+  en: {
+    heroBadge: "Portfolio",
+    heroTitle: "Our",
+    heroTitleHighlight: "Projects",
+    heroSub: "A look at some of the work we're proud to have delivered.",
+    filters: ["All", "Premium Bungalow", "Row House", "Residential Building", "Farmhouse", "RCC Work"],
+    projects: [
+      { name: "Skyline Bungalow", type: "Premium Bungalow", location: "Pune", desc: "A premium bungalow with custom interiors and landscaped grounds.", img: "https://picsum.photos/seed/proj11/500/350" },
+      { name: "Greenfield Row Houses", type: "Row House", location: "Pune", desc: "A gated row house community with modern amenities and shared green spaces.", img: "https://picsum.photos/seed/proj12/500/350" },
+      { name: "The Orchid Residency", type: "Residential Building", location: "Lonavala", desc: "A multi-storey residential building with quality finishes and ample parking.", img: "https://picsum.photos/seed/proj13/500/350" },
+      { name: "Riverside Farmhouse", type: "Farmhouse", location: "Mumbai", desc: "A countryside farmhouse retreat built to blend with its natural surroundings.", img: "https://picsum.photos/seed/proj14/500/350" },
+      { name: "Foundation & Slab Work", type: "RCC Work", location: "Pune", desc: "Structural RCC work covering foundations, columns, and slab casting.", img: "https://picsum.photos/seed/proj15/500/350" },
+      { name: "Hilltop Bungalow", type: "Premium Bungalow", location: "Lonavala", desc: "A luxury hilltop bungalow with panoramic views and premium fittings.", img: "https://picsum.photos/seed/proj16/500/350" },
+    ],
+    noneMessage: "No projects in this category yet.",
+    ctaTitle: "Want to be our next success story?",
+    ctaSub: "Let's discuss your project. Free consultation, no obligations.",
+    ctaBtn: "Start Your Project →",
+  },
+  mr: {
+    heroBadge: "पोर्टफोलिओ",
+    heroTitle: "आमचे",
+    heroTitleHighlight: "प्रकल्प",
+    heroSub: "आम्ही अभिमानाने पूर्ण केलेल्या कामांपैकी काही.",
+    filters: ["सर्व", "प्रीमियम बंगला", "रो हाउस", "निवासी इमारत", "फार्महाउस", "आरसीसी काम"],
+    projects: [
+      { name: "स्कायलाइन बंगला", type: "प्रीमियम बंगला", location: "पुणे", desc: "कस्टम इंटेरियर आणि लँडस्केप ग्राउंडसह एक प्रीमियम बंगला.", img: "https://picsum.photos/seed/proj11/500/350" },
+      { name: "ग्रीनफिल्ड रो हाउस", type: "रो हाउस", location: "पुणे", desc: "आधुनिक सुविधा आणि सामायिक हिरव्या जागांसह एक गेटेड रो हाउस समुदाय.", img: "https://picsum.photos/seed/proj12/500/350" },
+      { name: "द ऑर्किड रेसिडेन्सी", type: "निवासी इमारत", location: "लोणावळा", desc: "दर्जेदार फिनिशिंग आणि पुरेशा पार्किंगसह एक बहुमजली निवासी इमारत.", img: "https://picsum.photos/seed/proj13/500/350" },
+      { name: "रिव्हरसाइड फार्महाउस", type: "फार्महाउस", location: "मुंबई", desc: "नैसर्गिक परिसराशी मेळ घालण्यासाठी बांधलेले ग्रामीण फार्महाउस.", img: "https://picsum.photos/seed/proj14/500/350" },
+      { name: "फाउंडेशन आणि स्लॅब काम", type: "आरसीसी काम", location: "पुणे", desc: "पाया, खांब आणि स्लॅब कास्टिंग कव्हर करणारे संरचनात्मक आरसीसी काम.", img: "https://picsum.photos/seed/proj15/500/350" },
+      { name: "हिलटॉप बंगला", type: "प्रीमियम बंगला", location: "लोणावळा", desc: "मनोरम दृश्ये आणि प्रीमियम फिटिंग्जसह एक लक्झरी हिलटॉप बंगला.", img: "https://picsum.photos/seed/proj16/500/350" },
+    ],
+    noneMessage: "या श्रेणीत अद्याप प्रकल्प नाहीत.",
+    ctaTitle: "आमची पुढील यशोगाथा बनायची आहे का?",
+    ctaSub: "तुमच्या प्रकल्पाबद्दल चर्चा करूया. मोफत सल्लामसलत, कोणतेही बंधन नाही.",
+    ctaBtn: "तुमचा प्रकल्प सुरू करा →",
+  },
+};
 
 export default function Projects() {
-  const [active, setActive] = useState("All");
-  const filtered = active === "All" ? projects : projects.filter((p) => p.type === active);
+  const { lang } = useLanguage();
+  const t = translations[lang];
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const filtered = activeIndex === 0 ? t.projects : t.projects.filter((p) => p.type === t.filters[activeIndex]);
 
   return (
     <main className="overflow-hidden">
@@ -54,13 +88,13 @@ export default function Projects() {
           <motion.div initial="hidden" animate="visible" variants={stagger}>
             <motion.div variants={fadeUp} className="flex items-center gap-2 mb-3">
               <HardHat className="h-5 w-5 text-amber" />
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">Portfolio</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">{t.heroBadge}</p>
             </motion.div>
             <motion.h1 variants={fadeUp} className="text-4xl font-bold sm:text-5xl">
-              Our <span className="text-amber">Projects</span>
+              {t.heroTitle} <span className="text-amber">{t.heroTitleHighlight}</span>
             </motion.h1>
             <motion.p variants={fadeUp} className="mt-3 max-w-2xl text-white/80 text-lg">
-              A look at some of the work we&apos;re proud to have delivered.
+              {t.heroSub}
             </motion.p>
             <motion.div variants={fadeUp} className="relative mt-4 h-0.5 w-24 bg-amber/40 overflow-hidden rounded-full">
               <div className="absolute inset-y-0 w-12 bg-amber/80 rounded-full" style={{ animation: "shimmerLine 2s ease-in-out infinite" }} />
@@ -73,13 +107,13 @@ export default function Projects() {
       <section className="bg-white border-b border-black/8 py-5 sticky top-16 z-40">
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {filters.map((f) => (
+            {t.filters.map((f, i) => (
               <motion.button
                 key={f}
-                onClick={() => setActive(f)}
+                onClick={() => setActiveIndex(i)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`shrink-0 rounded-xl px-4 py-2 text-sm font-medium transition-all border ${active === f ? "bg-navy text-white border-navy shadow-md" : "bg-gray-50 text-navy/60 border-black/8 hover:border-amber/40 hover:bg-amber/5"}`}
+                className={`shrink-0 rounded-xl px-4 py-2 text-sm font-medium transition-all border ${activeIndex === i ? "bg-navy text-white border-navy shadow-md" : "bg-gray-50 text-navy/60 border-black/8 hover:border-amber/40 hover:bg-amber/5"}`}
               >
                 {f}
               </motion.button>
@@ -124,7 +158,7 @@ export default function Projects() {
           </motion.div>
 
           {filtered.length === 0 && (
-            <div className="text-center py-20 text-navy/40">No projects in this category yet.</div>
+            <div className="text-center py-20 text-navy/40">{t.noneMessage}</div>
           )}
         </div>
       </section>
@@ -132,11 +166,11 @@ export default function Projects() {
       {/* CTA */}
       <section className="bg-navy py-16">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mx-auto max-w-6xl px-6 text-center">
-          <motion.h2 variants={fadeUp} className="text-3xl font-bold text-white">Want to be our next success story?</motion.h2>
-          <motion.p variants={fadeUp} className="mt-3 text-white/60 max-w-xl mx-auto">Let&apos;s discuss your project. Free consultation, no obligations.</motion.p>
+          <motion.h2 variants={fadeUp} className="text-3xl font-bold text-white">{t.ctaTitle}</motion.h2>
+          <motion.p variants={fadeUp} className="mt-3 text-white/60 max-w-xl mx-auto">{t.ctaSub}</motion.p>
           <motion.div variants={fadeUp}>
             <Link href="/contact" className="mt-8 inline-block rounded-xl bg-amber px-10 py-4 font-semibold text-navy-dark hover:bg-amber-light hover:scale-105 transform transition">
-              Start Your Project →
+              {t.ctaBtn}
             </Link>
           </motion.div>
         </motion.div>

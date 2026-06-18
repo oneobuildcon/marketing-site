@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { HardHat, Phone, Mail, MapPin, Clock } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
 import FAQ from "@/components/FAQ";
+import { useLanguage } from "@/lib/LanguageContext";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -15,14 +16,43 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.12 } },
 };
 
-const contactInfo = [
-  { icon: Phone, label: "Phone", value: "+91 88060 29907", color: "text-amber" },
-  { icon: Mail, label: "Email", value: "oneobuildcon@gmail.com", color: "text-amber" },
-  { icon: MapPin, label: "Address", value: "Pune, Maharashtra, India", color: "text-amber" },
-  { icon: Clock, label: "Hours", value: "Mon - Sat, 9am - 6pm", color: "text-amber" },
-];
+const translations = {
+  en: {
+    heroBadge: "Get in Touch",
+    heroTitle: "Contact",
+    heroTitleHighlight: "Us",
+    heroSub: "Tell us about your project and we'll get back to you within one business day.",
+    getInTouch: "Get in Touch",
+    sendMessage: "Send a Message",
+    contactInfo: [
+      { label: "Phone", value: "+91 88060 29907" },
+      { label: "Email", value: "oneobuildcon@gmail.com" },
+      { label: "Address", value: "Pune, Maharashtra, India" },
+      { label: "Hours", value: "Mon - Sat, 9am - 6pm" },
+    ],
+  },
+  mr: {
+    heroBadge: "संपर्क करा",
+    heroTitle: "संपर्क",
+    heroTitleHighlight: "करा",
+    heroSub: "तुमच्या प्रकल्पाबद्दल सांगा आणि आम्ही एका व्यावसायिक दिवसात तुमच्याशी संपर्क साधू.",
+    getInTouch: "संपर्क करा",
+    sendMessage: "संदेश पाठवा",
+    contactInfo: [
+      { label: "फोन", value: "+91 88060 29907" },
+      { label: "ईमेल", value: "oneobuildcon@gmail.com" },
+      { label: "पत्ता", value: "पुणे, महाराष्ट्र, भारत" },
+      { label: "वेळ", value: "सोम - शनि, सकाळी ९ - संध्या ६" },
+    ],
+  },
+};
+
+const contactIcons = [Phone, Mail, MapPin, Clock];
 
 export default function Contact() {
+  const { lang } = useLanguage();
+  const t = translations[lang];
+
   return (
     <main className="overflow-hidden">
       <style>{`
@@ -47,13 +77,13 @@ export default function Contact() {
           <motion.div initial="hidden" animate="visible" variants={stagger}>
             <motion.div variants={fadeUp} className="flex items-center gap-2 mb-3">
               <HardHat className="h-5 w-5 text-amber" />
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">Get in Touch</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">{t.heroBadge}</p>
             </motion.div>
             <motion.h1 variants={fadeUp} className="text-4xl font-bold sm:text-5xl">
-              Contact <span className="text-amber">Us</span>
+              {t.heroTitle} <span className="text-amber">{t.heroTitleHighlight}</span>
             </motion.h1>
             <motion.p variants={fadeUp} className="mt-3 max-w-2xl text-white/80 text-lg">
-              Tell us about your project and we&apos;ll get back to you within one business day.
+              {t.heroSub}
             </motion.p>
             <motion.div variants={fadeUp} className="relative mt-4 h-0.5 w-24 bg-amber/40 overflow-hidden rounded-full">
               <div className="absolute inset-y-0 w-12 bg-amber/80 rounded-full" style={{ animation: "shimmerLine 2s ease-in-out infinite" }} />
@@ -69,10 +99,10 @@ export default function Contact() {
 
             {/* Info cards */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-              <motion.h2 variants={fadeUp} className="text-2xl font-bold text-navy mb-8">Get in Touch</motion.h2>
+              <motion.h2 variants={fadeUp} className="text-2xl font-bold text-navy mb-8">{t.getInTouch}</motion.h2>
               <div className="grid gap-4 sm:grid-cols-2">
-                {contactInfo.map((item) => {
-                  const Icon = item.icon;
+                {t.contactInfo.map((item, i) => {
+                  const Icon = contactIcons[i];
                   return (
                     <motion.div
                       key={item.label}
@@ -95,14 +125,14 @@ export default function Contact() {
               <motion.div variants={fadeUp} whileHover={{ scale: 1.01 }} className="mt-6 rounded-2xl overflow-hidden border border-black/8 shadow-sm h-48 bg-navy/5 flex items-center justify-center">
                 <div className="text-center">
                   <MapPin className="h-8 w-8 text-amber mx-auto mb-2" />
-                  <p className="text-sm font-medium text-navy">Pune, Maharashtra, India</p>
+                  <p className="text-sm font-medium text-navy">{lang === "en" ? "Pune, Maharashtra, India" : "पुणे, महाराष्ट्र, भारत"}</p>
                 </div>
               </motion.div>
             </motion.div>
 
             {/* Form */}
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="rounded-2xl bg-white border border-black/8 shadow-sm p-8">
-              <h2 className="text-2xl font-bold text-navy mb-6">Send a Message</h2>
+              <h2 className="text-2xl font-bold text-navy mb-6">{t.sendMessage}</h2>
               <ContactForm />
             </motion.div>
           </div>
