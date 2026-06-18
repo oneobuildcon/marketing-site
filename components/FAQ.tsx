@@ -8,11 +8,11 @@ import Link from "next/link";
 const faqs = [
   {
     q: "Which areas do you serve?",
-    a: "We're based in Pune and take on projects across Pune and the wider Maharashtra region — including bungalows, row houses, residential buildings, farmhouses, and RCC work.",
+    a: "We're based in Pune and take on projects across the wider Maharashtra region — including bungalows, row houses, residential buildings, farmhouses, and RCC work.",
   },
   {
     q: "How do I get a quote?",
-    a: "It's free and easy. Use our online cost calculator for an instant estimate, or fill out the contact form and our team will get back to you within one business day with a detailed quote.",
+    a: "It's free and easy. Use our online cost calculator for an instant estimate, or fill out the contact form, and our team will get back to you within one business day with a detailed quote.",
   },
   {
     q: "Can I get a cost estimate before committing?",

@@ -47,7 +47,7 @@ export default function Contact() {
           <motion.div initial="hidden" animate="visible" variants={stagger}>
             <motion.div variants={fadeUp} className="flex items-center gap-2 mb-3">
               <HardHat className="h-5 w-5 text-amber" />
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">Get In Touch</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">Get in Touch</p>
             </motion.div>
             <motion.h1 variants={fadeUp} className="text-4xl font-bold sm:text-5xl">
               Contact <span className="text-amber">Us</span>

@@ -22,9 +22,9 @@ const values = [
 
 const milestones = [
   { year: "2019", event: "One O Buildcon founded in Pune" },
-  { year: "2021", event: "Expanded to farmhouse & commercial builds" },
+  { year: "2021", event: "Expanded to farmhouse and commercial builds" },
   { year: "2023", event: "Completed 20+ projects across residential & commercial" },
-  { year: "2024", event: "Growing client base across Pune, Maharashtra" },
+  { year: "2024", event: "Expanding client base across Pune and Maharashtra" },
 ];
 
 export default function About() {

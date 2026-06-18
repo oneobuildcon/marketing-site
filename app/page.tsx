@@ -51,7 +51,7 @@ const whyChooseUs = [
 const processSteps = [
   { step: "01", title: "Consultation", desc: "We understand your vision, budget, and site requirements in a free initial meeting.", icon: MessageSquare },
   { step: "02", title: "Design & Planning", desc: "Our team prepares detailed blueprints, 3D layouts, and material estimates.", icon: PencilRuler },
-  { step: "03", title: "Construction", desc: "Skilled workers execute with precision using quality materials and modern equipment.", icon: HardHat },
+  { step: "03", title: "Construction", desc: "Skilled workers execute the work with precision, using quality materials and modern equipment.", icon: HardHat },
   { step: "04", title: "Handover", desc: "Final inspection, finishing touches, and keys handed over on schedule.", icon: KeyRound },
 ];
 
@@ -718,7 +718,7 @@ export default function Home() {
             <HardHat className="h-10 w-10 text-amber" />
           </motion.div>
           <motion.h2 variants={fadeUp} className="text-3xl font-bold sm:text-4xl">Planning a Construction Project?</motion.h2>
-          <motion.p variants={fadeUp} className="mt-3 text-white/80 text-lg">Let One O Buildcon bring your vision to life. Free consultation, no obligations.</motion.p>
+          <motion.p variants={fadeUp} className="mt-3 text-white/80 text-lg">Let One O Buildcon bring your vision to life. Free consultation, no obligation.</motion.p>
           <motion.div variants={fadeUp}>
             <Link href="/contact" className="mt-8 inline-block rounded-md bg-amber px-10 py-4 font-semibold text-navy-dark transition hover:bg-amber-light hover:scale-105 transform text-lg">
               Request a Free Quote →

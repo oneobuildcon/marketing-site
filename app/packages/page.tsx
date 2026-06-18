@@ -205,7 +205,7 @@ export default function Packages() {
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 80% 50%, #F59E0B 0%, transparent 50%)" }} />
         <div className="relative mx-auto max-w-6xl px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
-            <h3 className="text-2xl font-bold">Not sure which package fits you?</h3>
+            <h3 className="text-2xl font-bold">Not sure which package suits you?</h3>
             <p className="mt-2 text-white/60">Talk to our team — we&apos;ll help you choose the right one for your budget and requirements.</p>
           </div>
           <Link
