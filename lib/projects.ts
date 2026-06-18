@@ -150,14 +150,14 @@ export const projects: Project[] = [
     duration: "On request",
     budget: "On request",
     en: {
-      name: "Patil Residency",
+      name: "Hotel Ajinkytara",
       type: "Residential Building",
       location: "Dighi, Pune",
       desc: "A multi-storey residential building with a contemporary brown-and-grey façade, balconies and quality finishes. Featuring a striking carved entrance and well-lit common areas.",
       highlights: ["Multi-storey residential building", "Contemporary façade", "Carved feature entrance", "Quality finishes & balconies"],
     },
     mr: {
-      name: "पाटील रेसिडेन्सी",
+      name: "हॉटेल अजिंक्यतारा",
       type: "निवासी इमारत",
       location: "दिघी, पुणे",
       desc: "समकालीन तपकिरी-राखाडी फसाड, बाल्कनी आणि दर्जेदार फिनिशिंगसह बहुमजली निवासी इमारत. आकर्षक कोरीव प्रवेशद्वार आणि चांगल्या प्रकाशाच्या सामायिक जागा.",
