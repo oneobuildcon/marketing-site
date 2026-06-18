@@ -69,15 +69,12 @@ export default function CraneAnimation({ className = "" }: { className?: string 
         <line x1="214" y1="168" x2="394" y2="160" stroke="#c4760f" strokeWidth="5" />
         {/* truss web */}
         <g stroke="#f0a836" strokeWidth="2.5">
-          {[238, 268, 298, 328, 358, 388].map((x, idx) => {
-            const bx = 214 + (x - 214) * (160 - 150) / (394 - 214) + (x - 214); // approx
-            return (
-              <g key={x}>
-                <line x1={x} y1="150" x2={x} y2={167 - idx * 0.9} />
-                <line x1={x} y1={167 - idx * 0.9} x2={x + 30} y2="150" />
-              </g>
-            );
-          })}
+          {[238, 268, 298, 328, 358, 388].map((x, idx) => (
+            <g key={x}>
+              <line x1={x} y1="150" x2={x} y2={167 - idx * 0.9} />
+              <line x1={x} y1={167 - idx * 0.9} x2={x + 30} y2="150" />
+            </g>
+          ))}
         </g>
       </g>
 
