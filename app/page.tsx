@@ -475,7 +475,7 @@ export default function Home() {
 
             <motion.div variants={fadeUp} className="flex flex-wrap gap-4">
               <Link href="/contact" className="rounded-md bg-amber px-8 py-3 font-semibold text-navy-dark transition hover:bg-amber-light hover:scale-105 transform">
-                Get a Free Quote
+                Get Price of Your Dream Home
               </Link>
               <Link href="/projects" className="rounded-md border border-white/30 px-8 py-3 font-semibold transition hover:bg-white/10">
                 View Our Projects →
