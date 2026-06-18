@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { HardHat, Calculator, Phone, ArrowRight, Info, FileText, FileSpreadsheet } from "lucide-react";
+import { HardHat, Calculator, Phone, ArrowRight, Info, FileText, FileSpreadsheet, ChevronDown } from "lucide-react";
 import {
   defaultPackageContent,
   categories as defaultCategories,
@@ -657,14 +657,40 @@ export default function CalculatorPage() {
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
                 <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Select Package</label>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {packages.map((pkg) => (
-                    <motion.button key={pkg.id} onClick={() => setSelectedPkg(pkg)} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                      className={`rounded-xl border-2 p-3 text-center transition-all ${selectedPkg.id === pkg.id ? "border-amber bg-amber/10 shadow-md" : `${pkg.color} border`}`}>
-                      <p className="font-bold text-sm text-navy">{pkg.name}</p>
-                      <p className="text-xs text-amber font-semibold mt-0.5">₹{pkg.price}/sqft</p>
-                      <p className="text-[10px] text-navy/40 mt-0.5">excl. GST</p>
-                    </motion.button>
-                  ))}
+                  {packages.map((pkg, i) => {
+                    const isSelected = selectedPkg.id === pkg.id;
+                    const isPopular = pkg.id === "basic" || pkg.id === "standard";
+                    return (
+                      <motion.button
+                        key={pkg.id}
+                        onClick={() => setSelectedPkg(pkg)}
+                        whileHover={{ y: -4 }}
+                        whileTap={{ scale: 0.97 }}
+                        className={`relative rounded-2xl p-4 text-center transition-all border-2 ${
+                          isSelected
+                            ? "bg-navy border-amber shadow-xl shadow-navy/20 text-white"
+                            : "bg-white border-transparent shadow-sm hover:border-amber/30 hover:shadow-md text-navy"
+                        }`}
+                      >
+                        {isPopular && !isSelected && (
+                          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-amber px-2 py-0.5 text-[10px] font-bold text-navy-dark whitespace-nowrap">
+                            Popular
+                          </span>
+                        )}
+                        <div className={`mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full ${isSelected ? "bg-amber/20" : "bg-navy/5"}`}>
+                          <span className={`text-lg font-black ${isSelected ? "text-amber" : "text-navy/40"}`}>{String(i + 1).padStart(2, "0")}</span>
+                        </div>
+                        <p className={`font-bold text-sm ${isSelected ? "text-white" : "text-navy"}`}>{pkg.name}</p>
+                        <p className="text-xs mt-1 font-semibold text-amber">₹{pkg.price}</p>
+                        <p className={`text-[10px] ${isSelected ? "text-white/50" : "text-navy/40"}`}>per sqft</p>
+                        {isSelected && (
+                          <div className="mt-2 flex justify-center">
+                            <ChevronDown className="h-4 w-4 text-amber animate-bounce" />
+                          </div>
+                        )}
+                      </motion.button>
+                    );
+                  })}
                 </div>
               </motion.div>
 
