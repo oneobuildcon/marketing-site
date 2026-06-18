@@ -1,23 +1,24 @@
 /* eslint-disable @next/next/no-img-element */
 /**
- * Construction site scene using real transparent PNGs: a tower crane
- * lifting a load with a concrete site mixer tucked at its base. Both
- * images gently float/bob to give the scene life (respects reduced-motion).
+ * Construction site scene: tower crane (jib faces right, away from text)
+ * with concrete mixer beside it. Placed on the right side of the hero.
  */
 export default function CraneAnimation({ className = "" }: { className?: string }) {
   return (
-    <div className={`relative ${className}`}>
-      {/* Crane sets the overall height */}
+    <div className={`flex items-end ${className}`}>
+      {/* Mixer sits beside the crane base */}
+      <img
+        src="/mixer.png"
+        alt="Concrete site mixer"
+        className="crane-float-slow w-auto object-contain drop-shadow-xl self-end"
+        style={{ height: "32%" }}
+      />
+      {/* Crane flipped so jib faces right (outward from text) */}
       <img
         src="/crane.png"
         alt="Tower crane"
         className="crane-float h-full w-auto object-contain drop-shadow-xl"
-      />
-      {/* Mixer tucked at the bottom-left base of the crane */}
-      <img
-        src="/mixer.png"
-        alt="Concrete site mixer"
-        className="crane-float-slow absolute bottom-0 left-[-55%] h-[34%] w-auto object-contain drop-shadow-xl"
+        style={{ transform: "scaleX(-1)" }}
       />
     </div>
   );
