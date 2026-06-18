@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import MobileQuoteBar from "@/components/MobileQuoteBar";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
         {children}
         <Footer />
         <WhatsAppButton />
+        <MobileQuoteBar />
       </body>
     </html>
   );
