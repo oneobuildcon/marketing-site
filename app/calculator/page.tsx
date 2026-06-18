@@ -552,9 +552,10 @@ export default function CalculatorPage() {
               {/* Client Details */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
                 <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Client Details</label>
+                <p className="text-xs text-navy/50 mb-3 -mt-1">All fields are required to view your estimate.</p>
                 <div className="space-y-3">
                   <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-navy">Client Name</label>
+                    <label className="text-sm font-medium text-navy">Client Name <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       value={clientName}
@@ -564,7 +565,7 @@ export default function CalculatorPage() {
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-navy">Project Location</label>
+                    <label className="text-sm font-medium text-navy">Project Location <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       value={projectLocation}
@@ -574,7 +575,7 @@ export default function CalculatorPage() {
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-navy">Mobile Number</label>
+                    <label className="text-sm font-medium text-navy">Mobile Number <span className="text-red-500">*</span></label>
                     <div className="flex gap-2">
                       <span className="flex items-center rounded-xl border border-black/15 px-3 text-navy/60 font-medium text-sm bg-gray-50">+91</span>
                       <input
