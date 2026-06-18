@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useParams, notFound } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Tag, ArrowLeft, ChevronLeft, ChevronRight, CheckCircle2, Ruler, Clock, IndianRupee, BadgeCheck, Quote } from "lucide-react";
+import { MapPin, Tag, ArrowLeft, X, CheckCircle2, Ruler, Clock, IndianRupee, BadgeCheck, Quote } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { getProject } from "@/lib/projects";
 import { useLanguage } from "@/lib/LanguageContext";
 
@@ -60,7 +61,7 @@ export default function ProjectDetail() {
   const slug = typeof params.slug === "string" ? params.slug : Array.isArray(params.slug) ? params.slug[0] : "";
   const project = getProject(slug);
   const { lang } = useLanguage();
-  const [active, setActive] = useState(0);
+  const [zoom, setZoom] = useState<number | null>(null);
 
   if (!project) return notFound();
 
@@ -68,9 +69,6 @@ export default function ProjectDetail() {
   const c = project[lang];
   const photos = Array.from({ length: project.count }, (_, i) => `/projects/${project.slug}/${i + 1}.jpg`);
   const statusLabel = project.status === "completed" ? t.completed : t.ongoing;
-
-  const next = () => setActive((i) => (i + 1) % project.count);
-  const prev = () => setActive((i) => (i - 1 + project.count) % project.count);
 
   const infoRows = [
     { icon: Tag, label: t.type, value: c.type },
@@ -100,37 +98,23 @@ export default function ProjectDetail() {
         </div>
       </section>
 
-      {/* Gallery */}
-      <section className="bg-navy-dark pb-10">
+      {/* Gallery — grid of all photos */}
+      <section className="bg-navy-dark py-10">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-black sm:aspect-[16/9]">
-            <motion.div key={active} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="absolute inset-0">
-              <Image src={photos[active]} alt={`${c.name} ${active + 1}`} fill className="object-contain" sizes="100vw" priority />
-            </motion.div>
-            {project.count > 1 && (
-              <>
-                <button type="button" onClick={prev} aria-label="Previous" className="absolute left-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition hover:bg-amber hover:text-navy-dark">
-                  <ChevronLeft className="h-6 w-6" />
-                </button>
-                <button type="button" onClick={next} aria-label="Next" className="absolute right-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition hover:bg-amber hover:text-navy-dark">
-                  <ChevronRight className="h-6 w-6" />
-                </button>
-                <span className="absolute bottom-3 right-3 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white">
-                  {active + 1} / {project.count}
-                </span>
-              </>
-            )}
+          <h2 className="text-lg font-bold text-amber mb-5">{t.gallery}</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+            {photos.map((src, i) => (
+              <button
+                key={src}
+                type="button"
+                onClick={() => setZoom(i)}
+                className={`group relative overflow-hidden rounded-xl bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-amber ${i === 0 ? "col-span-2 row-span-2 aspect-[4/3]" : "aspect-square"}`}
+              >
+                <Image src={src} alt={`${c.name} ${i + 1}`} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width:640px) 50vw, 33vw" priority={i === 0} />
+                <div className="absolute inset-0 bg-navy/0 transition group-hover:bg-navy/20" />
+              </button>
+            ))}
           </div>
-
-          {project.count > 1 && (
-            <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-              {photos.map((src, i) => (
-                <button key={src} type="button" onClick={() => setActive(i)} className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition ${i === active ? "border-amber" : "border-transparent opacity-60 hover:opacity-100"}`}>
-                  <Image src={src} alt="" fill className="object-cover" sizes="96px" />
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </section>
 
@@ -206,6 +190,31 @@ export default function ProjectDetail() {
           </Link>
         </div>
       </section>
+
+      {/* Fullscreen single-image view */}
+      <AnimatePresence>
+        {zoom !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setZoom(null)}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          >
+            <button
+              type="button"
+              onClick={() => setZoom(null)}
+              aria-label="Close"
+              className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="relative h-[85vh] w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
+              <Image src={photos[zoom]} alt={`${c.name} ${zoom + 1}`} fill className="object-contain" sizes="100vw" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
