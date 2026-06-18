@@ -262,7 +262,7 @@ export const projects: Project[] = [
   },
   {
     slug: "markal-farmhouse",
-    count: 6,
+    count: 5,
     category: "farmhouse",
     status: "completed",
     area: "On request",
