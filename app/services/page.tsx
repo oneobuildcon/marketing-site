@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { HardHat, Home, Building2, Hammer, Ruler, PaintBucket, ClipboardList, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
+const MotionLink = motion(Link);
+
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -70,11 +72,13 @@ export default function Services() {
             {services.map((service) => {
               const Icon = service.icon;
               return (
-                <motion.div
+                <MotionLink
                   key={service.title}
+                  href="/contact"
+                  aria-label={`${service.title} — get a free quote`}
                   variants={fadeUp}
                   whileHover={{ y: -8 }}
-                  className="group relative overflow-hidden rounded-2xl bg-white border border-black/8 shadow-sm hover:shadow-xl hover:border-amber/30 transition-all"
+                  className="group relative block overflow-hidden rounded-2xl bg-white border border-black/8 shadow-sm hover:shadow-xl hover:border-amber/30 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2"
                 >
                   {/* Shimmer on hover */}
                   <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
@@ -92,10 +96,10 @@ export default function Services() {
                     <h3 className="text-lg font-bold text-navy group-hover:text-amber transition-colors">{service.title}</h3>
                     <p className="mt-2 text-sm text-navy/70 leading-relaxed">{service.desc}</p>
                     <div className="mt-4 flex items-center gap-1 text-amber text-sm font-semibold opacity-0 group-hover:opacity-100 transition-all translate-x-0 group-hover:translate-x-1">
-                      Learn more <ArrowRight className="h-4 w-4" />
+                      Get a quote <ArrowRight className="h-4 w-4" />
                     </div>
                   </div>
-                </motion.div>
+                </MotionLink>
               );
             })}
           </motion.div>
