@@ -43,3 +43,10 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Deter image saving/dragging across the site */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+}

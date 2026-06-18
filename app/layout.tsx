@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import MobileQuoteBar from "@/components/MobileQuoteBar";
+import ProtectContent from "@/components/ProtectContent";
 import { LanguageProvider } from "@/lib/LanguageContext";
 
 const sourceSans = Source_Sans_3({
@@ -99,6 +100,7 @@ export default function RootLayout({
       </head>
       <body className={`${sourceSans.variable} ${lexend.variable} font-sans antialiased text-navy`}>
         <LanguageProvider>
+          <ProtectContent />
           <Navbar />
           {children}
           <Footer />
