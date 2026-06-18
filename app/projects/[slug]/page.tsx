@@ -147,7 +147,7 @@ export default function ProjectDetail() {
                 aria-label={`Open photo ${i + 1}`}
                 className={`absolute inset-0 transition-opacity duration-700 ${i === current ? "opacity-100" : "pointer-events-none opacity-0"}`}
               >
-                <Image src={src} alt={`${c.name} ${i + 1}`} fill className="object-cover" sizes="(max-width:1024px) 100vw, 1152px" priority={i === 0} />
+                <Image src={src} alt={`${c.name} ${i + 1}`} fill className="object-contain" sizes="(max-width:1024px) 100vw, 1152px" priority={i === 0} />
               </button>
             ))}
 
