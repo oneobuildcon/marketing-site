@@ -673,7 +673,7 @@ export default function CalculatorPage() {
             {/* RIGHT — Result */}
             <div className="lg:sticky lg:top-24 h-fit">
               <AnimatePresence mode="wait">
-                {result ? (
+                {result && clientName.trim() && projectLocation.trim() ? (
                   <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-4">
 
                     {/* Main estimate card */}
@@ -771,10 +771,10 @@ export default function CalculatorPage() {
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber/10 mx-auto mb-4">
                       <Calculator className="h-8 w-8 text-amber" />
                     </div>
-                    <p className="text-navy font-bold text-lg">Enter floor slab areas</p>
-                    <p className="text-navy/50 text-sm mt-2">Fill in the details on the left to see your instant cost estimate</p>
+                    <p className="text-navy font-bold text-lg">Enter your details to see the estimate</p>
+                    <p className="text-navy/50 text-sm mt-2">Please add your <strong>Client Name</strong> and <strong>Project Location</strong>, then fill in the floor slab areas to view your cost estimate.</p>
                     <div className="mt-6 flex items-center justify-center gap-1 text-xs text-navy/30">
-                      <ArrowRight className="h-3 w-3" /> Select package → Choose floors → Enter slab areas
+                      <ArrowRight className="h-3 w-3" /> Name &amp; Location → Select package → Enter slab areas
                     </div>
                   </motion.div>
                 )}
