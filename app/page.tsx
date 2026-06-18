@@ -24,6 +24,7 @@ import {
   Download,
 } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
+import CraneAnimation from "@/components/CraneAnimation";
 
 // ── Translations ────────────────────────────────────────────────────────────
 const translations = {
@@ -401,6 +402,9 @@ export default function Home() {
             {icon.svg}
           </div>
         ))}
+
+        {/* Animated tower crane (desktop only) */}
+        <CraneAnimation className="pointer-events-none absolute bottom-0 right-4 hidden h-[90%] w-auto opacity-90 lg:block xl:right-16" />
 
         <div className="relative mx-auto max-w-6xl px-6 py-28 w-full">
           <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col items-start gap-6">
