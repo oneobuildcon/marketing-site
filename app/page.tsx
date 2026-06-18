@@ -33,14 +33,14 @@ const services = [
 ];
 
 const stats = [
-  { label: "Projects Completed", value: 150, suffix: "+" },
-  { label: "Years Experience", value: 15, suffix: "+" },
-  { label: "Happy Clients", value: 200, suffix: "+" },
-  { label: "Cities Served", value: 5, suffix: "" },
+  { label: "Projects Completed", value: 20, suffix: "+" },
+  { label: "Years Experience", value: 6, suffix: "+" },
+  { label: "Happy Clients", value: 25, suffix: "+" },
+  { label: "Cities Served", value: 3, suffix: "" },
 ];
 
 const whyChooseUs = [
-  { label: "15+ Years of Experience", icon: Award },
+  { label: "6+ Years of Experience", icon: Award },
   { label: "Licensed & Insured", icon: ShieldCheck },
   { label: "Skilled Team of Experts", icon: Users },
   { label: "High-Quality Materials", icon: Package },
@@ -602,7 +602,7 @@ export default function Home() {
             <Image src="https://picsum.photos/seed/whyus/600/700" alt="Why choose One O Buildcon" fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent" />
             <div className="absolute bottom-6 left-6 rounded-lg bg-amber px-4 py-2">
-              <p className="font-bold text-navy-dark text-lg">15+ Years</p>
+              <p className="font-bold text-navy-dark text-lg">6+ Years</p>
               <p className="text-xs text-navy-dark/80">of trusted construction</p>
             </div>
           </motion.div>
@@ -610,7 +610,7 @@ export default function Home() {
             <motion.div variants={fadeUp}>
               <p className="text-xs font-semibold uppercase tracking-widest text-amber">Why Us</p>
               <h2 className="mt-2 text-3xl font-bold text-navy">Why Choose One O Buildcon</h2>
-              <p className="mt-3 text-navy/70">We combine decades of expertise with modern techniques to deliver structures that stand the test of time.</p>
+              <p className="mt-3 text-navy/70">We combine years of hands-on expertise with modern techniques to deliver structures that stand the test of time.</p>
             </motion.div>
             <motion.div variants={stagger} className="mt-8 grid gap-3 sm:grid-cols-2">
               {whyChooseUs.map((item) => {
