@@ -1,9 +1,0 @@
-<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-  <rect width="160" height="160" rx="28" fill="#0d1b3e"/>
-  <g fill="#ffffff" transform="translate(14 52)">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M24 4a24 24 0 1 0 0 48 24 24 0 0 0 0-48Zm0 14a10 10 0 1 1 0 20 10 10 0 0 1 0-20Z"/>
-    <path d="M64 4h12v48H64V31L52 43V29l12-12V4Z"/>
-    <path d="M52 38l12 14H52V38Z"/>
-    <path d="M90 4h38v12h-26v6h22v12h-22v6h26v12H90V4Z"/>
-  </g>
-</svg>

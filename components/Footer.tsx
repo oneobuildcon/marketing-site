@@ -1,16 +1,11 @@
-import LogoMark from "./LogoMark";
-
 export default function Footer() {
   return (
     <footer className="bg-navy-dark text-white/80">
       <div className="mx-auto grid max-w-6xl gap-8 px-6 py-12 sm:grid-cols-3">
         <div>
-          <div className="flex items-center gap-2.5">
-            <LogoMark className="h-9 w-auto text-white" />
-            <h3 className="text-lg font-bold text-white">
-              One O <span className="text-amber-light">Buildcon</span>
-            </h3>
-          </div>
+          <h3 className="text-lg font-bold text-white">
+            One O <span className="text-amber-light">Buildcon</span>
+          </h3>
           <p className="mt-2 text-sm">From blueprint to brilliance.</p>
         </div>
 

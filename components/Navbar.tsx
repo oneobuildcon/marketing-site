@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import LogoMark from "./LogoMark";
 
 const links = [
   { href: "/about", label: "About" },
@@ -19,11 +18,8 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-navy text-white shadow-md">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2.5">
-          <LogoMark className="h-8 w-auto text-white" />
-          <span className="text-xl font-bold tracking-tight">
-            One O <span className="text-amber-light">Buildcon</span>
-          </span>
+        <Link href="/" className="text-xl font-bold tracking-tight">
+          One O <span className="text-amber-light">Buildcon</span>
         </Link>
 
         <ul className="hidden gap-8 md:flex">
