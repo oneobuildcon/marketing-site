@@ -62,8 +62,19 @@ export default function ProjectDetail() {
   const project = getProject(slug);
   const { lang } = useLanguage();
   const [zoom, setZoom] = useState<number | null>(null);
+  const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   const photoCount = project?.count ?? 0;
+
+  // Auto-advance the slideshow every 3 seconds (pauses on hover or when zoomed)
+  useEffect(() => {
+    if (photoCount <= 1 || paused || zoom !== null) return;
+    const id = setInterval(() => {
+      setCurrent((c) => (c + 1) % photoCount);
+    }, 3000);
+    return () => clearInterval(id);
+  }, [photoCount, paused, zoom]);
   const showPrev = useCallback(
     () => setZoom((z) => (z === null ? z : (z - 1 + photoCount) % photoCount)),
     [photoCount]
@@ -119,22 +130,58 @@ export default function ProjectDetail() {
         </div>
       </section>
 
-      {/* Gallery — clean proportioned grid */}
+      {/* Gallery — auto-playing slideshow */}
       <section className="bg-navy-dark py-8">
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="text-lg font-bold text-amber mb-5">{t.gallery}</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+          <div
+            className="group relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-black ring-1 ring-white/10"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+          >
             {photos.map((src, i) => (
               <button
                 key={src}
                 type="button"
                 onClick={() => setZoom(i)}
-                className="group relative aspect-[4/3] overflow-hidden rounded-xl bg-black ring-1 ring-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber"
+                aria-label={`Open photo ${i + 1}`}
+                className={`absolute inset-0 transition-opacity duration-700 ${i === current ? "opacity-100" : "pointer-events-none opacity-0"}`}
               >
-                <Image src={src} alt={`${c.name} ${i + 1}`} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw" priority={i === 0} />
-                <div className="absolute inset-0 bg-navy/0 transition group-hover:bg-navy/25" />
+                <Image src={src} alt={`${c.name} ${i + 1}`} fill className="object-cover" sizes="(max-width:1024px) 100vw, 1152px" priority={i === 0} />
               </button>
             ))}
+
+            {photos.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setCurrent((current - 1 + photos.length) % photos.length)}
+                  aria-label="Previous photo"
+                  className="absolute left-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white opacity-0 backdrop-blur-sm transition hover:bg-white/35 group-hover:opacity-100"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrent((current + 1) % photos.length)}
+                  aria-label="Next photo"
+                  className="absolute right-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white opacity-0 backdrop-blur-sm transition hover:bg-white/35 group-hover:opacity-100"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </button>
+                <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+                  {photos.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setCurrent(i)}
+                      aria-label={`Go to photo ${i + 1}`}
+                      className={`h-2.5 rounded-full transition-all ${i === current ? "w-7 bg-amber" : "w-2.5 bg-white/50 hover:bg-white/80"}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
