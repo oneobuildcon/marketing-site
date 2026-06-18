@@ -21,6 +21,7 @@ import {
   MessageSquare,
   PencilRuler,
   KeyRound,
+  Download,
 } from "lucide-react";
 
 const services = [
@@ -480,6 +481,14 @@ export default function Home() {
               <Link href="/projects" className="rounded-md border border-white/30 px-8 py-3 font-semibold transition hover:bg-white/10">
                 View Our Projects →
               </Link>
+              <a
+                href="/one-o-buildcon-company-profile.pdf"
+                download
+                className="flex items-center gap-2 rounded-md border border-amber/50 px-8 py-3 font-semibold text-amber transition hover:bg-amber/10"
+              >
+                <Download className="h-4 w-4" />
+                Company Profile
+              </a>
             </motion.div>
           </motion.div>
         </div>
