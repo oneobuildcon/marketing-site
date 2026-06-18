@@ -7,17 +7,24 @@ export default function CraneAnimation({ className = "" }: { className?: string 
   return (
     <svg viewBox="0 0 440 460" className={className} fill="none" aria-hidden="true">
       <defs>
-        <linearGradient id="craneSteel" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f7c061" />
-          <stop offset="0.5" stopColor="#e8951f" />
-          <stop offset="1" stopColor="#c4760f" />
+        <linearGradient id="craneSteel" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffd27a" />
+          <stop offset="0.45" stopColor="#ef9b22" />
+          <stop offset="1" stopColor="#b56a0c" />
         </linearGradient>
         <linearGradient id="craneConcrete" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#9aa3ad" />
-          <stop offset="1" stopColor="#5d646d" />
+          <stop offset="0" stopColor="#aab2bb" />
+          <stop offset="1" stopColor="#545b63" />
         </linearGradient>
+        <filter id="craneShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#000000" floodOpacity="0.35" />
+        </filter>
       </defs>
 
+      {/* soft ground shadow */}
+      <ellipse cx="220" cy="446" rx="120" ry="9" fill="#000000" opacity="0.25" />
+
+      <g filter="url(#craneShadow)">
       {/* Foundation */}
       <rect x="170" y="424" width="100" height="14" rx="3" fill="url(#craneConcrete)" stroke="#3f454c" strokeWidth="2" />
       <rect x="150" y="438" width="140" height="8" rx="2" fill="#4a5159" />
@@ -93,6 +100,7 @@ export default function CraneAnimation({ className = "" }: { className?: string 
           <line x1="236" y1="332" x2="257" y2="326" stroke="#3f454c" strokeWidth="2" />
           <line x1="278" y1="332" x2="257" y2="326" stroke="#3f454c" strokeWidth="2" />
         </g>
+      </g>
       </g>
     </svg>
   );
