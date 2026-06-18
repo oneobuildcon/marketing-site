@@ -106,9 +106,9 @@ img {
 }
 @keyframes craneSway {
   0%   { transform: scaleX(-1) rotate(0deg)    translateY(0); }
-  25%  { transform: scaleX(-1) rotate(1.4deg)  translateY(-4px); }
-  50%  { transform: scaleX(-1) rotate(0deg)    translateY(-7px); }
-  75%  { transform: scaleX(-1) rotate(-1.4deg) translateY(-4px); }
+  25%  { transform: scaleX(-1) rotate(0.6deg)  translateY(-2px); }
+  50%  { transform: scaleX(-1) rotate(0deg)    translateY(-3px); }
+  75%  { transform: scaleX(-1) rotate(-0.6deg) translateY(-2px); }
   100% { transform: scaleX(-1) rotate(0deg)    translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
