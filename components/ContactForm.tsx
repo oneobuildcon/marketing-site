@@ -4,9 +4,11 @@ import { useState } from "react";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
 type Status = "idle" | "sending" | "success" | "error";
+type Errors = { name?: string; phone?: string; message?: string };
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
+  const [errors, setErrors] = useState<Errors>({});
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -17,6 +19,20 @@ export default function ContactForm() {
     const phone = (form.elements.namedItem("phone") as HTMLInputElement).value.trim();
     const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim();
     const message = (form.elements.namedItem("message") as HTMLTextAreaElement).value.trim();
+
+    // Validate required fields before sending
+    const nextErrors: Errors = {};
+    if (!name) nextErrors.name = "Please enter your name.";
+    const digits = phone.replace(/\D/g, "");
+    if (!phone) nextErrors.phone = "Please enter your phone number.";
+    else if (digits.length < 10) nextErrors.phone = "Please enter a valid phone number.";
+    if (!message) nextErrors.message = "Please tell us about your project.";
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+    setErrors({});
 
     const leadData = {
       name,
@@ -85,6 +101,7 @@ export default function ContactForm() {
           autoComplete="name"
           className="mt-1 w-full rounded-md border border-black/10 px-4 py-2 text-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30"
         />
+        {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
       </div>
       <div>
         <label htmlFor="phone" className="block text-sm font-medium text-navy">
@@ -100,6 +117,7 @@ export default function ContactForm() {
           placeholder="+91 ..."
           className="mt-1 w-full rounded-md border border-black/10 px-4 py-2 text-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30"
         />
+        {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
       </div>
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-navy">
@@ -125,6 +143,7 @@ export default function ContactForm() {
           placeholder="Tell us about your project..."
           className="mt-1 w-full rounded-md border border-black/10 px-4 py-2 text-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30"
         />
+        {errors.message && <p className="mt-1 text-xs text-red-600">{errors.message}</p>}
       </div>
       <button
         type="submit"
