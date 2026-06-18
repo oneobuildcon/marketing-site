@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, useInView, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   Home as HomeIcon,
   Building2,
@@ -342,6 +342,10 @@ export default function Home() {
   const processRef = useRef(null);
   const processVisible = useInView(processRef, { once: false });
 
+  // Subtle hero parallax — background drifts as you scroll for depth
+  const { scrollY } = useScroll();
+  const heroImgY = useTransform(scrollY, [0, 700], [0, 110]);
+
   useEffect(() => {
     if (processVisible) setProcessInView(true);
   }, [processVisible]);
@@ -385,13 +389,15 @@ export default function Home() {
         className="relative overflow-hidden bg-navy text-white"
         style={{ minHeight: "90vh", display: "flex", alignItems: "center" }}
       >
-        <Image
-          src="https://picsum.photos/seed/herosite/1600/900"
-          alt="Construction site"
-          fill
-          priority
-          className="object-cover opacity-30"
-        />
+        <motion.div className="absolute inset-0" style={{ y: heroImgY }}>
+          <Image
+            src="https://picsum.photos/seed/herosite/1600/900"
+            alt="Construction site"
+            fill
+            priority
+            className="object-cover opacity-30 scale-110"
+          />
+        </motion.div>
 
         {/* Animated blueprint dot-grid */}
         <div
