@@ -23,7 +23,7 @@ const services = [
   { title: "Residential Buildings", desc: "Multi-storey residential complexes engineered for safety, durability, and comfortable modern living.", img: "https://picsum.photos/seed/residential2/500/350", icon: ClipboardList },
   { title: "Farmhouses", desc: "Farmhouse builds designed to blend with natural surroundings while offering modern comfort and durability.", img: "https://picsum.photos/seed/farmhouse2/500/350", icon: Ruler },
   { title: "RCC Work", desc: "Precision RCC structural work — foundations, columns, slabs, and framing carried out to strict engineering standards.", img: "https://picsum.photos/seed/rccwork2/500/350", icon: Hammer },
-  { title: "Interior Finishing", desc: "Floor to ceiling interior finishing — flooring, fittings, paint, and décor tailored to your taste.", img: "https://picsum.photos/seed/interior2/500/350", icon: PaintBucket },
+  { title: "Interior Finishing", desc: "Floor-to-ceiling interior finishing — flooring, fittings, paint, and décor tailored to your taste.", img: "https://picsum.photos/seed/interior2/500/350", icon: PaintBucket },
 ];
 
 export default function Services() {
