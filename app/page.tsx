@@ -22,8 +22,8 @@ import {
   PencilRuler,
   KeyRound,
   Download,
-  Languages,
 } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
 
 // ── Translations ────────────────────────────────────────────────────────────
 const translations = {
@@ -432,7 +432,7 @@ function TravelingDot({ active }: { active: boolean }) {
 }
 
 export default function Home() {
-  const [lang, setLang] = useState<"en" | "mr">("en");
+  const { lang } = useLanguage();
   const t = translations[lang];
 
   const [processInView, setProcessInView] = useState(false);
@@ -494,19 +494,6 @@ export default function Home() {
         ))}
 
         <div className="relative mx-auto max-w-6xl px-6 py-28 w-full">
-          {/* Language toggle */}
-          <div className="absolute top-6 right-6">
-            <motion.button
-              onClick={() => setLang(lang === "en" ? "mr" : "en")}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-2 text-sm font-semibold text-white hover:bg-amber/20 hover:border-amber/40 transition-all backdrop-blur-sm"
-            >
-              <Languages className="h-4 w-4 text-amber" />
-              {t.langToggle}
-            </motion.button>
-          </div>
-
           <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col items-start gap-6">
             <motion.div variants={fadeUp} className="flex items-center gap-2">
               <HardHat className="h-5 w-5 text-amber" />
