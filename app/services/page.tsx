@@ -33,11 +33,12 @@ export default function Services() {
         @keyframes floatSlow { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-16px) rotate(8deg)} }
         @keyframes shimmerLine { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
         @keyframes shimmerCard { 0%{left:-100%} 100%{left:200%} }
+        @keyframes heroPulse { 0%,100%{opacity:.05} 50%{opacity:.12} }
       `}</style>
 
       {/* Hero */}
       <section className="relative bg-navy py-20 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 70% 30%, #F59E0B 0%, transparent 50%)" }} />
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 70% 30%, #F59E0B 0%, transparent 50%)", animation: "heroPulse 8s ease-in-out infinite" }} />
         {[
           { top: "20%", left: "8%", size: 36, delay: "0s", dur: "6s" },
           { top: "55%", left: "85%", size: 44, delay: "1.5s", dur: "5s" },

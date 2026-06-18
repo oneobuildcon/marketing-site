@@ -48,8 +48,20 @@ export default function Packages() {
     <main>
       {/* Hero */}
       <section className="bg-navy py-20 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, #F59E0B 0%, transparent 50%), radial-gradient(circle at 80% 20%, #F59E0B 0%, transparent 40%)" }} />
-        <div className="relative mx-auto max-w-6xl px-6 text-center">
+        <style>{`
+          @keyframes floatSlow { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-16px) rotate(8deg)} }
+          @keyframes heroPulse { 0%,100%{opacity:.05} 50%{opacity:.12} }
+        `}</style>
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, #F59E0B 0%, transparent 50%), radial-gradient(circle at 80% 20%, #F59E0B 0%, transparent 40%)", animation: "heroPulse 8s ease-in-out infinite" }} />
+        {[
+          { top: "22%", left: "7%", size: 38, delay: "0s", dur: "6s" },
+          { top: "55%", left: "88%", size: 44, delay: "1.5s", dur: "7s" },
+        ].map((f, i) => (
+          <div key={i} className="absolute pointer-events-none text-amber/15" style={{ top: f.top, left: f.left, animation: `floatSlow ${f.dur} ${f.delay} ease-in-out infinite` }}>
+            <HardHat style={{ width: f.size, height: f.size }} />
+          </div>
+        ))}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} className="relative mx-auto max-w-6xl px-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <HardHat className="h-5 w-5 text-amber" />
             <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">Transparent Pricing</p>
@@ -58,7 +70,7 @@ export default function Packages() {
           <p className="mt-4 max-w-xl mx-auto text-white/70 text-lg">
             Every package is built around quality, honesty, and on-time delivery. Choose what fits your vision.
           </p>
-        </div>
+        </motion.div>
       </section>
 
       {/* Package Cards */}

@@ -33,11 +33,12 @@ export default function About() {
       <style>{`
         @keyframes floatSlow { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-18px) rotate(6deg)} }
         @keyframes shimmerLine { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
+        @keyframes heroPulse { 0%,100%{opacity:.05} 50%{opacity:.12} }
       `}</style>
 
       {/* Hero */}
       <section className="relative bg-navy py-20 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 30% 40%, #F59E0B 0%, transparent 50%), radial-gradient(circle at 70% 70%, #F59E0B 0%, transparent 40%)" }} />
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 30% 40%, #F59E0B 0%, transparent 50%), radial-gradient(circle at 70% 70%, #F59E0B 0%, transparent 40%)", animation: "heroPulse 8s ease-in-out infinite" }} />
         {/* Floating icons */}
         {[
           { top: "15%", left: "5%", size: 40, delay: "0s", dur: "5s" },
