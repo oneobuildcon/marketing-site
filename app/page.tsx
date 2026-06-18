@@ -63,8 +63,6 @@ const translations = {
       { step: "03", title: "Construction",    desc: "Skilled workers execute the work with precision, using quality materials and modern equipment." },
       { step: "04", title: "Handover",        desc: "Final inspection, finishing touches, and keys handed over on schedule." },
     ],
-    equipBadge: "On Every Site",
-    equipTitle: "Equipment & Tools We Use",
     whyBadge: "Why Us",
     whyTitle: "Why Choose One O Buildcon",
     whyDesc: "We combine years of hands-on expertise with modern techniques to deliver structures that stand the test of time.",
@@ -135,8 +133,6 @@ const translations = {
       { step: "03", title: "बांधकाम",            desc: "कुशल कामगार दर्जेदार साहित्य आणि आधुनिक उपकरणे वापरून अचूकतेने काम पार पाडतात." },
       { step: "04", title: "हस्तांतरण",          desc: "अंतिम तपासणी, फिनिशिंग टच आणि वेळापत्रकानुसार चाव्या दिल्या जातात." },
     ],
-    equipBadge: "प्रत्येक साइटवर",
-    equipTitle: "आम्ही वापरत असलेली उपकरणे आणि साधने",
     whyBadge: "आम्हीच का",
     whyTitle: "वन ओ बिल्डकॉन का निवडावे",
     whyDesc: "आम्ही आधुनिक तंत्रांसह वर्षांच्या अनुभवाला एकत्र करतो जेणेकरून टिकाऊ संरचना तयार होतात.",
@@ -195,91 +191,6 @@ const avatarImgs = [
   "https://picsum.photos/seed/avatar1/80/80",
   "https://picsum.photos/seed/avatar2/80/80",
   "https://picsum.photos/seed/avatar3/80/80",
-];
-
-const tools = [
-  {
-    name: "Tower Crane",
-    svg: (
-      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
-        <line x1="32" y1="4" x2="32" y2="56" />
-        <line x1="32" y1="16" x2="58" y2="16" />
-        <line x1="32" y1="16" x2="14" y2="16" />
-        <line x1="58" y1="16" x2="58" y2="28" />
-        <line x1="32" y1="4" x2="58" y2="16" />
-        <rect x="54" y="28" width="8" height="6" rx="1" />
-        <line x1="32" y1="56" x2="24" y2="56" />
-        <line x1="32" y1="56" x2="40" y2="56" />
-      </svg>
-    ),
-  },
-  {
-    name: "Excavator",
-    svg: (
-      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
-        <rect x="8" y="36" width="30" height="14" rx="2" />
-        <circle cx="14" cy="52" r="5" />
-        <circle cx="32" cy="52" r="5" />
-        <line x1="8" y1="44" x2="38" y2="44" />
-        <rect x="28" y="28" width="16" height="12" rx="2" />
-        <line x1="36" y1="28" x2="48" y2="18" />
-        <line x1="48" y1="18" x2="56" y2="30" />
-        <path d="M56 30 L60 38 L48 40 L44 32" />
-      </svg>
-    ),
-  },
-  {
-    name: "Concrete Mixer",
-    svg: (
-      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
-        <ellipse cx="32" cy="30" rx="14" ry="18" transform="rotate(-20 32 30)" />
-        <line x1="18" y1="48" x2="14" y2="58" />
-        <line x1="46" y1="48" x2="50" y2="58" />
-        <line x1="14" y1="58" x2="50" y2="58" />
-        <line x1="32" y1="12" x2="32" y2="4" />
-        <circle cx="32" cy="30" r="5" />
-      </svg>
-    ),
-  },
-  {
-    name: "Bulldozer",
-    svg: (
-      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
-        <rect x="10" y="30" width="36" height="14" rx="2" />
-        <rect x="16" y="22" width="20" height="10" rx="1" />
-        <line x1="4" y1="38" x2="10" y2="38" />
-        <line x1="4" y1="30" x2="4" y2="46" />
-        <line x1="4" y1="46" x2="10" y2="44" />
-        <circle cx="18" cy="46" r="4" />
-        <circle cx="38" cy="46" r="4" />
-        <line x1="18" y1="46" x2="38" y2="46" />
-      </svg>
-    ),
-  },
-  {
-    name: "Laser Level",
-    svg: (
-      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
-        <rect x="20" y="24" width="24" height="16" rx="3" />
-        <circle cx="32" cy="32" r="4" />
-        <line x1="4" y1="32" x2="20" y2="32" strokeDasharray="3 2" />
-        <line x1="44" y1="32" x2="60" y2="32" strokeDasharray="3 2" />
-        <line x1="32" y1="8" x2="32" y2="24" strokeDasharray="3 2" />
-        <line x1="32" y1="40" x2="32" y2="56" strokeDasharray="3 2" />
-      </svg>
-    ),
-  },
-  {
-    name: "Power Drill",
-    svg: (
-      <svg viewBox="0 0 64 64" fill="none" className="h-12 w-12" stroke="currentColor" strokeWidth="1.5">
-        <rect x="8" y="26" width="28" height="14" rx="3" />
-        <path d="M36 30 L50 28 L52 36 L36 36" />
-        <line x1="52" y1="32" x2="60" y2="32" />
-        <rect x="14" y="40" width="12" height="8" rx="1" />
-      </svg>
-    ),
-  },
 ];
 
 // ── Floating hero icons ───────────────────────────────────────────────────────
@@ -474,9 +385,7 @@ export default function Home() {
           animation: floatUpDown var(--dur, 7s) ease-in-out infinite;
           animation-delay: var(--delay, 0s);
         }
-        .tool-icon-hover:hover svg {
-          animation: glowPulse 1s ease-in-out infinite;
-        }
+
       `}</style>
 
       {/* HERO */}
@@ -596,26 +505,6 @@ export default function Home() {
                 </motion.div>
               );
             })}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* EQUIPMENT */}
-      <section className="bg-navy py-16">
-        <div className="mx-auto max-w-6xl px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-10">
-            <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">{t.equipBadge}</p>
-            <h2 className="mt-2 text-3xl font-bold text-white">{t.equipTitle}</h2>
-          </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-3 gap-6 sm:grid-cols-6">
-            {tools.map((tool) => (
-              <motion.div key={tool.name} variants={fadeUp} whileHover={{ y: -4, scale: 1.05 }} className="tool-icon-hover flex flex-col items-center gap-3 rounded-xl bg-white/5 border border-white/10 p-4 hover:bg-amber/10 hover:border-amber/40 transition-all cursor-default">
-                <motion.div className="text-amber" whileHover={{ filter: ["drop-shadow(0 0 0px #f59e0b)", "drop-shadow(0 0 8px #f59e0b)", "drop-shadow(0 0 0px #f59e0b)"] }} transition={{ duration: 0.8, repeat: Infinity }}>
-                  {tool.svg}
-                </motion.div>
-                <span className="text-xs font-medium text-white/70 text-center">{tool.name}</span>
-              </motion.div>
-            ))}
           </motion.div>
         </div>
       </section>
