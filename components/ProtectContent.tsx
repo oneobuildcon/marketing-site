@@ -10,10 +10,10 @@ import { useEffect } from "react";
 export default function ProtectContent() {
   useEffect(() => {
     const blockContextMenu = (e: MouseEvent) => {
-      // Allow right-click inside form fields so users can paste/edit
+      // Only block right-click ON IMAGES. Everywhere else (links, text,
+      // forms, navigation) keeps working normally — no UX issues.
       const target = e.target as HTMLElement;
-      if (target.closest("input, textarea")) return;
-      e.preventDefault();
+      if (target.tagName === "IMG") e.preventDefault();
     };
     const blockDrag = (e: DragEvent) => {
       const target = e.target as HTMLElement;

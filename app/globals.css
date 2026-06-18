@@ -44,9 +44,7 @@ body {
   }
 }
 
-/* Deter image saving/dragging across the site */
+/* Deter image saving/dragging only — text stays selectable for users */
 img {
   -webkit-user-drag: none;
-  user-select: none;
-  -webkit-user-select: none;
 }
