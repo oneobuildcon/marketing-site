@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { HardHat, Phone, Mail, MapPin, Clock } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
+import FAQ from "@/components/FAQ";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -107,6 +108,9 @@ export default function Contact() {
           </div>
         </div>
       </section>
+
+      {/* FAQ */}
+      <FAQ />
     </main>
   );
 }

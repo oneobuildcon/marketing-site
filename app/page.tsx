@@ -22,7 +22,6 @@ import {
   PencilRuler,
   KeyRound,
 } from "lucide-react";
-import FAQ from "@/components/FAQ";
 
 const services = [
   { title: "Premium Bungalows", desc: "Custom builds with premium finishes", icon: HomeIcon },
@@ -709,9 +708,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
-      {/* FAQ */}
-      <FAQ />
 
       <section className="relative overflow-hidden py-24 text-center text-white">
         <Image src="https://picsum.photos/seed/ctabg/1600/600" alt="Construction project" fill className="object-cover opacity-25" />
