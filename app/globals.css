@@ -87,3 +87,13 @@ img {
   to { transform: rotate(-360deg); }
 }
 @media (prefers-reduced-motion: reduce) { .rmc-gear { animation: none; } }
+
+.crane-float { animation: craneFloat 4s ease-in-out infinite; }
+.crane-float-slow { animation: craneFloat 5.5s ease-in-out infinite; }
+@keyframes craneFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crane-float, .crane-float-slow { animation: none; }
+}
