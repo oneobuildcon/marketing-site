@@ -121,8 +121,8 @@ img {
   animation: craneCable 3.2s ease-in-out infinite;
 }
 @keyframes craneCable {
-  0%, 100% { transform: rotate(-7deg); }
-  50%      { transform: rotate(7deg); }
+  0%, 100% { transform: rotate(-16deg); }
+  50%      { transform: rotate(16deg); }
 }
 @media (prefers-reduced-motion: reduce) {
   .crane-cable { animation: none; }
