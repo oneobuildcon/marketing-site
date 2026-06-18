@@ -105,11 +105,11 @@ img {
   animation: craneSway 6s ease-in-out infinite;
 }
 @keyframes craneSway {
-  0%   { transform: scaleX(-1) rotate(0deg)    translateY(0); }
-  25%  { transform: scaleX(-1) rotate(1.4deg)  translateY(-4px); }
-  50%  { transform: scaleX(-1) rotate(0deg)    translateY(-7px); }
-  75%  { transform: scaleX(-1) rotate(-1.4deg) translateY(-4px); }
-  100% { transform: scaleX(-1) rotate(0deg)    translateY(0); }
+  0%   { transform: scaleX(-1) translateX(-18px) rotate(0deg)    translateY(0); }
+  25%  { transform: scaleX(-1) translateX(-9px)  rotate(1.4deg)  translateY(-4px); }
+  50%  { transform: scaleX(-1) translateX(18px)  rotate(0deg)    translateY(-7px); }
+  75%  { transform: scaleX(-1) translateX(-9px)  rotate(-1.4deg) translateY(-4px); }
+  100% { transform: scaleX(-1) translateX(-18px) rotate(0deg)    translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
   .crane-sway { animation: none; transform: scaleX(-1); }
