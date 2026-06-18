@@ -21,11 +21,10 @@ const values = [
 ];
 
 const milestones = [
-  { year: "2009", event: "One O Buildcon founded in Pune" },
-  { year: "2013", event: "Completed 50th residential project" },
-  { year: "2017", event: "Expanded to farmhouse & commercial builds" },
-  { year: "2021", event: "200+ happy clients milestone" },
-  { year: "2024", event: "Serving 5 cities across Maharashtra" },
+  { year: "2019", event: "One O Buildcon founded in Pune" },
+  { year: "2021", event: "Expanded to farmhouse & commercial builds" },
+  { year: "2023", event: "Completed 20+ projects across residential & commercial" },
+  { year: "2024", event: "Growing client base across Pune, Maharashtra" },
 ];
 
 export default function About() {
@@ -59,7 +58,7 @@ export default function About() {
               About <span className="text-amber">One O Buildcon</span>
             </motion.h1>
             <motion.p variants={fadeUp} className="mt-3 max-w-2xl text-white/80 text-lg">
-              Building trust, one project at a time — since 2009.
+              Building trust, one project at a time — since 2019.
             </motion.p>
             <motion.div variants={fadeUp} className="relative mt-4 h-0.5 w-24 bg-amber/40 overflow-hidden rounded-full">
               <div className="absolute inset-y-0 w-12 bg-amber/80 rounded-full" style={{ animation: "shimmerLine 2s ease-in-out infinite" }} />
