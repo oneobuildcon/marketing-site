@@ -1,11 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { HardHat, MapPin, Tag } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { HardHat, MapPin, Tag, Images, X, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
+
+type Project = {
+  name: string;
+  type: string;
+  location: string;
+  desc: string;
+  slug: string;
+  count: number;
+};
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -25,17 +34,17 @@ const translations = {
     heroSub: "A look at some of the work we're proud to have delivered.",
     filters: ["All", "Premium Bungalow", "Row House", "Residential Building", "Farmhouse"],
     projects: [
-      { name: "Nikam Residency", type: "Residential Building", location: "Porwal Road, Pune", desc: "A well-planned 3-storey residential building with terracotta and cream facade, quality RCC structure, and premium finishes throughout.", img: "/projects/porwal-road.jpg" },
-      { name: "Baiche Residency", type: "Residential Building", location: "Vishrantwadi, Pune", desc: "A contemporary apartment building with clean lines, wooden-louvre accents, and a modern, low-maintenance exterior.", img: "/projects/baiche.jpg" },
-      { name: "Dhere Bungalow", type: "Premium Bungalow", location: "Vadgaon Shinde, Pune", desc: "Premium custom bungalow work featuring detailed inlay flooring and high-quality interior finishing throughout.", img: "/projects/dhere.jpg" },
-      { name: "Gangurde Row House", type: "Row House", location: "Yerwada, Pune", desc: "A modern duplex row house with warm wooden cladding, balcony railings, and elegant evening façade lighting.", img: "/projects/gangurde.jpg" },
-      { name: "Kamthe Bungalow", type: "Premium Bungalow", location: "Lohegaon, Pune", desc: "A spacious bungalow under construction — solid RCC structure and brickwork built to exacting engineering standards.", img: "/projects/kamthe.jpg" },
-      { name: "Patil Residency", type: "Residential Building", location: "Dighi, Pune", desc: "A multi-storey residential building with a contemporary brown-and-grey façade, balconies, and quality finishes.", img: "/projects/patil-dighi.jpg" },
-      { name: "Relekar Bungalow", type: "Premium Bungalow", location: "Charoli, Pune", desc: "A sophisticated 3-storey bungalow with floor-to-ceiling glass facade, elegant lighting, and contemporary architecture.", img: "/projects/relekar.jpg" },
-      { name: "Raskar Bungalow", type: "Premium Bungalow", location: "Charoli, Pune", desc: "A striking modern bungalow with exposed brick accents, wooden louvers, and open balconies — warmth meets contemporary style.", img: "/projects/raskar.jpg" },
-      { name: "Tapkir Residency", type: "Residential Building", location: "Charoli, Pune", desc: "An elegant multi-storey residential building with a grand classical façade, columns, and balconies for every home.", img: "/projects/tapkir.jpg" },
-      { name: "Shinde Bungalow", type: "Premium Bungalow", location: "Charoli, Pune", desc: "A beautifully finished modern bungalow with glass balcony railings, terracotta accents, and premium interiors.", img: "/projects/shinde.jpg" },
-      { name: "Markal Farmhouse", type: "Farmhouse", location: "Markal, Pune", desc: "A charming single-storey farmhouse built with red stone and brick, designed to blend with its natural surroundings.", img: "/projects/markal-farmhouse.jpg" },
+      { name: "Nikam Residency", type: "Residential Building", location: "Porwal Road, Pune", desc: "A well-planned 3-storey residential building with terracotta and cream facade, quality RCC structure, and premium finishes throughout.", slug: "porwal-road", count: 5 },
+      { name: "Baiche Residency", type: "Residential Building", location: "Vishrantwadi, Pune", desc: "A contemporary apartment building with clean lines, wooden-louvre accents, and a modern, low-maintenance exterior.", slug: "baiche", count: 1 },
+      { name: "Dhere Bungalow", type: "Premium Bungalow", location: "Vadgaon Shinde, Pune", desc: "Premium custom bungalow work featuring detailed inlay flooring and high-quality interior finishing throughout.", slug: "dhere", count: 1 },
+      { name: "Gangurde Row House", type: "Row House", location: "Yerwada, Pune", desc: "A modern duplex row house with warm wooden cladding, balcony railings, and elegant evening façade lighting.", slug: "gangurde", count: 3 },
+      { name: "Kamthe Bungalow", type: "Premium Bungalow", location: "Lohegaon, Pune", desc: "A spacious bungalow under construction — solid RCC structure and brickwork built to exacting engineering standards.", slug: "kamthe", count: 4 },
+      { name: "Patil Residency", type: "Residential Building", location: "Dighi, Pune", desc: "A multi-storey residential building with a contemporary brown-and-grey façade, balconies, and quality finishes.", slug: "patil-dighi", count: 6 },
+      { name: "Relekar Bungalow", type: "Premium Bungalow", location: "Charoli, Pune", desc: "A sophisticated 3-storey bungalow with floor-to-ceiling glass facade, elegant lighting, and contemporary architecture.", slug: "relekar", count: 3 },
+      { name: "Raskar Bungalow", type: "Premium Bungalow", location: "Charoli, Pune", desc: "A striking modern bungalow with exposed brick accents, wooden louvers, and open balconies — warmth meets contemporary style.", slug: "raskar", count: 4 },
+      { name: "Tapkir Residency", type: "Residential Building", location: "Charoli, Pune", desc: "An elegant multi-storey residential building with a grand classical façade, columns, and balconies for every home.", slug: "tapkir", count: 2 },
+      { name: "Shinde Bungalow", type: "Premium Bungalow", location: "Charoli, Pune", desc: "A beautifully finished modern bungalow with glass balcony railings, terracotta accents, and premium interiors.", slug: "shinde", count: 8 },
+      { name: "Markal Farmhouse", type: "Farmhouse", location: "Markal, Pune", desc: "A charming single-storey farmhouse built with red stone and brick, designed to blend with its natural surroundings.", slug: "markal-farmhouse", count: 6 },
     ],
     noneMessage: "No projects in this category yet.",
     ctaTitle: "Want to be our next success story?",
@@ -49,17 +58,17 @@ const translations = {
     heroSub: "आम्ही अभिमानाने पूर्ण केलेल्या कामांपैकी काही.",
     filters: ["सर्व", "प्रीमियम बंगला", "रो हाउस", "निवासी इमारत", "फार्महाउस"],
     projects: [
-      { name: "निकम रेसिडेन्सी", type: "निवासी इमारत", location: "पोरवाल रोड, पुणे", desc: "टेराकोटा आणि क्रीम फसाडसह सुनियोजित ३-मजली निवासी इमारत, दर्जेदार आरसीसी संरचना आणि प्रीमियम फिनिशिंग.", img: "/projects/porwal-road.jpg" },
-      { name: "बैचे रेसिडेन्सी", type: "निवासी इमारत", location: "विश्रांतवाडी, पुणे", desc: "स्वच्छ रेषा, लाकडी लुव्हर अॅक्सेंट आणि आधुनिक बाह्यरूप असलेली समकालीन अपार्टमेंट इमारत.", img: "/projects/baiche.jpg" },
-      { name: "ढेरे बंगला", type: "प्रीमियम बंगला", location: "वडगाव शिंदे, पुणे", desc: "तपशीलवार इनले फ्लोरिंग आणि उच्च दर्जाच्या इंटेरियर फिनिशिंगसह प्रीमियम कस्टम बंगला काम.", img: "/projects/dhere.jpg" },
-      { name: "गांगुर्डे रो हाउस", type: "रो हाउस", location: "येरवडा, पुणे", desc: "उबदार लाकडी क्लॅडिंग, बाल्कनी रेलिंग आणि सुरेख संध्याकाळच्या प्रकाशयोजनेसह आधुनिक डुप्लेक्स रो हाउस.", img: "/projects/gangurde.jpg" },
-      { name: "कामथे बंगला", type: "प्रीमियम बंगला", location: "लोहेगाव, पुणे", desc: "बांधकाम सुरू असलेला प्रशस्त बंगला — कठोर अभियांत्रिकी मानकांनुसार भक्कम आरसीसी संरचना आणि विटकाम.", img: "/projects/kamthe.jpg" },
-      { name: "पाटील रेसिडेन्सी", type: "निवासी इमारत", location: "दिघी, पुणे", desc: "समकालीन तपकिरी-राखाडी फसाड, बाल्कनी आणि दर्जेदार फिनिशिंगसह बहुमजली निवासी इमारत.", img: "/projects/patil-dighi.jpg" },
-      { name: "रेलेकर बंगला", type: "प्रीमियम बंगला", location: "चारोली, पुणे", desc: "मजल्यापासून छतापर्यंत काचेचा दर्शनभाग, सुरेख प्रकाशयोजना आणि समकालीन वास्तुकलेसह ३-मजली बंगला.", img: "/projects/relekar.jpg" },
-      { name: "रास्कर बंगला", type: "प्रीमियम बंगला", location: "चारोली, पुणे", desc: "एक्सपोज्ड विट, लाकडी लुव्हर्स आणि खुल्या बाल्कनींसह आधुनिक बंगला — उबदारपणा आणि समकालीन शैलीचा मिलाफ.", img: "/projects/raskar.jpg" },
-      { name: "तपकीर रेसिडेन्सी", type: "निवासी इमारत", location: "चारोली, पुणे", desc: "भव्य क्लासिकल फसाड, खांब आणि प्रत्येक घरासाठी बाल्कनी असलेली देखणी बहुमजली निवासी इमारत.", img: "/projects/tapkir.jpg" },
-      { name: "शिंदे बंगला", type: "प्रीमियम बंगला", location: "चारोली, पुणे", desc: "काचेच्या बाल्कनी रेलिंग, टेराकोटा अॅक्सेंट आणि प्रीमियम इंटेरियरसह सुंदररित्या पूर्ण केलेला आधुनिक बंगला.", img: "/projects/shinde.jpg" },
-      { name: "मार्कळ फार्महाउस", type: "फार्महाउस", location: "मार्कळ, पुणे", desc: "लाल दगड आणि विटांनी बांधलेले एकमजली फार्महाउस, नैसर्गिक परिसराशी सुंदरपणे मिसळणारे.", img: "/projects/markal-farmhouse.jpg" },
+      { name: "निकम रेसिडेन्सी", type: "निवासी इमारत", location: "पोरवाल रोड, पुणे", desc: "टेराकोटा आणि क्रीम फसाडसह सुनियोजित ३-मजली निवासी इमारत, दर्जेदार आरसीसी संरचना आणि प्रीमियम फिनिशिंग.", slug: "porwal-road", count: 5 },
+      { name: "बैचे रेसिडेन्सी", type: "निवासी इमारत", location: "विश्रांतवाडी, पुणे", desc: "स्वच्छ रेषा, लाकडी लुव्हर अॅक्सेंट आणि आधुनिक बाह्यरूप असलेली समकालीन अपार्टमेंट इमारत.", slug: "baiche", count: 1 },
+      { name: "ढेरे बंगला", type: "प्रीमियम बंगला", location: "वडगाव शिंदे, पुणे", desc: "तपशीलवार इनले फ्लोरिंग आणि उच्च दर्जाच्या इंटेरियर फिनिशिंगसह प्रीमियम कस्टम बंगला काम.", slug: "dhere", count: 1 },
+      { name: "गांगुर्डे रो हाउस", type: "रो हाउस", location: "येरवडा, पुणे", desc: "उबदार लाकडी क्लॅडिंग, बाल्कनी रेलिंग आणि सुरेख संध्याकाळच्या प्रकाशयोजनेसह आधुनिक डुप्लेक्स रो हाउस.", slug: "gangurde", count: 3 },
+      { name: "कामथे बंगला", type: "प्रीमियम बंगला", location: "लोहेगाव, पुणे", desc: "बांधकाम सुरू असलेला प्रशस्त बंगला — कठोर अभियांत्रिकी मानकांनुसार भक्कम आरसीसी संरचना आणि विटकाम.", slug: "kamthe", count: 4 },
+      { name: "पाटील रेसिडेन्सी", type: "निवासी इमारत", location: "दिघी, पुणे", desc: "समकालीन तपकिरी-राखाडी फसाड, बाल्कनी आणि दर्जेदार फिनिशिंगसह बहुमजली निवासी इमारत.", slug: "patil-dighi", count: 6 },
+      { name: "रेलेकर बंगला", type: "प्रीमियम बंगला", location: "चारोली, पुणे", desc: "मजल्यापासून छतापर्यंत काचेचा दर्शनभाग, सुरेख प्रकाशयोजना आणि समकालीन वास्तुकलेसह ३-मजली बंगला.", slug: "relekar", count: 3 },
+      { name: "रास्कर बंगला", type: "प्रीमियम बंगला", location: "चारोली, पुणे", desc: "एक्सपोज्ड विट, लाकडी लुव्हर्स आणि खुल्या बाल्कनींसह आधुनिक बंगला — उबदारपणा आणि समकालीन शैलीचा मिलाफ.", slug: "raskar", count: 4 },
+      { name: "तपकीर रेसिडेन्सी", type: "निवासी इमारत", location: "चारोली, पुणे", desc: "भव्य क्लासिकल फसाड, खांब आणि प्रत्येक घरासाठी बाल्कनी असलेली देखणी बहुमजली निवासी इमारत.", slug: "tapkir", count: 2 },
+      { name: "शिंदे बंगला", type: "प्रीमियम बंगला", location: "चारोली, पुणे", desc: "काचेच्या बाल्कनी रेलिंग, टेराकोटा अॅक्सेंट आणि प्रीमियम इंटेरियरसह सुंदररित्या पूर्ण केलेला आधुनिक बंगला.", slug: "shinde", count: 8 },
+      { name: "मार्कळ फार्महाउस", type: "फार्महाउस", location: "मार्कळ, पुणे", desc: "लाल दगड आणि विटांनी बांधलेले एकमजली फार्महाउस, नैसर्गिक परिसराशी सुंदरपणे मिसळणारे.", slug: "markal-farmhouse", count: 6 },
     ],
     noneMessage: "या श्रेणीत अद्याप प्रकल्प नाहीत.",
     ctaTitle: "आमची पुढील यशोगाथा बनायची आहे का?",
@@ -72,6 +81,43 @@ export default function Projects() {
   const { lang } = useLanguage();
   const t = translations[lang];
   const [activeIndex, setActiveIndex] = useState(0);
+
+  // Lightbox gallery state
+  const [gallery, setGallery] = useState<Project | null>(null);
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  const openGallery = (project: Project) => {
+    setGallery(project);
+    setPhotoIndex(0);
+  };
+  const closeGallery = useCallback(() => setGallery(null), []);
+  const nextPhoto = useCallback(() => {
+    setGallery((g) => {
+      if (g) setPhotoIndex((i) => (i + 1) % g.count);
+      return g;
+    });
+  }, []);
+  const prevPhoto = useCallback(() => {
+    setGallery((g) => {
+      if (g) setPhotoIndex((i) => (i - 1 + g.count) % g.count);
+      return g;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!gallery) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeGallery();
+      if (e.key === "ArrowRight") nextPhoto();
+      if (e.key === "ArrowLeft") prevPhoto();
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [gallery, closeGallery, nextPhoto, prevPhoto]);
 
   const filtered = activeIndex === 0 ? t.projects : t.projects.filter((p) => p.type === t.filters[activeIndex]);
 
@@ -137,17 +183,19 @@ export default function Projects() {
         <div className="mx-auto max-w-6xl px-6">
           <motion.div layout className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((project) => (
-              <motion.div
+              <motion.button
                 key={project.name}
+                type="button"
+                onClick={() => openGallery(project)}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 whileHover={{ y: -8 }}
-                className="group overflow-hidden rounded-2xl bg-white border border-black/8 shadow-sm hover:shadow-xl hover:border-amber/30 transition-all"
+                className="group text-left overflow-hidden rounded-2xl bg-white border border-black/8 shadow-sm hover:shadow-xl hover:border-amber/30 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2"
               >
                 <div className="relative h-52 w-full overflow-hidden">
-                  <Image src={project.img} alt={project.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <Image src={`/projects/${project.slug}/1.jpg`} alt={project.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/20 to-transparent" />
                   <motion.span
                     whileHover={{ scale: 1.05 }}
@@ -155,6 +203,11 @@ export default function Projects() {
                   >
                     <Tag className="h-3 w-3" /> {project.type}
                   </motion.span>
+                  {project.count > 1 && (
+                    <span className="absolute right-3 bottom-3 rounded-full bg-navy/80 px-2.5 py-1 text-xs font-semibold text-white flex items-center gap-1 backdrop-blur-sm">
+                      <Images className="h-3.5 w-3.5 text-amber" /> {project.count}
+                    </span>
+                  )}
                   <div className="absolute bottom-3 left-3 flex items-center gap-1 text-white/80 text-xs">
                     <MapPin className="h-3 w-3 text-amber" /> {project.location}
                   </div>
@@ -163,7 +216,7 @@ export default function Projects() {
                   <h3 className="text-lg font-bold text-navy group-hover:text-amber transition-colors">{project.name}</h3>
                   <p className="mt-2 text-sm text-navy/70 leading-relaxed">{project.desc}</p>
                 </div>
-              </motion.div>
+              </motion.button>
             ))}
           </motion.div>
 
@@ -185,6 +238,98 @@ export default function Projects() {
           </motion.div>
         </motion.div>
       </section>
+
+      {/* Lightbox gallery */}
+      <AnimatePresence>
+        {gallery && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeGallery}
+            className="fixed inset-0 z-[100] flex flex-col bg-black/90 backdrop-blur-sm"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 text-white" onClick={(e) => e.stopPropagation()}>
+              <div>
+                <h3 className="text-lg font-bold">{gallery.name}</h3>
+                <p className="text-xs text-white/60 flex items-center gap-1">
+                  <MapPin className="h-3 w-3 text-amber" /> {gallery.location}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeGallery}
+                aria-label="Close"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Image area */}
+            <div className="relative flex-1 flex items-center justify-center px-4 sm:px-16" onClick={(e) => e.stopPropagation()}>
+              <motion.div
+                key={photoIndex}
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.25 }}
+                className="relative h-full w-full max-w-4xl"
+              >
+                <Image
+                  src={`/projects/${gallery.slug}/${photoIndex + 1}.jpg`}
+                  alt={`${gallery.name} photo ${photoIndex + 1}`}
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                />
+              </motion.div>
+
+              {gallery.count > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={prevPhoto}
+                    aria-label="Previous photo"
+                    className="absolute left-2 sm:left-6 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-amber hover:text-navy-dark transition"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={nextPhoto}
+                    aria-label="Next photo"
+                    className="absolute right-2 sm:right-6 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-amber hover:text-navy-dark transition"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Counter + thumbnails */}
+            <div className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+              <p className="text-center text-sm text-white/70 mb-3">
+                {photoIndex + 1} / {gallery.count}
+              </p>
+              {gallery.count > 1 && (
+                <div className="flex justify-center gap-2 overflow-x-auto pb-1">
+                  {Array.from({ length: gallery.count }).map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setPhotoIndex(i)}
+                      className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition ${i === photoIndex ? "border-amber" : "border-transparent opacity-60 hover:opacity-100"}`}
+                    >
+                      <Image src={`/projects/${gallery.slug}/${i + 1}.jpg`} alt="" fill className="object-cover" sizes="80px" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
