@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | One O Buildcon Pune",
   },
   description:
-    "One O Buildcon is a trusted construction company in Pune specialising in premium bungalows, row houses, residential buildings and farmhouses. Expert RCC contractors in Pune delivering quality from blueprint to brilliance.",
+    "Trusted construction company in Pune building premium bungalows, row houses, residential buildings & farmhouses. Expert RCC contractors. Free consultation.",
   keywords: [
     "construction company Pune",
     "bungalow builder Pune",
@@ -51,13 +51,13 @@ export const metadata: Metadata = {
     title: "One O Buildcon | Construction Company in Pune",
     description:
       "Premium bungalows, row houses, residential buildings and farmhouses built by trusted RCC contractors in Pune, Maharashtra.",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "One O Buildcon – Construction Company Pune" }],
+    images: [{ url: "/logo.png", width: 1024, height: 1024, alt: "One O Buildcon – Construction Company Pune" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "One O Buildcon | Construction Company in Pune",
     description: "Premium bungalows, row houses & residential buildings by trusted RCC contractors in Pune.",
-    images: ["/og-image.jpg"],
+    images: ["/logo.png"],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   verification: { google: "" },
