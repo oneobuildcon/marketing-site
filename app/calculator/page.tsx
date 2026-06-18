@@ -406,6 +406,9 @@ export default function CalculatorPage() {
   const [floorRows, setFloorRows] = useState<FloorRow[]>(buildFloorRows(0, false));
   const [clientName, setClientName] = useState("");
   const [projectLocation, setProjectLocation] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
+  const [detailsSubmitted, setDetailsSubmitted] = useState(false);
+  const [detailsError, setDetailsError] = useState("");
   const [pkgContent, setPkgContent] = useState<PackageContent>(defaultPackageContent);
   const [cats, setCats] = useState<CategoryMeta[]>(defaultCategories);
   const [result, setResult] = useState<null | ResultData>(null);
@@ -489,6 +492,34 @@ export default function CalculatorPage() {
     setOtpSending(false);
     setLeadModal(null);
     setLeadName(""); setLeadPhone("");
+  }
+
+  function handleSubmitDetails() {
+    const phone = clientPhone.replace(/\D/g, "");
+    if (!clientName.trim()) { setDetailsError("Please enter your name."); return; }
+    if (!projectLocation.trim()) { setDetailsError("Please enter your project location."); return; }
+    if (phone.length !== 10 || !/^[6-9]/.test(phone)) {
+      setDetailsError("Enter a valid 10-digit mobile number.");
+      return;
+    }
+    setDetailsError("");
+
+    // Save the lead so it reaches the admin leads page + Google Sheet
+    const leadData = {
+      name: clientName.trim(),
+      phone: `+91${phone}`,
+      location: projectLocation.trim(),
+      source: "Cost Calculator",
+      date: new Date().toLocaleString("en-IN"),
+    };
+    try {
+      const existing = JSON.parse(localStorage.getItem("oneo_leads") || "[]");
+      existing.push(leadData);
+      localStorage.setItem("oneo_leads", JSON.stringify(existing));
+    } catch {}
+    fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(leadData) }).catch(() => {});
+
+    setDetailsSubmitted(true);
   }
 
   function updateSlab(index: number, value: string) {
@@ -593,6 +624,32 @@ export default function CalculatorPage() {
                       className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
                     />
                   </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-navy">Mobile Number</label>
+                    <div className="flex gap-2">
+                      <span className="flex items-center rounded-xl border border-black/15 px-3 text-navy/60 font-medium text-sm bg-gray-50">+91</span>
+                      <input
+                        type="tel"
+                        value={clientPhone}
+                        onChange={(e) => setClientPhone(e.target.value)}
+                        placeholder="98765 43210"
+                        maxLength={10}
+                        className="flex-1 rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                      />
+                    </div>
+                  </div>
+                  {detailsError && <p className="text-red-500 text-xs font-medium">{detailsError}</p>}
+                  {!detailsSubmitted ? (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                      onClick={handleSubmitDetails}
+                      className="w-full rounded-xl bg-amber py-3 text-sm font-bold text-navy-dark hover:bg-amber/90 transition"
+                    >
+                      Submit &amp; See Estimate →
+                    </motion.button>
+                  ) : (
+                    <p className="text-center text-xs font-medium text-emerald-600">✓ Details submitted — enter slab areas below to see your estimate.</p>
+                  )}
                 </div>
               </motion.div>
 
@@ -673,7 +730,7 @@ export default function CalculatorPage() {
             {/* RIGHT — Result */}
             <div className="lg:sticky lg:top-24 h-fit">
               <AnimatePresence mode="wait">
-                {result && clientName.trim() && projectLocation.trim() ? (
+                {result && detailsSubmitted ? (
                   <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-4">
 
                     {/* Main estimate card */}
@@ -771,10 +828,10 @@ export default function CalculatorPage() {
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber/10 mx-auto mb-4">
                       <Calculator className="h-8 w-8 text-amber" />
                     </div>
-                    <p className="text-navy font-bold text-lg">Enter your details to see the estimate</p>
-                    <p className="text-navy/50 text-sm mt-2">Please add your <strong>Client Name</strong> and <strong>Project Location</strong>, then fill in the floor slab areas to view your cost estimate.</p>
+                    <p className="text-navy font-bold text-lg">Submit your details to see the estimate</p>
+                    <p className="text-navy/50 text-sm mt-2">Enter your <strong>Name</strong>, <strong>Project Location</strong> and <strong>Mobile Number</strong> and click <strong>Submit</strong>, then fill in the floor slab areas to view your cost estimate.</p>
                     <div className="mt-6 flex items-center justify-center gap-1 text-xs text-navy/30">
-                      <ArrowRight className="h-3 w-3" /> Name &amp; Location → Select package → Enter slab areas
+                      <ArrowRight className="h-3 w-3" /> Submit details → Select package → Enter slab areas
                     </div>
                   </motion.div>
                 )}
