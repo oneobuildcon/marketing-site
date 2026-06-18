@@ -139,10 +139,18 @@ export default function CraneAnimation({ className = "" }: { className?: string 
         {/* ═══ SINGLE-BAG SITE MIXER (right) ═══ */}
         <ellipse cx="330" cy="432" rx="76" ry="6" fill="#000" opacity="0.2" />
 
-        {/* two big spoked wheels */}
+        {/* two big spoked wheels with tyre tread */}
         {[300, 366].map((cx) => (
           <g key={cx}>
             <circle cx={cx} cy="408" r="23" fill="url(#rmcTyre)" stroke="#000" strokeWidth="2" />
+            {/* tread ticks */}
+            <g stroke="#0c0e10" strokeWidth="2">
+              {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((a) => (
+                <line key={a}
+                  x1={cx + 20 * Math.cos((a * Math.PI) / 180)} y1={408 + 20 * Math.sin((a * Math.PI) / 180)}
+                  x2={cx + 23 * Math.cos((a * Math.PI) / 180)} y2={408 + 23 * Math.sin((a * Math.PI) / 180)} />
+              ))}
+            </g>
             <circle cx={cx} cy="408" r="15" fill="none" stroke="#7a818a" strokeWidth="3" />
             <g stroke="#9aa3ad" strokeWidth="2">
               {[0, 45, 90, 135].map((a) => (
@@ -155,17 +163,38 @@ export default function CraneAnimation({ className = "" }: { className?: string 
           </g>
         ))}
 
-        {/* axle + A-frame stand */}
+        {/* axle + A-frame stand + gussets */}
         <g stroke="url(#rmcChassis)" strokeWidth="7" strokeLinecap="round">
           <line x1="300" y1="408" x2="366" y2="408" />
           <line x1="312" y1="406" x2="330" y2="364" />
           <line x1="356" y1="406" x2="338" y2="364" />
         </g>
         <rect x="322" y="360" width="26" height="10" rx="3" fill="#3a3f45" />
+        <g fill="#23272c">
+          <circle cx="312" cy="406" r="2.5" />
+          <circle cx="356" cy="406" r="2.5" />
+        </g>
+        {/* tow handle */}
+        <line x1="290" y1="406" x2="262" y2="418" stroke="url(#rmcChassis)" strokeWidth="5" strokeLinecap="round" />
+        <rect x="254" y="414" width="12" height="6" rx="3" fill="#2c3036" />
+
+        {/* diesel engine + belt drive */}
+        <rect x="296" y="378" width="24" height="20" rx="3" fill="url(#rmcChassis)" stroke="#23272c" strokeWidth="1.5" />
+        <g stroke="#23272c" strokeWidth="1">
+          <line x1="300" y1="380" x2="300" y2="396" />
+          <line x1="304" y1="380" x2="304" y2="396" />
+          <line x1="308" y1="380" x2="308" y2="396" />
+        </g>
+        <circle cx="316" cy="388" r="5" fill="#6b7178" stroke="#23272c" strokeWidth="1.5" />
+        {/* drive belt to drum */}
+        <line x1="320" y1="384" x2="330" y2="368" stroke="#23272c" strokeWidth="2" />
+        <line x1="320" y1="392" x2="332" y2="372" stroke="#23272c" strokeWidth="2" />
 
         {/* tilting drum (amber, rotating) */}
         <g transform="translate(334 352) rotate(-24)">
           <ellipse cx="0" cy="0" rx="40" ry="30" fill="url(#craneSteel)" stroke="#9a5e0c" strokeWidth="2.5" />
+          {/* highlight sheen */}
+          <ellipse cx="-6" cy="-9" rx="20" ry="9" fill="#ffe1a0" opacity="0.35" />
           <g clipPath="url(#drumClip)">
             <g className="rmc-drum" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
               {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
@@ -175,19 +204,29 @@ export default function CraneAnimation({ className = "" }: { className?: string 
               ))}
             </g>
           </g>
+          {/* reinforcing bands */}
           <ellipse cx="0" cy="0" rx="40" ry="30" fill="none" stroke="#ffd27a" strokeWidth="1.5" opacity="0.6" />
-          <ellipse cx="9" cy="0" rx="29" ry="30" fill="none" stroke="#9a5e0c" strokeWidth="1.5" opacity="0.5" />
+          <ellipse cx="-9" cy="0" rx="30" ry="30" fill="none" stroke="#9a5e0c" strokeWidth="2" opacity="0.55" />
+          <ellipse cx="9" cy="0" rx="30" ry="30" fill="none" stroke="#9a5e0c" strokeWidth="2" opacity="0.55" />
+          {/* rivets around rim */}
+          <g fill="#7a4a10">
+            {[20, 60, 100, 140, 220, 260, 300, 340].map((a) => (
+              <circle key={a} cx={38 * Math.cos((a * Math.PI) / 180)} cy={28 * Math.sin((a * Math.PI) / 180)} r="1.6" />
+            ))}
+          </g>
           {/* open mouth */}
           <ellipse cx="32" cy="0" rx="10" ry="21" fill="#5a3a0a" stroke="#9a5e0c" strokeWidth="2" />
           <ellipse cx="32" cy="0" rx="5.5" ry="14" fill="#3f2a08" />
         </g>
 
         {/* tilt hand-wheel */}
-        <g transform="translate(366 376)">
+        <g transform="translate(368 374)">
           <circle r="12" fill="none" stroke="#5d646d" strokeWidth="3" />
           <g stroke="#5d646d" strokeWidth="2">
             <line x1="-10" y1="0" x2="10" y2="0" />
             <line x1="0" y1="-10" x2="0" y2="10" />
+            <line x1="-7" y1="-7" x2="7" y2="7" />
+            <line x1="-7" y1="7" x2="7" y2="-7" />
           </g>
           <circle r="3.5" fill="#3a3f45" />
         </g>
