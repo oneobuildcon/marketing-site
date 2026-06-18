@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, notFound } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Tag, ArrowLeft, X, CheckCircle2, Ruler, Clock, IndianRupee, BadgeCheck, Quote } from "lucide-react";
+import { MapPin, Tag, ArrowLeft, X, CheckCircle2, Ruler, Clock, IndianRupee, BadgeCheck } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { getProject } from "@/lib/projects";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -166,15 +166,6 @@ export default function ProjectDetail() {
                   ))}
                 </ul>
               </motion.div>
-
-              {c.testimonial && (
-                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="relative rounded-2xl bg-amber/10 border border-amber/30 p-7">
-                  <Quote className="h-8 w-8 text-amber/40 mb-3" />
-                  <p className="text-navy/80 italic leading-relaxed">&ldquo;{c.testimonial.quote}&rdquo;</p>
-                  <p className="mt-4 text-sm font-bold text-navy">— {c.testimonial.author}</p>
-                  <p className="text-xs text-navy/50">{c.location}</p>
-                </motion.div>
-              )}
             </div>
           </div>
         </div>
