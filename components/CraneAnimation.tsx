@@ -1,18 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 /**
- * Construction site scene: tower crane (jib faces right, away from text)
- * with concrete mixer beside it. Placed on the right side of the hero.
+ * Tower crane (jib faces right, away from text), placed on the right
+ * side of the hero with a gentle float to give the scene life.
  */
 export default function CraneAnimation({ className = "" }: { className?: string }) {
   return (
-    <div className={`flex items-end ${className}`}>
-      {/* Mixer sits beside the crane base */}
-      <img
-        src="/mixer.png"
-        alt="Concrete site mixer"
-        className="crane-float-slow w-auto object-contain drop-shadow-xl self-end"
-        style={{ height: "32%" }}
-      />
+    <div className={`flex items-end justify-end ${className}`}>
       {/* Crane flipped so jib faces right (outward from text) */}
       <img
         src="/crane.png"
