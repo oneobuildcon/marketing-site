@@ -63,7 +63,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/10 px-6 py-4 text-center text-xs flex items-center justify-center gap-4">
-        <span>© {new Date().getFullYear()} One O Buildcon. {t.rights}</span>
+        <span>© 2021 One O Buildcon. {t.rights}</span>
         <a href="/admin" className="text-white/20 hover:text-white/40 transition text-xs">Admin</a>
       </div>
     </footer>
