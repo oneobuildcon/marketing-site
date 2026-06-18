@@ -6,13 +6,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Construction Services in Pune | One O Buildcon",
     description: "Full construction services in Pune — bungalows, row houses, residential buildings, farmhouses and RCC contractors.",
-    images: [{ url: "/logo.png", width: 1024, height: 1024, alt: "One O Buildcon Services" }],
     url: "https://www.oneobuildcon.com/services",
   },
   twitter: {
     title: "Construction Services in Pune | One O Buildcon",
     description: "Full construction services in Pune — bungalows, row houses, residential buildings, farmhouses and RCC contractors.",
-    images: ["/logo.png"],
   },
 };
 

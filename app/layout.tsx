@@ -51,13 +51,11 @@ export const metadata: Metadata = {
     title: "One O Buildcon | Construction Company in Pune",
     description:
       "Premium bungalows, row houses, residential buildings and farmhouses built by trusted RCC contractors in Pune, Maharashtra.",
-    images: [{ url: "/logo.png", width: 1024, height: 1024, alt: "One O Buildcon – Construction Company Pune" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "One O Buildcon | Construction Company in Pune",
     description: "Premium bungalows, row houses & residential buildings by trusted RCC contractors in Pune.",
-    images: ["/logo.png"],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   verification: { google: "" },

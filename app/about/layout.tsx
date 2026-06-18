@@ -6,13 +6,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "About One O Buildcon | Construction Company Pune",
     description: "Trusted construction company in Pune specialising in bungalows, row houses, residential buildings and farmhouses.",
-    images: [{ url: "/logo.png", width: 1024, height: 1024, alt: "About One O Buildcon" }],
     url: "https://www.oneobuildcon.com/about",
   },
   twitter: {
     title: "About One O Buildcon | Construction Company Pune",
     description: "Trusted construction company in Pune specialising in bungalows, row houses, residential buildings and farmhouses.",
-    images: ["/logo.png"],
   },
 };
 

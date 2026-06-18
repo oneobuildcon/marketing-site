@@ -6,13 +6,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Our Projects | One O Buildcon Pune",
     description: "Browse completed bungalows, row houses, residential buildings and farmhouses built by One O Buildcon in Pune, Maharashtra.",
-    images: [{ url: "/logo.png", width: 1024, height: 1024, alt: "One O Buildcon Projects" }],
     url: "https://www.oneobuildcon.com/projects",
   },
   twitter: {
     title: "Our Projects | One O Buildcon Pune",
     description: "Browse completed bungalows, row houses, residential buildings and farmhouses built by One O Buildcon in Pune.",
-    images: ["/logo.png"],
   },
 };
 
