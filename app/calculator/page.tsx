@@ -412,11 +412,6 @@ export default function CalculatorPage() {
   const [pkgContent, setPkgContent] = useState<PackageContent>(defaultPackageContent);
   const [cats, setCats] = useState<CategoryMeta[]>(defaultCategories);
   const [result, setResult] = useState<null | ResultData>(null);
-  const [leadModal, setLeadModal] = useState<null | "pdf" | "excel">(null);
-  const [leadName, setLeadName] = useState("");
-  const [leadPhone, setLeadPhone] = useState("");
-  const [leadError, setLeadError] = useState("");
-  const [otpSending, setOtpSending] = useState(false);
 
   // Load package content and categories from localStorage on mount
   useEffect(() => {
@@ -447,52 +442,6 @@ export default function CalculatorPage() {
       return newRows.map((r, i) => ({ ...r, slab: prev[i]?.slab ?? "" }));
     });
   }, [upperFloors, parking]);
-
-  async function handleSubmitLead() {
-    const phone = leadPhone.replace(/\D/g, "");
-    if (!leadName.trim()) { setLeadError("Please enter your name."); return; }
-    if (phone.length !== 10 || !/^[6-9]/.test(phone)) {
-      setLeadError("Enter a valid 10-digit Indian mobile number.");
-      return;
-    }
-    if (!result) return;
-    setLeadError("");
-    setOtpSending(true);
-
-    // Build lead record
-    const leadData = {
-      name: leadName.trim(),
-      phone: `+91${phone}`,
-      package: selectedPkg.name,
-      rate: selectedPkg.price,
-      config: upperFloors === 0 ? "G" : `G+${upperFloors}`,
-      ground: parking ? "Parking" : "House",
-      totalArea: result.totalArea,
-      totalCost: result.total,
-      gst,
-      location: projectLocation || "",
-      date: new Date().toLocaleString("en-IN"),
-    };
-    // Save to localStorage for admin/leads page
-    try {
-      const existing = JSON.parse(localStorage.getItem("oneo_leads") || "[]");
-      existing.push(leadData);
-      localStorage.setItem("oneo_leads", JSON.stringify(existing));
-    } catch {}
-    // Save lead to Google Sheet + email owner (via Apps Script)
-    fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(leadData) }).catch(() => {});
-
-    // Download file
-    if (leadModal === "pdf") {
-      exportPDF(result, selectedPkg, upperFloors, parking, gst, clientName || leadName, projectLocation, pkgContent, cats);
-    } else {
-      exportExcel(result, selectedPkg, upperFloors, parking, gst, clientName || leadName, projectLocation, pkgContent, cats);
-    }
-
-    setOtpSending(false);
-    setLeadModal(null);
-    setLeadName(""); setLeadPhone("");
-  }
 
   function handleSubmitDetails() {
     const phone = clientPhone.replace(/\D/g, "");
@@ -820,14 +769,14 @@ export default function CalculatorPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => setLeadModal("pdf")}
+                        onClick={() => result && exportPDF(result, selectedPkg, upperFloors, parking, gst, clientName, projectLocation, pkgContent, cats)}
                         className="flex items-center justify-center gap-2 rounded-xl bg-navy py-3 font-semibold text-white hover:bg-navy/90 transition text-sm"
                       >
                         <FileText className="h-4 w-4" /> Download PDF
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => setLeadModal("excel")}
+                        onClick={() => result && exportExcel(result, selectedPkg, upperFloors, parking, gst, clientName, projectLocation, pkgContent, cats)}
                         className="flex items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 transition text-sm"
                       >
                         <FileSpreadsheet className="h-4 w-4" /> Download Excel
@@ -867,67 +816,6 @@ export default function CalculatorPage() {
         </div>
       </section>
 
-
-      {/* Lead capture + OTP modal */}
-      <AnimatePresence>
-        {leadModal && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden"
-            >
-              {/* Modal header */}
-              <div className="bg-navy px-6 py-5">
-                <p className="text-xs font-semibold uppercase tracking-widest text-amber mb-1">
-                  Almost there
-                </p>
-                <h3 className="text-xl font-bold text-white">
-                  Enter your details to download
-                </h3>
-                <p className="text-white/60 text-sm mt-1">
-                  Get your detailed quotation as {leadModal === "pdf" ? "PDF" : "Excel"}.
-                </p>
-              </div>
-
-              <div className="px-6 py-6 space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1.5">Your Name *</label>
-                  <input type="text" value={leadName} onChange={(e) => setLeadName(e.target.value)}
-                    placeholder="e.g. Rahul Sharma"
-                    className="w-full rounded-xl border border-black/15 px-4 py-3 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1.5">Mobile Number *</label>
-                  <div className="flex gap-2">
-                    <span className="flex items-center rounded-xl border border-black/15 px-3 text-navy/60 font-medium text-sm bg-gray-50">+91</span>
-                    <input type="tel" value={leadPhone} onChange={(e) => setLeadPhone(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSubmitLead()}
-                      placeholder="98765 43210" maxLength={10}
-                      className="flex-1 rounded-xl border border-black/15 px-4 py-3 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20" />
-                  </div>
-                </div>
-                {leadError && <p className="text-red-500 text-xs font-medium">{leadError}</p>}
-                <div className="flex gap-3 pt-1">
-                  <button onClick={() => { setLeadModal(null); setLeadError(""); }}
-                    className="flex-1 rounded-xl border-2 border-black/10 py-3 text-sm font-semibold text-navy/60 hover:border-navy/30 transition">
-                    Cancel
-                  </button>
-                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                    onClick={handleSubmitLead} disabled={otpSending}
-                    className="flex-1 rounded-xl bg-amber py-3 text-sm font-bold text-navy-dark hover:bg-amber/90 transition disabled:opacity-60">
-                    {otpSending ? "Preparing..." : `Download ${leadModal === "pdf" ? "PDF" : "Excel"} →`}
-                  </motion.button>
-                </div>
-                <p className="text-center text-xs text-navy/30">Your details are only used to follow up on your enquiry.</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Disclaimer */}
       <section className="bg-white py-8 border-t border-black/5">
