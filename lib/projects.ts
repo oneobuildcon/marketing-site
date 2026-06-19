@@ -99,7 +99,7 @@ export const projects: Project[] = [
   },
   {
     slug: "baiche",
-    count: 1,
+    count: 11,
     category: "residential",
     status: "ongoing",
     area: "5,100 Sq.ft",
