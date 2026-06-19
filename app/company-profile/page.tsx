@@ -173,7 +173,7 @@ export default function CompanyProfilePage() {
   return (
     <main className="bg-gray-100 min-h-screen py-8 print:bg-white print:py-0">
       {/* Action bar — hidden when printing */}
-      <div className="no-print mx-auto mb-6 flex max-w-4xl justify-end gap-3 px-6">
+      <div className="no-print mx-auto mb-6 flex max-w-4xl justify-end gap-3 px-4 sm:px-6">
         <button
           onClick={handleShare}
           className="flex items-center gap-2 rounded-md border border-navy/30 px-5 py-2.5 font-semibold text-navy transition hover:bg-navy/5"
@@ -192,12 +192,12 @@ export default function CompanyProfilePage() {
       {/* The printable A4 document */}
       <article id="profile-doc" className="profile-doc mx-auto max-w-4xl bg-white text-navy shadow-xl print:max-w-none print:shadow-none">
         {/* Header / cover */}
-        <header className="flex items-center gap-5 bg-navy px-10 py-8 text-white">
-          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-amber/40">
+        <header className="flex items-center gap-4 bg-navy px-5 py-6 text-white sm:gap-5 sm:px-10 sm:py-8">
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-amber/40 sm:h-20 sm:w-20">
             <Image src="/logo.png" alt="One O Buildcon" fill className="object-contain p-1" />
           </div>
           <div>
-            <h1 className="font-display text-3xl font-bold">
+            <h1 className="font-display text-2xl font-bold sm:text-3xl">
               One O <span className="text-amber">Buildcon</span>
             </h1>
             <p className="text-amber-light">{c.tagline}</p>
@@ -205,7 +205,7 @@ export default function CompanyProfilePage() {
           </div>
         </header>
 
-        <div className="space-y-10 px-10 py-10">
+        <div className="space-y-8 px-5 py-8 sm:space-y-10 sm:px-10 sm:py-10">
           {/* About */}
           <section>
             <h2 className="mb-3 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.about}</h2>
@@ -284,17 +284,17 @@ export default function CompanyProfilePage() {
           </section>
 
           {/* Contact */}
-          <section className="break-inside-avoid rounded-lg bg-navy px-6 py-6 text-white">
+          <section className="break-inside-avoid rounded-lg bg-navy px-5 py-6 text-white sm:px-6">
             <h2 className="mb-4 font-display text-xl font-bold">{c.contact}</h2>
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 text-sm sm:grid-cols-3 sm:text-base">
               <a href="tel:+918806029907" className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-amber" /> +91 88060 29907
+                <Phone className="h-4 w-4 shrink-0 text-amber" /> +91 88060 29907
               </a>
-              <a href="mailto:oneobuildcon@gmail.com" className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-amber" /> oneobuildcon@gmail.com
+              <a href="mailto:oneobuildcon@gmail.com" className="flex items-center gap-2 break-all">
+                <Mail className="h-4 w-4 shrink-0 text-amber" /> oneobuildcon@gmail.com
               </a>
               <p className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-amber" /> {c.addressVal}
+                <MapPin className="h-4 w-4 shrink-0 text-amber" /> {c.addressVal}
               </p>
             </div>
             <p className="mt-4 text-sm text-white/60">oneobuildcon.com</p>
