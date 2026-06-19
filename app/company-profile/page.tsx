@@ -526,12 +526,11 @@ export default function CompanyProfilePage() {
                             <div className="flex items-center gap-1.5">
                               <p className="truncate font-display text-base font-bold text-navy">{content.name}</p>
                               {(() => {
-                                const StatusIcon = group === "completed" ? CheckCircle2 : group === "ongoing" ? HardHat : Clock;
-                                const color = group === "completed" ? "text-green-600" : group === "ongoing" ? "text-amber" : "text-sky-500";
+                                const emoji = group === "completed" ? "🏗️" : group === "ongoing" ? "🚧" : "🗓️";
                                 const label = group === "completed" ? c.completed : group === "ongoing" ? c.underConstruction : c.planned;
                                 return (
-                                  <span title={label} aria-label={label}>
-                                    <StatusIcon className={`h-4 w-4 shrink-0 ${color}`} />
+                                  <span title={label} aria-label={label} className="shrink-0 text-base leading-none">
+                                    {emoji}
                                   </span>
                                 );
                               })()}
