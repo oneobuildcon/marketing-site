@@ -8,7 +8,7 @@ import {
   Printer, Phone, Mail, MapPin, CheckCircle2, Share2, ClipboardList, PencilRuler,
   Calculator, HardHat, ShieldCheck, KeyRound, Globe, Camera, MessageCircle, Building2,
   CalendarDays, Users, Home, Layers, Warehouse, Hammer, PaintBucket, Ruler, Star,
-  BadgeCheck, Package, Phone as PhoneIcon, Sparkles,
+  Package, Phone as PhoneIcon, Sparkles,
 } from "lucide-react";
 
 const t = {
@@ -55,7 +55,7 @@ const t = {
       "Daily Site Supervision",
     ],
     materials: "Materials We Trust",
-    materialsList: ["UltraTech Cement", "Tata Tiscon Steel", "Asian Paints", "Kajaria Tiles", "Havells Electricals"],
+    materialsList: ["Birla Super Cement", "JK Cement", "Tata Tiscon Steel", "Uma", "Asian Paints", "Cera", "Vermora", "Jaguar", "Kajaria Tiles", "Polycab", "Dr. Fixit"],
     team: "Our Team",
     teamList: ["Civil Engineers", "Architects", "Site Supervisors", "Skilled Technicians", "Project Managers"],
     teamStrength: "Team Strength",
@@ -121,7 +121,7 @@ const t = {
       "दैनंदिन साइट पर्यवेक्षण",
     ],
     materials: "आम्ही विश्वास ठेवतो ती सामग्री",
-    materialsList: ["अल्ट्राटेक सिमेंट", "टाटा टिस्कॉन स्टील", "एशियन पेंट्स", "कजारिया टाइल्स", "हॅवेल्स इलेक्ट्रिकल्स"],
+    materialsList: ["बिर्ला सुपर सिमेंट", "जेके सिमेंट", "टाटा टिस्कॉन स्टील", "उमा", "एशियन पेंट्स", "सेरा", "व्हर्मोरा", "जॅग्वार", "कजारिया टाइल्स", "पॉलिकॅब", "डॉ. फिक्सिट"],
     team: "आमची टीम",
     teamList: ["सिव्हिल इंजिनिअर्स", "आर्किटेक्ट्स", "साइट सुपरवायझर्स", "कुशल तंत्रज्ञ", "प्रकल्प व्यवस्थापक"],
     teamStrength: "टीम संख्या",
@@ -148,17 +148,9 @@ const t = {
 
 const statValues = [
   { v: "20+", icon: Building2 },
-  { v: "50,000+", icon: Ruler },
+  { v: "30,000+", icon: Ruler },
   { v: "25+", icon: Users },
   { v: "6+", icon: CalendarDays },
-];
-
-// Registrations — values shown as "verified" badges; actual numbers can be filled in later.
-const certifications = [
-  { en: "GST Registered", mr: "जीएसटी नोंदणीकृत" },
-  { en: "MSME / Udyam Registered", mr: "एमएसएमई / उद्यम नोंदणीकृत" },
-  { en: "Shop Act License", mr: "शॉप अॅक्ट परवाना" },
-  { en: "Registered Contractor", mr: "नोंदणीकृत कंत्राटदार" },
 ];
 
 const processIcons = [ClipboardList, PencilRuler, Calculator, HardHat, ShieldCheck, KeyRound];
@@ -456,20 +448,6 @@ export default function CompanyProfilePage() {
                 </div>
               );
             })}
-          </section>
-
-          {/* Certifications & Registrations — trust signals */}
-          <section className="break-inside-avoid">
-            <h2 className="mb-1 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.certs}</h2>
-            <p className="mb-4 pl-3 text-sm text-gray-500">{c.certNote}</p>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {certifications.map((cert) => (
-                <div key={cert.en} className="flex flex-col items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-4 text-center">
-                  <BadgeCheck className="h-7 w-7 text-green-600" />
-                  <span className="text-sm font-semibold text-navy">{cert[lang]}</span>
-                </div>
-              ))}
-            </div>
           </section>
 
           {/* Founder message — placed near the end */}
