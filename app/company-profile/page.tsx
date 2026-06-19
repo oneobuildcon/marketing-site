@@ -325,7 +325,7 @@ export default function CompanyProfilePage() {
           {/* About */}
           <section>
             <h2 className="mb-3 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.about}</h2>
-            <p className="leading-relaxed text-gray-700">{c.aboutText}</p>
+            <p className="leading-loose text-gray-700">{c.aboutText}</p>
           </section>
 
           {/* Stats — corporate navy band */}
@@ -512,7 +512,7 @@ export default function CompanyProfilePage() {
                     {items.map((p) => {
                       const content = p[lang];
                       return (
-                        <div key={p.slug} className="break-inside-avoid overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                        <div key={p.slug} className="flex break-inside-avoid flex-col overflow-hidden rounded-lg border border-gray-200 shadow-sm">
                           <div className="relative aspect-[4/3] w-full bg-gray-100">
                             <Image
                               src={`/projects/${p.slug}/1.jpg`}
@@ -522,7 +522,7 @@ export default function CompanyProfilePage() {
                               className="object-cover"
                             />
                           </div>
-                          <div className="px-3 py-2.5">
+                          <div className="flex flex-1 flex-col px-3 py-2.5">
                             <div className="flex items-center gap-1.5">
                               <p className="truncate font-display text-base font-bold text-navy">{content.name}</p>
                               {(() => {
@@ -537,7 +537,7 @@ export default function CompanyProfilePage() {
                             </div>
                             <p className="truncate text-[11px] font-medium uppercase tracking-wide text-amber">{content.type}</p>
                             <p className="truncate text-xs text-gray-500">{content.location}</p>
-                            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-600">
+                            <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1.5 text-[11px] text-gray-600">
                               <span className="flex items-center gap-1">
                                 <Ruler className="h-3 w-3 text-amber" /> {p.area}
                               </span>
@@ -566,7 +566,7 @@ export default function CompanyProfilePage() {
                 <Image src="/logo.png" alt={c.founderName} fill className="object-contain p-1" />
               </div>
               <div>
-                <p className="italic leading-relaxed text-gray-700">&ldquo;{c.founderMsg}&rdquo;</p>
+                <p className="italic leading-loose text-gray-700">&ldquo;{c.founderMsg}&rdquo;</p>
                 <p className="mt-3 font-display text-lg font-bold text-navy">{c.founderName}</p>
                 <p className="text-sm font-medium text-amber">{c.founderRole}</p>
               </div>
