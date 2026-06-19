@@ -525,18 +525,16 @@ export default function CompanyProfilePage() {
                           <div className="px-3 py-2.5">
                             <div className="flex items-center gap-1.5">
                               <p className="truncate font-display text-base font-bold text-navy">{content.name}</p>
-                              <span
-                                className={`flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase ${
-                                  group === "completed"
-                                    ? "bg-green-100 text-green-700"
-                                    : group === "ongoing"
-                                    ? "bg-amber/20 text-navy"
-                                    : "bg-sky-100 text-sky-700"
-                                }`}
-                              >
-                                <span className={`h-1.5 w-1.5 rounded-full ${group === "completed" ? "bg-green-500" : group === "ongoing" ? "bg-amber" : "bg-sky-500"}`} />
-                                {group === "completed" ? c.completed : group === "ongoing" ? c.underConstruction : c.planned}
-                              </span>
+                              {(() => {
+                                const StatusIcon = group === "completed" ? CheckCircle2 : group === "ongoing" ? HardHat : Clock;
+                                const color = group === "completed" ? "text-green-600" : group === "ongoing" ? "text-amber" : "text-sky-500";
+                                const label = group === "completed" ? c.completed : group === "ongoing" ? c.underConstruction : c.planned;
+                                return (
+                                  <span title={label} aria-label={label}>
+                                    <StatusIcon className={`h-4 w-4 shrink-0 ${color}`} />
+                                  </span>
+                                );
+                              })()}
                             </div>
                             <p className="truncate text-[11px] font-medium uppercase tracking-wide text-amber">{content.type}</p>
                             <p className="truncate text-xs text-gray-500">{content.location}</p>
