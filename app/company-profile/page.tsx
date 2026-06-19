@@ -521,6 +521,11 @@ export default function CompanyProfilePage() {
                               sizes="(max-width: 640px) 50vw, 33vw"
                               className="object-cover"
                             />
+                            {group === "completed" && (
+                              <span className="absolute left-2 top-2 rounded bg-green-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow">
+                                {c.completed}
+                              </span>
+                            )}
                             {group === "ongoing" && (
                               <span className="absolute left-2 top-2 rounded bg-amber px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-navy shadow">
                                 {c.underConstruction}
