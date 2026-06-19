@@ -57,14 +57,14 @@ export const projects: Project[] = [
     duration: "On request",
     budget: "On request",
     en: {
-      name: "Pune Farmhouse",
+      name: "Farmhouse",
       type: "Farmhouse",
       location: "Pune",
       desc: "A charming single-storey farmhouse set amid open, green surroundings. Built with a warm terracotta-roof structure, a shaded gazebo and landscaped grounds, it offers a peaceful, natural retreat — completed and handed over in 2022.",
       highlights: ["Single-storey farmhouse", "Warm terracotta-roof structure", "Shaded gazebo & open grounds", "Peaceful natural setting"],
     },
     mr: {
-      name: "पुणे फार्महाउस",
+      name: "फार्महाउस",
       type: "फार्महाउस",
       location: "पुणे",
       desc: "हिरव्यागार, मोकळ्या परिसरात वसलेले एक आकर्षक एकमजली फार्महाउस. उबदार टेराकोटा छताची रचना, सावलीदार गॅझिबो आणि सुशोभित परिसरासह बांधलेले, हे शांत, नैसर्गिक विश्रांतीस्थान देते — २०२२ मध्ये पूर्ण करून दिलेले.",
