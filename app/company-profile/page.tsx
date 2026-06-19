@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { projects } from "@/lib/projects";
 import { Printer, Phone, Mail, MapPin, CheckCircle2, Share2 } from "lucide-react";
@@ -39,6 +40,7 @@ const t = {
     address: "Address",
     addressVal: "Pune, Maharashtra, India",
     download: "Download PDF",
+    preparing: "Preparing…",
     share: "Share",
     copied: "Link copied!",
     cats: {
@@ -84,6 +86,7 @@ const t = {
     address: "पत्ता",
     addressVal: "पुणे, महाराष्ट्र, भारत",
     download: "पीडीएफ डाउनलोड करा",
+    preparing: "तयार होत आहे…",
     share: "शेअर करा",
     copied: "लिंक कॉपी झाली!",
     cats: {
@@ -108,6 +111,42 @@ const statValues = [
 export default function CompanyProfilePage() {
   const { lang } = useLanguage();
   const c = t[lang];
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    const el = document.getElementById("profile-doc");
+    if (!el) return;
+    setDownloading(true);
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
+      const img = canvas.toDataURL("image/jpeg", 0.95);
+      const pdf = new jsPDF({ unit: "mm", format: "a4" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const imgH = (canvas.height * pageW) / canvas.width;
+      let heightLeft = imgH;
+      let position = 0;
+      pdf.addImage(img, "JPEG", 0, position, pageW, imgH);
+      heightLeft -= pageH;
+      while (heightLeft > 0) {
+        position -= pageH;
+        pdf.addPage();
+        pdf.addImage(img, "JPEG", 0, position, pageW, imgH);
+        heightLeft -= pageH;
+      }
+      pdf.save("One-O-Buildcon-Company-Profile.pdf");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   // Live counts derived from the actual projects data
   const completedCount = projects.filter((p) => p.status === "completed").length;
@@ -142,15 +181,16 @@ export default function CompanyProfilePage() {
           <Share2 className="h-4 w-4" /> {c.share}
         </button>
         <button
-          onClick={() => window.print()}
-          className="flex items-center gap-2 rounded-md bg-amber px-5 py-2.5 font-semibold text-navy transition hover:bg-amber-light"
+          onClick={handleDownload}
+          disabled={downloading}
+          className="flex items-center gap-2 rounded-md bg-amber px-5 py-2.5 font-semibold text-navy transition hover:bg-amber-light disabled:opacity-60"
         >
-          <Printer className="h-4 w-4" /> {c.download}
+          <Printer className="h-4 w-4" /> {downloading ? c.preparing : c.download}
         </button>
       </div>
 
       {/* The printable A4 document */}
-      <article className="profile-doc mx-auto max-w-4xl bg-white text-navy shadow-xl print:max-w-none print:shadow-none">
+      <article id="profile-doc" className="profile-doc mx-auto max-w-4xl bg-white text-navy shadow-xl print:max-w-none print:shadow-none">
         {/* Header / cover */}
         <header className="flex items-center gap-5 bg-navy px-10 py-8 text-white">
           <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-amber/40">
