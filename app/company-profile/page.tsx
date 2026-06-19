@@ -522,9 +522,9 @@ export default function CompanyProfilePage() {
                               className="object-cover"
                             />
                           </div>
-                          <div className="flex flex-1 flex-col px-3 py-2.5">
+                          <div className="flex flex-1 flex-col bg-navy px-3 py-2.5 text-white">
                             <div className="flex items-center gap-1.5">
-                              <p className="truncate font-display text-base font-bold text-navy">{content.name}</p>
+                              <p className="truncate font-display text-base font-bold text-white">{content.name}</p>
                               {(() => {
                                 const emoji = group === "completed" ? "🏗️" : group === "ongoing" ? "🚧" : "🗓️";
                                 const label = group === "completed" ? c.completed : group === "ongoing" ? c.underConstruction : c.planned;
@@ -535,9 +535,9 @@ export default function CompanyProfilePage() {
                                 );
                               })()}
                             </div>
-                            <p className="truncate text-[11px] font-medium uppercase tracking-wide text-amber">{content.type}</p>
-                            <p className="truncate text-xs text-gray-500">{content.location}</p>
-                            <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1.5 text-[11px] text-gray-600">
+                            <p className="truncate text-[11px] font-medium uppercase tracking-wide text-amber-light">{content.type}</p>
+                            <p className="truncate text-xs text-white/60">{content.location}</p>
+                            <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1.5 text-[11px] text-white/75">
                               <span className="flex items-center gap-1">
                                 <Ruler className="h-3 w-3 text-amber" /> {p.area}
                               </span>
