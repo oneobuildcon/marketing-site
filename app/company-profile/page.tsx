@@ -67,6 +67,9 @@ const t = {
     underConstruction: "Under Construction",
     certs: "Certifications & Registrations",
     certNote: "Registered & compliant — documents available on request.",
+    testimonialsTitle: "What Our Clients Say",
+    ctaTitle: "Planning Your Dream Home?",
+    ctaBtn: "Schedule a Free Site Visit",
     contact: "Free Consultation",
     contactSub: "Get in touch — we respond within 24 hours.",
     callNow: "Call Now",
@@ -133,6 +136,9 @@ const t = {
     underConstruction: "बांधकाम सुरू",
     certs: "प्रमाणपत्रे व नोंदणी",
     certNote: "नोंदणीकृत व अनुपालनशील — कागदपत्रे विनंतीनुसार उपलब्ध.",
+    testimonialsTitle: "आमचे ग्राहक काय म्हणतात",
+    ctaTitle: "तुमच्या स्वप्नातील घराचे नियोजन करत आहात?",
+    ctaBtn: "मोफत साइट भेटीचे नियोजन करा",
     contact: "मोफत सल्ला",
     contactSub: "संपर्क करा — आम्ही २४ तासांत प्रतिसाद देतो.",
     callNow: "आता कॉल करा",
@@ -200,6 +206,12 @@ export default function CompanyProfilePage() {
   // Live counts derived from the actual projects data
   const completedCount = projects.filter((p) => p.status === "completed").length;
   const ongoingCount = projects.filter((p) => p.status === "ongoing").length;
+
+  // Real client testimonials pulled live from the projects data
+  const testimonials = projects
+    .map((p) => ({ slug: p.slug, location: p[lang].location, ...p[lang].testimonial }))
+    .filter((x): x is { slug: string; location: string; quote: string; author: string } => Boolean(x.quote))
+    .slice(0, 3);
 
   const handleShare = async () => {
     const url = `${WEBSITE}/company-profile`;
@@ -286,7 +298,7 @@ export default function CompanyProfilePage() {
           </div>
         </header>
 
-        <div className="space-y-10 px-5 py-8 sm:space-y-14 sm:px-10 sm:py-12">
+        <div className="space-y-12 px-5 py-8 sm:space-y-16 sm:px-10 sm:py-12">
           {/* About */}
           <section>
             <h2 className="mb-3 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.about}</h2>
@@ -428,7 +440,7 @@ export default function CompanyProfilePage() {
                     {items.map((p) => {
                       const content = p[lang];
                       return (
-                        <div key={p.slug} className="break-inside-avoid overflow-hidden rounded-lg border border-gray-200">
+                        <div key={p.slug} className="break-inside-avoid overflow-hidden rounded-lg border border-gray-200 shadow-sm">
                           <div className="relative aspect-[4/3] w-full bg-gray-100">
                             <Image
                               src={`/projects/${p.slug}/1.jpg`}
@@ -457,6 +469,31 @@ export default function CompanyProfilePage() {
             })}
           </section>
 
+          {/* Client testimonials — real quotes from completed projects */}
+          {testimonials.length > 0 && (
+            <section className="break-inside-avoid">
+              <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.testimonialsTitle}</h2>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {testimonials.map((tm) => (
+                  <figure key={tm.slug} className="flex flex-col rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                    <div className="mb-2 flex gap-0.5 text-amber">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-amber" />
+                      ))}
+                    </div>
+                    <blockquote className="flex-1 text-sm italic leading-relaxed text-gray-700">
+                      &ldquo;{tm.quote}&rdquo;
+                    </blockquote>
+                    <figcaption className="mt-3 text-sm font-bold text-navy">
+                      {tm.author}
+                      <span className="block text-xs font-medium text-gray-500">{tm.location}</span>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Founder message — placed near the end */}
           <section className="break-inside-avoid rounded-lg border border-amber/30 bg-amber/5 p-5 sm:p-6">
             <h2 className="mb-4 font-display text-xl font-bold text-navy">{c.founderTitle}</h2>
@@ -476,6 +513,16 @@ export default function CompanyProfilePage() {
           <section className="break-inside-avoid rounded-lg bg-navy px-5 py-6 text-white sm:px-6">
             <h2 className="font-display text-xl font-bold">{c.contact}</h2>
             <p className="mb-4 text-sm text-white/70">{c.contactSub}</p>
+            {/* Lead-generation call-to-action */}
+            <a
+              href="tel:+918806029907"
+              className="mb-6 flex flex-col items-start gap-2 rounded-lg border border-amber/40 bg-amber/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <span className="font-display text-lg font-bold text-amber-light">{c.ctaTitle}</span>
+              <span className="flex items-center gap-2 rounded-md bg-amber px-4 py-2 text-sm font-bold text-navy">
+                <Phone className="h-4 w-4" /> {c.ctaBtn}
+              </span>
+            </a>
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-3 text-sm sm:text-base">
                 <a href="tel:+918806029907" className="flex items-center gap-2">
