@@ -35,6 +35,9 @@ const ui = {
     noneMessage: "No projects in this category yet.",
     viewProject: "View project",
     photos: "photos",
+    completed: "Completed",
+    ongoing: "Ongoing",
+    pipeline: "Pipeline",
     ctaTitle: "Want to be our next success story?",
     ctaSub: "Let's discuss your project. Free consultation, no obligations.",
     ctaBtn: "Start Your Project →",
@@ -47,6 +50,9 @@ const ui = {
     noneMessage: "या श्रेणीत अद्याप प्रकल्प नाहीत.",
     viewProject: "प्रकल्प पहा",
     photos: "फोटो",
+    completed: "पूर्ण",
+    ongoing: "सुरू",
+    pipeline: "नियोजित",
     ctaTitle: "आमची पुढील यशोगाथा बनायची आहे का?",
     ctaSub: "तुमच्या प्रकल्पाबद्दल चर्चा करूया. मोफत सल्लामसलत, कोणतेही बंधन नाही.",
     ctaBtn: "तुमचा प्रकल्प सुरू करा →",
@@ -141,6 +147,18 @@ export default function Projects() {
                     <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/20 to-transparent" />
                     <span className="absolute right-3 top-3 rounded-full bg-amber px-3 py-1 text-xs font-bold text-navy-dark flex items-center gap-1">
                       <Tag className="h-3 w-3" /> {c.type}
+                    </span>
+                    <span
+                      className={`absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5 backdrop-blur-sm ${
+                        project.status === "completed"
+                          ? "bg-emerald-500/90"
+                          : project.status === "pipeline"
+                          ? "bg-sky-500/90"
+                          : "bg-amber/90 text-navy-dark"
+                      }`}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                      {project.status === "completed" ? t.completed : project.status === "pipeline" ? t.pipeline : t.ongoing}
                     </span>
                     {project.count > 1 && (
                       <span className="absolute right-3 bottom-3 rounded-full bg-navy/80 px-2.5 py-1 text-xs font-semibold text-white flex items-center gap-1 backdrop-blur-sm">
