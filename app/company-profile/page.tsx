@@ -292,17 +292,17 @@ export default function CompanyProfilePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-navy-dark/90 via-transparent to-navy-dark/30" />
           <div className="absolute inset-0 cover-grid opacity-30" />
           <div className="pointer-events-none absolute inset-0 cover-sheen" />
-          <div className="relative flex flex-col gap-6 px-5 py-12 sm:px-10 sm:py-16">
-            <div className="flex flex-col items-start gap-4">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-amber/40 sm:h-20 sm:w-20">
+          <div className="relative flex flex-col gap-4 px-5 py-7 sm:px-10 sm:py-9">
+            <div className="flex items-center gap-4">
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-amber/40 sm:h-16 sm:w-16">
                 <Image src="/logo.png" alt="One O Buildcon" fill className="object-contain p-1" />
               </div>
               <div>
-                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.25em] text-amber/80">{c.profile}</p>
-                <h1 className="font-display text-4xl font-bold leading-tight sm:text-6xl">
+                <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-amber/80">{c.profile}</p>
+                <h1 className="font-display text-2xl font-bold leading-tight sm:text-4xl">
                   One O <span className="text-amber">Buildcon</span>
                 </h1>
-                <p className="mt-2 text-lg text-amber-light sm:text-xl">{c.tagline}</p>
+                <p className="mt-1 text-sm text-amber-light sm:text-base">{c.tagline}</p>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-white/60 sm:text-sm">
