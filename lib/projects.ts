@@ -295,7 +295,7 @@ export const projects: Project[] = [
   },
   {
     slug: "shinde",
-    count: 8,
+    count: 11,
     category: "bungalow",
     status: "completed",
     area: "3,330 Sq.ft",
