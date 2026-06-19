@@ -260,18 +260,22 @@ export default function CompanyProfilePage() {
 
       {/* The printable A4 document */}
       <article id="profile-doc" className="profile-doc mx-auto max-w-4xl bg-white text-navy shadow-xl print:max-w-none print:shadow-none">
-        {/* Cover — hero project image with navy overlay */}
+        {/* Cover — hero project image with navy overlay + living sheen */}
         <header className="relative overflow-hidden bg-navy text-white">
-          <Image
-            src="/projects/shinde/1.jpg"
-            alt=""
-            aria-hidden="true"
-            fill
-            sizes="(max-width: 896px) 100vw, 896px"
-            className="object-cover opacity-25"
-            priority
-          />
+          <div className="absolute inset-0 cover-zoom">
+            <Image
+              src="/projects/shinde/1.jpg"
+              alt=""
+              aria-hidden="true"
+              fill
+              sizes="(max-width: 896px) 100vw, 896px"
+              className="object-cover opacity-25"
+              priority
+            />
+          </div>
           <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/90 to-navy/60" />
+          <div className="absolute inset-0 cover-grid opacity-40" />
+          <div className="pointer-events-none absolute inset-0 cover-sheen" />
           <div className="relative flex flex-col gap-4 px-5 py-8 sm:px-10 sm:py-10">
             <div className="flex items-center gap-4 sm:gap-5">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-amber/40 sm:h-20 sm:w-20">
@@ -297,6 +301,8 @@ export default function CompanyProfilePage() {
               </a>
             </div>
           </div>
+          {/* Brand accent bar */}
+          <div className="relative h-1.5 w-full bg-gradient-to-r from-amber via-amber-light to-amber" />
         </header>
 
         <div className="space-y-12 px-5 py-8 sm:space-y-16 sm:px-10 sm:py-12">
@@ -306,22 +312,24 @@ export default function CompanyProfilePage() {
             <p className="leading-relaxed text-gray-700">{c.aboutText}</p>
           </section>
 
-          {/* Stats */}
+          {/* Stats — corporate navy band */}
           <section>
             <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.statsTitle}</h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {statValues.map((s, i) => {
-                const Icon = s.icon;
-                return (
-                  <div key={i} className="flex flex-col items-center rounded-lg bg-navy/5 px-3 py-4 text-center">
-                    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-navy text-amber">
-                      <Icon className="h-5 w-5" />
+            <div className="overflow-hidden rounded-xl bg-gradient-to-br from-navy to-navy-dark shadow-lg">
+              <div className="grid grid-cols-2 divide-x divide-white/10 sm:grid-cols-4 sm:[&>*:nth-child(-n+2)]:border-b-0 [&>*:nth-child(2)]:border-r-0 sm:[&>*:nth-child(2)]:border-r [&>*:nth-child(-n+2)]:border-b [&>*:nth-child(-n+2)]:border-white/10 sm:[&>*]:border-b-0">
+                {statValues.map((s, i) => {
+                  const Icon = s.icon;
+                  return (
+                    <div key={i} className="flex flex-col items-center px-3 py-6 text-center">
+                      <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-amber/15 text-amber ring-1 ring-amber/30">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <p className="font-display text-2xl font-bold text-amber sm:text-3xl">{s.v}</p>
+                      <p className="mt-1 text-xs font-medium text-white/70">{c.statLabels[i]}</p>
                     </div>
-                    <p className="font-display text-2xl font-bold text-amber sm:text-3xl">{s.v}</p>
-                    <p className="mt-1 text-xs font-medium text-gray-600">{c.statLabels[i]}</p>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </section>
 

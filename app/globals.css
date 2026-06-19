@@ -126,6 +126,34 @@ img {
   @page { margin: 12mm; }
 }
 
+/* Company profile cover — slow living sheen + subtle zoom on the hero image */
+.cover-sheen {
+  background: linear-gradient(115deg, transparent 30%, rgba(242, 169, 63, 0.12) 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: coverSheen 7s ease-in-out infinite;
+}
+@keyframes coverSheen {
+  0%   { background-position: 130% 0; }
+  100% { background-position: -30% 0; }
+}
+.cover-zoom {
+  animation: coverZoom 18s ease-in-out infinite alternate;
+}
+@keyframes coverZoom {
+  0%   { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+/* Faint grid texture for a corporate blueprint feel */
+.cover-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cover-sheen, .cover-zoom { animation: none; }
+}
+
 /* Hook cable swings left-right like a pendulum from its top attach point */
 .crane-cable {
   transform-origin: 50% 0%;
