@@ -113,6 +113,15 @@ img {
   .crane-sway { animation: none; transform: scaleX(-1); }
 }
 
+/* Company profile: clean print output (hide site chrome, show only doc) */
+@media print {
+  nav, footer, .no-print,
+  [aria-label="WhatsApp"], .mobile-quote-bar { display: none !important; }
+  body { background: #fff !important; }
+  .profile-doc { box-shadow: none !important; margin: 0 !important; max-width: none !important; }
+  @page { margin: 12mm; }
+}
+
 /* Hook cable swings left-right like a pendulum from its top attach point */
 .crane-cable {
   transform-origin: 50% 0%;

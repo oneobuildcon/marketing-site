@@ -1,0 +1,255 @@
+"use client";
+
+import Image from "next/image";
+import { useLanguage } from "@/lib/LanguageContext";
+import { projects } from "@/lib/projects";
+import { Printer, Phone, Mail, MapPin, CheckCircle2 } from "lucide-react";
+
+const t = {
+  en: {
+    profile: "Company Profile",
+    tagline: "From blueprint to brilliance.",
+    about: "About Us",
+    aboutText:
+      "One O Buildcon is a trusted construction company based in Pune, Maharashtra, specialising in premium bungalows, row houses, residential buildings and farmhouses. From foundation and RCC work to final interior finishing, we deliver durable, modern structures with complete transparency, quality craftsmanship and on-time execution.",
+    statsTitle: "By the Numbers",
+    services: "Our Services",
+    serviceList: [
+      "Premium Bungalows",
+      "Row Houses",
+      "Residential Buildings",
+      "Farmhouses",
+      "RCC Structural Work",
+      "Interior Finishing",
+    ],
+    why: "Why Choose Us",
+    whyList: [
+      "6+ years of hands-on construction expertise",
+      "End-to-end delivery — design to finishing",
+      "Strict engineering standards & quality control",
+      "Transparent pricing and clear timelines",
+      "Dedicated project management on every site",
+    ],
+    portfolio: "Project Portfolio",
+    completed: "Completed",
+    ongoing: "Ongoing",
+    contact: "Contact Us",
+    phone: "Phone",
+    email: "Email",
+    address: "Address",
+    addressVal: "Pune, Maharashtra, India",
+    download: "Download / Print PDF",
+    cats: {
+      bungalow: "Bungalow",
+      rowhouse: "Row House",
+      residential: "Residential Building",
+      farmhouse: "Farmhouse",
+    },
+    stat: (n: number, s: string, l: string) => ({ value: `${n}${s}`, label: l }),
+    statLabels: ["Projects Completed", "Years Experience", "Happy Clients", "Cities Served"],
+    location: "Location",
+  },
+  mr: {
+    profile: "कंपनी प्रोफाइल",
+    tagline: "ब्लूप्रिंटपासून उत्कृष्टतेपर्यंत.",
+    about: "आमच्याबद्दल",
+    aboutText:
+      "वन ओ बिल्डकॉन ही पुणे, महाराष्ट्र येथील एक विश्वासू बांधकाम कंपनी आहे, जी प्रीमियम बंगले, रो हाउस, निवासी इमारती आणि फार्महाउसमध्ये तज्ञ आहे. पाया आणि आरसीसी कामापासून अंतिम इंटेरियर फिनिशिंगपर्यंत, आम्ही पूर्ण पारदर्शकता, दर्जेदार कारागिरी आणि वेळेवर अंमलबजावणीसह टिकाऊ, आधुनिक संरचना देतो.",
+    statsTitle: "आकड्यांमध्ये",
+    services: "आमच्या सेवा",
+    serviceList: [
+      "प्रीमियम बंगले",
+      "रो हाउस",
+      "निवासी इमारती",
+      "फार्महाउस",
+      "आरसीसी संरचनात्मक काम",
+      "इंटेरियर फिनिशिंग",
+    ],
+    why: "आम्हालाच का निवडावे",
+    whyList: [
+      "६+ वर्षांचा प्रत्यक्ष बांधकाम अनुभव",
+      "संपूर्ण सेवा — डिझाइनपासून फिनिशिंगपर्यंत",
+      "कठोर अभियांत्रिकी मानके व गुणवत्ता नियंत्रण",
+      "पारदर्शक किंमत आणि स्पष्ट कालमर्यादा",
+      "प्रत्येक साइटवर समर्पित प्रकल्प व्यवस्थापन",
+    ],
+    portfolio: "प्रकल्प पोर्टफोलिओ",
+    completed: "पूर्ण",
+    ongoing: "सुरू",
+    contact: "संपर्क करा",
+    phone: "फोन",
+    email: "ईमेल",
+    address: "पत्ता",
+    addressVal: "पुणे, महाराष्ट्र, भारत",
+    download: "पीडीएफ डाउनलोड / प्रिंट करा",
+    cats: {
+      bungalow: "बंगला",
+      rowhouse: "रो हाउस",
+      residential: "निवासी इमारत",
+      farmhouse: "फार्महाउस",
+    },
+    stat: (n: number, s: string, l: string) => ({ value: `${n}${s}`, label: l }),
+    statLabels: ["पूर्ण झालेले प्रकल्प", "वर्षांचा अनुभव", "समाधानी ग्राहक", "सेवा दिलेली शहरे"],
+    location: "ठिकाण",
+  },
+};
+
+const statValues = [
+  { n: 20, s: "+" },
+  { n: 6, s: "+" },
+  { n: 25, s: "+" },
+  { n: 3, s: "" },
+];
+
+export default function CompanyProfilePage() {
+  const { lang } = useLanguage();
+  const c = t[lang];
+
+  // Live counts derived from the actual projects data
+  const completedCount = projects.filter((p) => p.status === "completed").length;
+  const ongoingCount = projects.filter((p) => p.status === "ongoing").length;
+
+  return (
+    <main className="bg-gray-100 min-h-screen py-8 print:bg-white print:py-0">
+      {/* Action bar — hidden when printing */}
+      <div className="no-print mx-auto mb-6 flex max-w-4xl items-center justify-between px-6">
+        <p className="text-sm text-gray-500">
+          {lang === "en"
+            ? "This profile updates automatically as the website changes."
+            : "वेबसाइट बदलल्यावर हे प्रोफाइल आपोआप अपडेट होते."}
+        </p>
+        <button
+          onClick={() => window.print()}
+          className="flex items-center gap-2 rounded-md bg-amber px-5 py-2.5 font-semibold text-navy transition hover:bg-amber-light"
+        >
+          <Printer className="h-4 w-4" /> {c.download}
+        </button>
+      </div>
+
+      {/* The printable A4 document */}
+      <article className="profile-doc mx-auto max-w-4xl bg-white text-navy shadow-xl print:max-w-none print:shadow-none">
+        {/* Header / cover */}
+        <header className="flex items-center gap-5 bg-navy px-10 py-8 text-white">
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-amber/40">
+            <Image src="/logo.png" alt="One O Buildcon" fill className="object-contain p-1" />
+          </div>
+          <div>
+            <h1 className="font-display text-3xl font-bold">
+              One O <span className="text-amber">Buildcon</span>
+            </h1>
+            <p className="text-amber-light">{c.tagline}</p>
+            <p className="mt-1 text-sm text-white/70">{c.profile}</p>
+          </div>
+        </header>
+
+        <div className="space-y-10 px-10 py-10">
+          {/* About */}
+          <section>
+            <h2 className="mb-3 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.about}</h2>
+            <p className="leading-relaxed text-gray-700">{c.aboutText}</p>
+          </section>
+
+          {/* Stats */}
+          <section>
+            <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.statsTitle}</h2>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {statValues.map((s, i) => (
+                <div key={i} className="rounded-lg bg-navy/5 px-3 py-4 text-center">
+                  <p className="font-display text-3xl font-bold text-amber">
+                    {s.n}
+                    {s.s}
+                  </p>
+                  <p className="mt-1 text-xs font-medium text-gray-600">{c.statLabels[i]}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Services + Why (two columns) */}
+          <section className="grid gap-8 sm:grid-cols-2">
+            <div>
+              <h2 className="mb-3 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.services}</h2>
+              <ul className="space-y-2">
+                {c.serviceList.map((s) => (
+                  <li key={s} className="flex items-start gap-2 text-gray-700">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-amber" /> {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h2 className="mb-3 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.why}</h2>
+              <ul className="space-y-2">
+                {c.whyList.map((s) => (
+                  <li key={s} className="flex items-start gap-2 text-gray-700">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-amber" /> {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          {/* Portfolio — generated live from projects data */}
+          <section className="break-inside-avoid">
+            <h2 className="mb-1 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.portfolio}</h2>
+            <p className="mb-4 pl-3 text-sm text-gray-500">
+              {projects.length} {lang === "en" ? "projects" : "प्रकल्प"} · {completedCount} {c.completed} · {ongoingCount} {c.ongoing}
+            </p>
+            <div className="overflow-hidden rounded-lg border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-navy text-left text-white">
+                    <th className="px-4 py-2 font-semibold">#</th>
+                    <th className="px-4 py-2 font-semibold">{lang === "en" ? "Project" : "प्रकल्प"}</th>
+                    <th className="px-4 py-2 font-semibold">{lang === "en" ? "Type" : "प्रकार"}</th>
+                    <th className="px-4 py-2 font-semibold">{c.location}</th>
+                    <th className="px-4 py-2 font-semibold">{lang === "en" ? "Status" : "स्थिती"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {projects.map((p, i) => {
+                    const content = p[lang];
+                    return (
+                      <tr key={p.slug} className="border-t border-gray-100 odd:bg-gray-50">
+                        <td className="px-4 py-2 text-gray-500">{i + 1}</td>
+                        <td className="px-4 py-2 font-medium">{content.name}</td>
+                        <td className="px-4 py-2 text-gray-600">{c.cats[p.category]}</td>
+                        <td className="px-4 py-2 text-gray-600">{content.location}</td>
+                        <td className="px-4 py-2">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                              p.status === "completed" ? "bg-green-100 text-green-700" : "bg-amber/20 text-navy"
+                            }`}
+                          >
+                            {p.status === "completed" ? c.completed : c.ongoing}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* Contact */}
+          <section className="break-inside-avoid rounded-lg bg-navy px-6 py-6 text-white">
+            <h2 className="mb-4 font-display text-xl font-bold">{c.contact}</h2>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <a href="tel:+918806029907" className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-amber" /> +91 88060 29907
+              </a>
+              <a href="mailto:oneobuildcon@gmail.com" className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-amber" /> oneobuildcon@gmail.com
+              </a>
+              <p className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-amber" /> {c.addressVal}
+              </p>
+            </div>
+            <p className="mt-4 text-sm text-white/60">oneobuildcon.com</p>
+          </section>
+        </div>
+      </article>
+    </main>
+  );
+}

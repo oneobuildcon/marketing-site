@@ -434,10 +434,10 @@ export default function Home() {
               <Link href="/projects" className="rounded-md border border-white/30 px-8 py-3 font-semibold transition hover:bg-white/10">
                 {t.ctaProjects}
               </Link>
-              <a href="/one-o-buildcon-company-profile.pdf" download className="flex items-center gap-2 rounded-md border border-amber/50 px-8 py-3 font-semibold text-amber transition hover:bg-amber/10">
+              <Link href="/company-profile" className="flex items-center gap-2 rounded-md border border-amber/50 px-8 py-3 font-semibold text-amber transition hover:bg-amber/10">
                 <Download className="h-4 w-4" />
                 {t.ctaProfile}
-              </a>
+              </Link>
             </motion.div>
           </motion.div>
         </div>

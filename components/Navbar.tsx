@@ -71,15 +71,14 @@ export default function Navbar() {
             <Languages className="h-3.5 w-3.5 text-amber" />
             {t.toggleLabel}
           </button>
-          <a
-            href="/one-o-buildcon-company-profile.pdf"
-            download
+          <Link
+            href="/company-profile"
             className="flex items-center gap-1.5 rounded-full border border-amber/40 px-3 py-1.5 text-xs font-semibold text-amber transition hover:bg-amber/10"
-            aria-label="Download company profile"
+            aria-label="View company profile"
           >
             <Download className="h-3.5 w-3.5" />
             {lang === "en" ? "Profile" : "प्रोफाइल"}
-          </a>
+          </Link>
           <Link
             href="/contact"
             className="rounded-md bg-amber px-4 py-2 text-sm font-semibold text-navy-dark transition hover:bg-amber-light"
@@ -122,15 +121,14 @@ export default function Navbar() {
             </Link>
           </li>
           <li>
-            <a
-              href="/one-o-buildcon-company-profile.pdf"
-              download
+            <Link
+              href="/company-profile"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 rounded-full border border-amber/40 px-4 py-2 text-sm font-semibold text-amber transition hover:bg-amber/10 w-fit"
             >
               <Download className="h-4 w-4" />
               {lang === "en" ? "Company Profile" : "कंपनी प्रोफाइल"}
-            </a>
+            </Link>
           </li>
           <li>
             <button
