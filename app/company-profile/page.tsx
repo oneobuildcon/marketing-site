@@ -195,6 +195,30 @@ export default function CompanyProfilePage() {
             <p className="mb-4 pl-3 text-sm text-gray-500">
               {projects.length} {lang === "en" ? "projects" : "प्रकल्प"} · {completedCount} {c.completed} · {ongoingCount} {c.ongoing}
             </p>
+            {/* Photo gallery — cover image of every project, generated live */}
+            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {projects.map((p) => {
+                const content = p[lang];
+                return (
+                  <div key={p.slug} className="break-inside-avoid overflow-hidden rounded-lg border border-gray-200">
+                    <div className="relative aspect-[4/3] w-full bg-gray-100">
+                      <Image
+                        src={`/projects/${p.slug}/1.jpg`}
+                        alt={content.name}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="px-3 py-2">
+                      <p className="truncate text-sm font-semibold text-navy">{content.name}</p>
+                      <p className="truncate text-xs text-gray-500">{content.location}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
             <div className="overflow-hidden rounded-lg border border-gray-200">
               <table className="w-full text-sm">
                 <thead>
