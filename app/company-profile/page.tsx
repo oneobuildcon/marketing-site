@@ -355,8 +355,8 @@ export default function CompanyProfilePage() {
           <section className="break-inside-avoid rounded-lg border border-amber/30 bg-amber/5 p-5 sm:p-6">
             <h2 className="mb-4 font-display text-xl font-bold text-navy">{c.founderTitle}</h2>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-navy text-2xl font-bold text-amber ring-2 ring-amber/40">
-                AS
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-amber/40">
+                <Image src="/logo.png" alt={c.founderName} fill className="object-contain p-1" />
               </div>
               <div>
                 <p className="italic leading-relaxed text-gray-700">&ldquo;{c.founderMsg}&rdquo;</p>
