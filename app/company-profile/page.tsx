@@ -8,18 +8,18 @@ import {
   Printer, Phone, Mail, MapPin, CheckCircle2, Share2, ClipboardList, PencilRuler,
   Calculator, HardHat, ShieldCheck, KeyRound, Globe, Camera, MessageCircle, Building2,
   CalendarDays, Users, Home, Layers, Warehouse, Hammer, PaintBucket, Ruler, Star,
-  Package, Phone as PhoneIcon, Sparkles, Languages,
+  Package, Phone as PhoneIcon, Sparkles, Languages, Gem, Handshake, Clock, Eye,
 } from "lucide-react";
 
 const t = {
   en: {
     profile: "Company Profile",
     tagline: "From blueprint to brilliance.",
-    rating: "5.0 · Google Reviews",
+    rating: "5.0 Rating on Google",
     about: "About Us",
     aboutText:
       "One O Buildcon is a Pune-based construction company specializing in premium residential, commercial and farmhouse projects. With 6+ years of experience and 20+ completed projects, we provide end-to-end construction solutions — from planning and RCC work to interior finishing — ensuring quality, transparency and timely delivery on every site we take on.",
-    founderTitle: "Message From the Founder",
+    founderTitle: "Our Commitment",
     founderName: "Avinash Shinde",
     founderRole: "Founder & Director",
     founderMsg:
@@ -59,9 +59,16 @@ const t = {
     team: "Our Team",
     teamList: ["Civil Engineers", "Architects", "Site Supervisors", "Skilled Technicians", "Project Managers"],
     teamStrength: "Team Strength",
+    coreValues: "Our Core Values",
+    coreValuesList: ["Quality", "Transparency", "Commitment", "Safety", "Timely Delivery"],
+    safety: "Safety First",
+    safetyList: ["PPE Compliance", "Site Safety Inspections", "Structural Safety Checks", "Safe Work Practices"],
+    serviceAreas: "Service Areas",
+    serviceAreasList: ["Pune", "PCMC", "Chakan", "Alandi", "Charholi", "Moshi", "Wagholi"],
+    closing: "Your vision. Our expertise. Built to last.",
     process: "How We Work",
     processSteps: ["Planning", "Design", "Estimation", "Construction", "Quality Inspection", "Handover"],
-    portfolio: "Project Portfolio",
+    portfolio: "Featured Projects",
     completed: "Completed",
     ongoing: "Ongoing",
     pipeline: "Pipeline",
@@ -81,17 +88,17 @@ const t = {
     preparing: "Preparing…",
     share: "Share",
     copied: "Link copied!",
-    statLabels: ["Projects Completed", "Sq.ft Built", "Happy Families", "Years Experience"],
+    statLabels: ["Projects Completed", "Sq.ft Constructed", "Satisfied Clients", "Years Experience"],
     projectsWord: "projects",
   },
   mr: {
     profile: "कंपनी प्रोफाइल",
     tagline: "ब्लूप्रिंटपासून उत्कृष्टतेपर्यंत.",
-    rating: "५.० · गूगल रिव्ह्यूज",
+    rating: "गूगलवर ५.० रेटिंग",
     about: "आमच्याबद्दल",
     aboutText:
       "वन ओ बिल्डकॉन ही पुणेस्थित बांधकाम कंपनी आहे, जी प्रीमियम निवासी, व्यावसायिक आणि फार्महाउस प्रकल्पांमध्ये तज्ञ आहे. ६+ वर्षांचा अनुभव आणि २०+ पूर्ण झालेल्या प्रकल्पांसह, आम्ही नियोजन आणि आरसीसी कामापासून इंटेरियर फिनिशिंगपर्यंत संपूर्ण बांधकाम उपाय देतो — प्रत्येक साइटवर दर्जा, पारदर्शकता आणि वेळेवर पूर्णत्वाची हमी देत.",
-    founderTitle: "संस्थापकांचा संदेश",
+    founderTitle: "आमची बांधिलकी",
     founderName: "अविनाश शिंदे",
     founderRole: "संस्थापक व संचालक",
     founderMsg:
@@ -131,9 +138,16 @@ const t = {
     team: "आमची टीम",
     teamList: ["सिव्हिल इंजिनिअर्स", "आर्किटेक्ट्स", "साइट सुपरवायझर्स", "कुशल तंत्रज्ञ", "प्रकल्प व्यवस्थापक"],
     teamStrength: "टीम संख्या",
+    coreValues: "आमची मूल्ये",
+    coreValuesList: ["दर्जा", "पारदर्शकता", "बांधिलकी", "सुरक्षा", "वेळेवर पूर्णत्व"],
+    safety: "सुरक्षा प्रथम",
+    safetyList: ["पीपीई अनुपालन", "साइट सुरक्षा तपासणी", "संरचनात्मक सुरक्षा तपासणी", "सुरक्षित कार्यपद्धती"],
+    serviceAreas: "सेवा क्षेत्रे",
+    serviceAreasList: ["पुणे", "पीसीएमसी", "चाकण", "आळंदी", "चऱ्होली", "मोशी", "वाघोली"],
+    closing: "तुमची दूरदृष्टी. आमची तज्ञता. टिकणारे बांधकाम.",
     process: "आम्ही कसे काम करतो",
     processSteps: ["नियोजन", "डिझाइन", "अंदाजपत्रक", "बांधकाम", "गुणवत्ता तपासणी", "हस्तांतरण"],
-    portfolio: "प्रकल्प पोर्टफोलिओ",
+    portfolio: "निवडक प्रकल्प",
     completed: "पूर्ण",
     ongoing: "सुरू",
     pipeline: "नियोजित",
@@ -153,7 +167,7 @@ const t = {
     preparing: "तयार होत आहे…",
     share: "शेअर करा",
     copied: "लिंक कॉपी झाली!",
-    statLabels: ["पूर्ण झालेले प्रकल्प", "बांधलेले चौ.फूट", "समाधानी कुटुंबे", "वर्षांचा अनुभव"],
+    statLabels: ["पूर्ण झालेले प्रकल्प", "बांधलेले चौ.फूट", "समाधानी ग्राहक", "वर्षांचा अनुभव"],
     projectsWord: "प्रकल्प",
   },
 };
@@ -167,6 +181,7 @@ const statValues = [
 
 const processIcons = [ClipboardList, PencilRuler, Calculator, HardHat, ShieldCheck, KeyRound];
 const serviceIcons = [Home, Layers, Building2, Warehouse, Hammer, PaintBucket];
+const valueIcons = [Gem, Eye, Handshake, ShieldCheck, Clock];
 const WEBSITE = "https://oneobuildcon.com";
 
 export default function CompanyProfilePage() {
@@ -273,31 +288,32 @@ export default function CompanyProfilePage() {
               priority
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/90 to-navy/60" />
-          <div className="absolute inset-0 cover-grid opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-navy-dark via-navy/95 to-navy/75" />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy-dark/90 via-transparent to-navy-dark/30" />
+          <div className="absolute inset-0 cover-grid opacity-30" />
           <div className="pointer-events-none absolute inset-0 cover-sheen" />
-          <div className="relative flex flex-col gap-4 px-5 py-8 sm:px-10 sm:py-10">
-            <div className="flex items-center gap-4 sm:gap-5">
+          <div className="relative flex flex-col gap-6 px-5 py-12 sm:px-10 sm:py-16">
+            <div className="flex flex-col items-start gap-4">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-amber/40 sm:h-20 sm:w-20">
                 <Image src="/logo.png" alt="One O Buildcon" fill className="object-contain p-1" />
               </div>
               <div>
-                <h1 className="font-display text-2xl font-bold sm:text-3xl">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.25em] text-amber/80">{c.profile}</p>
+                <h1 className="font-display text-4xl font-bold leading-tight sm:text-6xl">
                   One O <span className="text-amber">Buildcon</span>
                 </h1>
-                <p className="text-amber-light">{c.tagline}</p>
-                <p className="mt-1 text-sm text-white/70">{c.profile}</p>
+                <p className="mt-2 text-lg text-amber-light sm:text-xl">{c.tagline}</p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
-              <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 font-semibold">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-white/60 sm:text-sm">
+              <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 font-semibold text-white">
                 <Star className="h-4 w-4 fill-amber text-amber" /> {c.rating}
               </span>
-              <a href="tel:+918806029907" className="flex items-center gap-1.5 font-semibold">
-                <PhoneIcon className="h-4 w-4 text-amber" /> +91 88060 29907
+              <a href="tel:+918806029907" className="flex items-center gap-1.5">
+                <PhoneIcon className="h-3.5 w-3.5 text-amber" /> +91 88060 29907
               </a>
-              <a href={WEBSITE} className="flex items-center gap-1.5 font-semibold">
-                <Globe className="h-4 w-4 text-amber" /> oneobuildcon.com
+              <a href={WEBSITE} className="flex items-center gap-1.5">
+                <Globe className="h-3.5 w-3.5 text-amber" /> oneobuildcon.com
               </a>
             </div>
           </div>
@@ -363,6 +379,24 @@ export default function CompanyProfilePage() {
             </div>
           </section>
 
+          {/* Core Values */}
+          <section className="break-inside-avoid">
+            <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.coreValues}</h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+              {c.coreValuesList.map((v, i) => {
+                const Icon = valueIcons[i] ?? CheckCircle2;
+                return (
+                  <div key={v} className="flex flex-col items-center gap-2 rounded-lg border border-navy/10 bg-navy/5 px-3 py-4 text-center">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-navy text-amber">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <span className="text-sm font-semibold text-navy">{v}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
           {/* Quality + Materials (two columns) */}
           <section className="grid gap-8 sm:grid-cols-2">
             <div className="break-inside-avoid">
@@ -391,18 +425,47 @@ export default function CompanyProfilePage() {
             </div>
           </section>
 
-          {/* Team */}
-          <section className="break-inside-avoid">
-            <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.team}</h2>
-            <div className="flex flex-wrap items-center gap-3">
-              {c.teamList.map((role) => (
-                <span key={role} className="flex items-center gap-1.5 rounded-lg bg-navy/5 px-3 py-2 text-sm font-medium text-gray-700">
-                  <Users className="h-4 w-4 text-amber" /> {role}
-                </span>
-              ))}
-              <span className="flex items-center gap-1.5 rounded-lg bg-amber px-3 py-2 text-sm font-bold text-navy">
-                <Sparkles className="h-4 w-4" /> {c.teamStrength}: 25+
+          {/* Safety First */}
+          <section className="break-inside-avoid rounded-xl border border-green-200 bg-green-50/60 p-5 sm:p-6">
+            <h2 className="mb-4 flex items-center gap-2 font-display text-xl font-bold text-navy">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-600 text-white">
+                <ShieldCheck className="h-5 w-5" />
               </span>
+              {c.safety}
+            </h2>
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              {c.safetyList.map((s) => (
+                <div key={s} className="flex items-center gap-2 text-gray-700">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" /> {s}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Team + Service Areas (two columns) */}
+          <section className="grid gap-8 sm:grid-cols-2">
+            <div className="break-inside-avoid">
+              <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.team}</h2>
+              <div className="flex flex-wrap items-center gap-2.5">
+                {c.teamList.map((role) => (
+                  <span key={role} className="flex items-center gap-1.5 rounded-lg bg-navy/5 px-3 py-2 text-sm font-medium text-gray-700">
+                    <Users className="h-4 w-4 text-amber" /> {role}
+                  </span>
+                ))}
+                <span className="flex items-center gap-1.5 rounded-lg bg-amber px-3 py-2 text-sm font-bold text-navy">
+                  <Sparkles className="h-4 w-4" /> {c.teamStrength}: 25+
+                </span>
+              </div>
+            </div>
+            <div className="break-inside-avoid">
+              <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.serviceAreas}</h2>
+              <div className="flex flex-wrap items-center gap-2.5">
+                {c.serviceAreasList.map((area) => (
+                  <span key={area} className="flex items-center gap-1.5 rounded-full border border-navy/15 bg-navy/5 px-3 py-1.5 text-sm font-medium text-navy">
+                    <MapPin className="h-3.5 w-3.5 text-amber" /> {area}
+                  </span>
+                ))}
+              </div>
             </div>
           </section>
 
@@ -469,9 +532,9 @@ export default function CompanyProfilePage() {
                               </span>
                             )}
                           </div>
-                          <div className="px-3 py-2">
-                            <p className="truncate text-sm font-semibold text-navy">{content.name}</p>
-                            <p className="truncate text-xs font-medium text-amber">{content.type}</p>
+                          <div className="px-3 py-2.5">
+                            <p className="truncate font-display text-base font-bold text-navy">{content.name}</p>
+                            <p className="truncate text-[11px] font-medium uppercase tracking-wide text-amber">{content.type}</p>
                             <p className="truncate text-xs text-gray-500">{content.location}</p>
                             <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-600">
                               <span className="flex items-center gap-1">
@@ -509,6 +572,14 @@ export default function CompanyProfilePage() {
             </div>
           </section>
 
+          {/* Strong closing statement */}
+          <section className="break-inside-avoid text-center">
+            <p className="mx-auto max-w-2xl font-display text-xl font-bold italic leading-snug text-navy sm:text-2xl">
+              &ldquo;{c.closing}&rdquo;
+            </p>
+            <div className="mx-auto mt-3 h-1 w-20 rounded-full bg-gradient-to-r from-amber to-amber-light" />
+          </section>
+
           {/* Contact — Free Consultation with QR code */}
           <section className="break-inside-avoid rounded-lg bg-navy px-5 py-6 text-white sm:px-6">
             <h2 className="font-display text-xl font-bold">{c.contact}</h2>
@@ -524,24 +595,24 @@ export default function CompanyProfilePage() {
               </span>
             </a>
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="grid gap-3 text-sm sm:text-base">
-                <a href="tel:+918806029907" className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 shrink-0 text-amber" /> +91 88060 29907
+              <div className="grid gap-3.5 text-base sm:text-lg">
+                <a href="tel:+918806029907" className="flex items-center gap-2.5">
+                  <Phone className="h-5 w-5 shrink-0 text-amber" /> +91 88060 29907
                 </a>
-                <a href="https://wa.me/918806029907" className="flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4 shrink-0 text-amber" /> WhatsApp
+                <a href="https://wa.me/918806029907" className="flex items-center gap-2.5">
+                  <MessageCircle className="h-5 w-5 shrink-0 text-amber" /> WhatsApp
                 </a>
-                <a href="mailto:oneobuildcon@gmail.com" className="flex items-center gap-2 break-all">
-                  <Mail className="h-4 w-4 shrink-0 text-amber" /> oneobuildcon@gmail.com
+                <a href="mailto:oneobuildcon@gmail.com" className="flex items-center gap-2.5 break-all">
+                  <Mail className="h-5 w-5 shrink-0 text-amber" /> oneobuildcon@gmail.com
                 </a>
-                <a href={WEBSITE} className="flex items-center gap-2">
-                  <Globe className="h-4 w-4 shrink-0 text-amber" /> oneobuildcon.com
+                <a href={WEBSITE} className="flex items-center gap-2.5">
+                  <Globe className="h-5 w-5 shrink-0 text-amber" /> oneobuildcon.com
                 </a>
-                <a href="https://instagram.com/one_o_buildcon" className="flex items-center gap-2">
-                  <Camera className="h-4 w-4 shrink-0 text-amber" /> @one_o_buildcon
+                <a href="https://instagram.com/one_o_buildcon" className="flex items-center gap-2.5">
+                  <Camera className="h-5 w-5 shrink-0 text-amber" /> @one_o_buildcon
                 </a>
-                <p className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 shrink-0 text-amber" /> Pune, Maharashtra, India
+                <p className="flex items-center gap-2.5">
+                  <MapPin className="h-5 w-5 shrink-0 text-amber" /> Pune, Maharashtra, India
                 </p>
               </div>
               <div className="flex flex-col items-center gap-2">
@@ -551,7 +622,7 @@ export default function CompanyProfilePage() {
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=0&data=${encodeURIComponent(WEBSITE)}`}
                   alt="QR code to oneobuildcon.com"
                   crossOrigin="anonymous"
-                  className="h-32 w-32 rounded-lg bg-white p-2"
+                  className="h-28 w-28 rounded-lg bg-white p-2"
                 />
                 <span className="max-w-[8rem] text-center text-xs text-white/60">{c.scanLabel}</span>
               </div>
