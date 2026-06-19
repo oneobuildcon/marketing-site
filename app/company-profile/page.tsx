@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { projects } from "@/lib/projects";
-import { Printer, Phone, Mail, MapPin, CheckCircle2, Share2, ClipboardList, PencilRuler, Calculator, HardHat, ShieldCheck, KeyRound, Globe, Camera, MessageCircle } from "lucide-react";
+import { Printer, Phone, Mail, MapPin, CheckCircle2, Share2, ClipboardList, PencilRuler, Calculator, HardHat, ShieldCheck, KeyRound, Globe, Camera, MessageCircle, Building2, CalendarDays, Users, MapPinned, Home, Layers, Warehouse, Hammer, PaintBucket } from "lucide-react";
 
 const t = {
   en: {
@@ -125,6 +125,8 @@ const statValues = [
 ];
 
 const processIcons = [ClipboardList, PencilRuler, Calculator, HardHat, ShieldCheck, KeyRound];
+const statIcons = [Building2, CalendarDays, Users, MapPinned];
+const serviceIcons = [Home, Layers, Building2, Warehouse, Hammer, PaintBucket];
 
 export default function CompanyProfilePage() {
   const { lang } = useLanguage();
@@ -223,7 +225,7 @@ export default function CompanyProfilePage() {
           </div>
         </header>
 
-        <div className="space-y-8 px-5 py-8 sm:space-y-10 sm:px-10 sm:py-10">
+        <div className="space-y-10 px-5 py-8 sm:space-y-14 sm:px-10 sm:py-12">
           {/* About */}
           <section>
             <h2 className="mb-3 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.about}</h2>
@@ -234,15 +236,21 @@ export default function CompanyProfilePage() {
           <section>
             <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.statsTitle}</h2>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {statValues.map((s, i) => (
-                <div key={i} className="rounded-lg bg-navy/5 px-3 py-4 text-center">
-                  <p className="font-display text-3xl font-bold text-amber">
-                    {s.n}
-                    {s.s}
-                  </p>
-                  <p className="mt-1 text-xs font-medium text-gray-600">{c.statLabels[i]}</p>
-                </div>
-              ))}
+              {statValues.map((s, i) => {
+                const Icon = statIcons[i];
+                return (
+                  <div key={i} className="flex flex-col items-center rounded-lg bg-navy/5 px-3 py-4 text-center">
+                    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-navy text-amber">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <p className="font-display text-3xl font-bold text-amber">
+                      {s.n}
+                      {s.s}
+                    </p>
+                    <p className="mt-1 text-xs font-medium text-gray-600">{c.statLabels[i]}</p>
+                  </div>
+                );
+              })}
             </div>
           </section>
 
@@ -250,12 +258,18 @@ export default function CompanyProfilePage() {
           <section className="grid gap-8 sm:grid-cols-2">
             <div>
               <h2 className="mb-3 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.services}</h2>
-              <ul className="space-y-2">
-                {c.serviceList.map((s) => (
-                  <li key={s} className="flex items-start gap-2 text-gray-700">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-amber" /> {s}
-                  </li>
-                ))}
+              <ul className="space-y-2.5">
+                {c.serviceList.map((s, i) => {
+                  const Icon = serviceIcons[i] ?? CheckCircle2;
+                  return (
+                    <li key={s} className="flex items-center gap-2.5 text-gray-700">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-amber/15 text-amber">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      {s}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
             <div>
@@ -295,29 +309,46 @@ export default function CompanyProfilePage() {
             <p className="mb-4 pl-3 text-sm text-gray-500">
               {projects.length} {lang === "en" ? "projects" : "प्रकल्प"} · {completedCount} {c.completed} · {ongoingCount} {c.ongoing}
             </p>
-            {/* Photo gallery — cover image of every project, generated live */}
-            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {projects.map((p) => {
-                const content = p[lang];
-                return (
-                  <div key={p.slug} className="break-inside-avoid overflow-hidden rounded-lg border border-gray-200">
-                    <div className="relative aspect-[4/3] w-full bg-gray-100">
-                      <Image
-                        src={`/projects/${p.slug}/1.jpg`}
-                        alt={content.name}
-                        fill
-                        sizes="(max-width: 640px) 50vw, 33vw"
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="px-3 py-2">
-                      <p className="truncate text-sm font-semibold text-navy">{content.name}</p>
-                      <p className="truncate text-xs text-gray-500">{content.location}</p>
-                    </div>
+            {/* Completed projects (real photos) and ongoing projects, grouped */}
+            {(["completed", "ongoing"] as const).map((group) => {
+              const items = projects.filter((p) => p.status === group);
+              if (items.length === 0) return null;
+              return (
+                <div key={group} className="mt-5">
+                  <div className="mb-3 flex items-center gap-2 pl-3">
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full ${group === "completed" ? "bg-green-500" : "bg-amber"}`}
+                    />
+                    <h3 className="font-display text-base font-bold text-navy">
+                      {group === "completed" ? c.completed : c.ongoing} {lang === "en" ? "Projects" : "प्रकल्प"}
+                    </h3>
+                    <span className="text-sm text-gray-400">({items.length})</span>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {items.map((p) => {
+                      const content = p[lang];
+                      return (
+                        <div key={p.slug} className="break-inside-avoid overflow-hidden rounded-lg border border-gray-200">
+                          <div className="relative aspect-[4/3] w-full bg-gray-100">
+                            <Image
+                              src={`/projects/${p.slug}/1.jpg`}
+                              alt={content.name}
+                              fill
+                              sizes="(max-width: 640px) 50vw, 33vw"
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="px-3 py-2">
+                            <p className="truncate text-sm font-semibold text-navy">{content.name}</p>
+                            <p className="truncate text-xs text-gray-500">{content.location}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </section>
 
           {/* Founder message — placed near the end */}
