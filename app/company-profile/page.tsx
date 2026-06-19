@@ -112,12 +112,7 @@ export default function CompanyProfilePage() {
   return (
     <main className="bg-gray-100 min-h-screen py-8 print:bg-white print:py-0">
       {/* Action bar — hidden when printing */}
-      <div className="no-print mx-auto mb-6 flex max-w-4xl items-center justify-between px-6">
-        <p className="text-sm text-gray-500">
-          {lang === "en"
-            ? "This profile updates automatically as the website changes."
-            : "वेबसाइट बदलल्यावर हे प्रोफाइल आपोआप अपडेट होते."}
-        </p>
+      <div className="no-print mx-auto mb-6 flex max-w-4xl justify-end px-6">
         <button
           onClick={() => window.print()}
           className="flex items-center gap-2 rounded-md bg-amber px-5 py-2.5 font-semibold text-navy transition hover:bg-amber-light"
