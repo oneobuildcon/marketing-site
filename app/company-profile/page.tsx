@@ -8,7 +8,7 @@ import {
   Printer, Phone, Mail, MapPin, CheckCircle2, Share2, ClipboardList, PencilRuler,
   Calculator, HardHat, ShieldCheck, KeyRound, Globe, Camera, MessageCircle, Building2,
   CalendarDays, Users, Home, Layers, Warehouse, Hammer, PaintBucket, Ruler, Star,
-  Package, Phone as PhoneIcon, Sparkles,
+  Package, Phone as PhoneIcon, Sparkles, Languages,
 } from "lucide-react";
 
 const t = {
@@ -158,7 +158,7 @@ const serviceIcons = [Home, Layers, Building2, Warehouse, Hammer, PaintBucket];
 const WEBSITE = "https://oneobuildcon.com";
 
 export default function CompanyProfilePage() {
-  const { lang } = useLanguage();
+  const { lang, setLang } = useLanguage();
   const c = t[lang];
   const [downloading, setDownloading] = useState(false);
 
@@ -191,7 +191,7 @@ export default function CompanyProfilePage() {
         pdf.addImage(img, "JPEG", 0, position, pageW, imgH);
         heightLeft -= pageH;
       }
-      pdf.save("One-O-Buildcon-Company-Profile.pdf");
+      pdf.save(lang === "mr" ? "One-O-Buildcon-Company-Profile-Marathi.pdf" : "One-O-Buildcon-Company-Profile.pdf");
     } finally {
       setDownloading(false);
     }
@@ -222,7 +222,14 @@ export default function CompanyProfilePage() {
   return (
     <main className="bg-gray-100 min-h-screen py-8 print:bg-white print:py-0">
       {/* Action bar — hidden when printing */}
-      <div className="no-print mx-auto mb-6 flex max-w-4xl justify-end gap-3 px-4 sm:px-6">
+      <div className="no-print mx-auto mb-6 flex max-w-4xl flex-wrap items-center justify-end gap-3 px-4 sm:px-6">
+        <button
+          onClick={() => setLang(lang === "en" ? "mr" : "en")}
+          className="flex items-center gap-2 rounded-md border border-navy/30 px-5 py-2.5 font-semibold text-navy transition hover:bg-navy/5"
+          aria-label="Toggle language"
+        >
+          <Languages className="h-4 w-4 text-amber" /> {lang === "en" ? "मराठी" : "English"}
+        </button>
         <button
           onClick={handleShare}
           className="flex items-center gap-2 rounded-md border border-navy/30 px-5 py-2.5 font-semibold text-navy transition hover:bg-navy/5"
