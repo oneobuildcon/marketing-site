@@ -218,42 +218,6 @@ export default function CompanyProfilePage() {
                 );
               })}
             </div>
-
-            <div className="overflow-hidden rounded-lg border border-gray-200">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-navy text-left text-white">
-                    <th className="px-4 py-2 font-semibold">#</th>
-                    <th className="px-4 py-2 font-semibold">{lang === "en" ? "Project" : "प्रकल्प"}</th>
-                    <th className="px-4 py-2 font-semibold">{lang === "en" ? "Type" : "प्रकार"}</th>
-                    <th className="px-4 py-2 font-semibold">{c.location}</th>
-                    <th className="px-4 py-2 font-semibold">{lang === "en" ? "Status" : "स्थिती"}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {projects.map((p, i) => {
-                    const content = p[lang];
-                    return (
-                      <tr key={p.slug} className="border-t border-gray-100 odd:bg-gray-50">
-                        <td className="px-4 py-2 text-gray-500">{i + 1}</td>
-                        <td className="px-4 py-2 font-medium">{content.name}</td>
-                        <td className="px-4 py-2 text-gray-600">{c.cats[p.category]}</td>
-                        <td className="px-4 py-2 text-gray-600">{content.location}</td>
-                        <td className="px-4 py-2">
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                              p.status === "completed" ? "bg-green-100 text-green-700" : "bg-amber/20 text-navy"
-                            }`}
-                          >
-                            {p.status === "completed" ? c.completed : c.ongoing}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
           </section>
 
           {/* Contact */}
