@@ -230,21 +230,6 @@ export default function CompanyProfilePage() {
             <p className="leading-relaxed text-gray-700">{c.aboutText}</p>
           </section>
 
-          {/* Founder message */}
-          <section className="break-inside-avoid rounded-lg border border-amber/30 bg-amber/5 p-5 sm:p-6">
-            <h2 className="mb-4 font-display text-xl font-bold text-navy">{c.founderTitle}</h2>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-navy text-2xl font-bold text-amber ring-2 ring-amber/40">
-                AS
-              </div>
-              <div>
-                <p className="italic leading-relaxed text-gray-700">&ldquo;{c.founderMsg}&rdquo;</p>
-                <p className="mt-3 font-display text-lg font-bold text-navy">{c.founderName}</p>
-                <p className="text-sm font-medium text-amber">{c.founderRole}</p>
-              </div>
-            </div>
-          </section>
-
           {/* Stats */}
           <section>
             <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.statsTitle}</h2>
@@ -332,6 +317,21 @@ export default function CompanyProfilePage() {
                   </div>
                 );
               })}
+            </div>
+          </section>
+
+          {/* Founder message — placed near the end */}
+          <section className="break-inside-avoid rounded-lg border border-amber/30 bg-amber/5 p-5 sm:p-6">
+            <h2 className="mb-4 font-display text-xl font-bold text-navy">{c.founderTitle}</h2>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-navy text-2xl font-bold text-amber ring-2 ring-amber/40">
+                AS
+              </div>
+              <div>
+                <p className="italic leading-relaxed text-gray-700">&ldquo;{c.founderMsg}&rdquo;</p>
+                <p className="mt-3 font-display text-lg font-bold text-navy">{c.founderName}</p>
+                <p className="text-sm font-medium text-amber">{c.founderRole}</p>
+              </div>
             </div>
           </section>
 
