@@ -99,7 +99,7 @@ export const projects: Project[] = [
   },
   {
     slug: "baiche",
-    count: 3,
+    count: 2,
     category: "residential",
     status: "ongoing",
     area: "5,100 Sq.ft",
@@ -221,7 +221,7 @@ export const projects: Project[] = [
   },
   {
     slug: "relekar",
-    count: 3,
+    count: 4,
     category: "bungalow",
     status: "completed",
     area: "3,900 Sq.ft",
