@@ -158,7 +158,7 @@ const t = {
 
 const statValues = [
   { v: "20+", icon: Building2 },
-  { v: "40,000+", icon: Ruler },
+  { v: "60,000+", icon: Ruler },
   { v: "25+", icon: Users },
   { v: "6+", icon: CalendarDays },
 ];
