@@ -29,7 +29,7 @@ export const projects: Project[] = [
     category: "residential",
     status: "completed",
     area: "3,400 Sq.ft",
-    year: "2024",
+    year: "2021",
     duration: "On request",
     budget: "On request",
     en: {
@@ -55,6 +55,7 @@ export const projects: Project[] = [
     category: "residential",
     status: "ongoing",
     area: "5,100 Sq.ft",
+    year: "Dec 2026",
     duration: "On request",
     budget: "On request",
     en: {
@@ -78,6 +79,7 @@ export const projects: Project[] = [
     category: "farmhouse",
     status: "ongoing",
     area: "2,450 Sq.ft",
+    year: "Jul 2026",
     duration: "On request",
     budget: "On request",
     en: {
@@ -101,6 +103,7 @@ export const projects: Project[] = [
     category: "rowhouse",
     status: "completed",
     area: "3,600 Sq.ft",
+    year: "2019",
     duration: "On request",
     budget: "On request",
     en: {
@@ -126,6 +129,7 @@ export const projects: Project[] = [
     category: "bungalow",
     status: "ongoing",
     area: "5,700 Sq.ft",
+    year: "Aug 2026",
     duration: "On request",
     budget: "On request",
     en: {
@@ -147,8 +151,9 @@ export const projects: Project[] = [
     slug: "patil-dighi",
     count: 6,
     category: "residential",
-    status: "ongoing",
+    status: "completed",
     area: "7,890 Sq.ft",
+    year: "2024",
     duration: "On request",
     budget: "On request",
     en: {
@@ -170,8 +175,9 @@ export const projects: Project[] = [
     slug: "relekar",
     count: 3,
     category: "bungalow",
-    status: "ongoing",
+    status: "completed",
     area: "3,900 Sq.ft",
+    year: "2026",
     duration: "On request",
     budget: "On request",
     en: {
@@ -195,6 +201,7 @@ export const projects: Project[] = [
     category: "bungalow",
     status: "completed",
     area: "5,565 Sq.ft",
+    year: "2025",
     duration: "On request",
     budget: "On request",
     en: {
@@ -220,6 +227,7 @@ export const projects: Project[] = [
     category: "residential",
     status: "pipeline",
     area: "20,180 Sq.ft",
+    year: "Dec 2027",
     duration: "On request",
     budget: "On request",
     en: {
@@ -243,6 +251,7 @@ export const projects: Project[] = [
     category: "bungalow",
     status: "completed",
     area: "3,330 Sq.ft",
+    year: "2023",
     duration: "On request",
     budget: "On request",
     en: {
@@ -268,6 +277,7 @@ export const projects: Project[] = [
     category: "farmhouse",
     status: "completed",
     area: "1,800 Sq.ft",
+    year: "2022",
     duration: "On request",
     budget: "On request",
     en: {

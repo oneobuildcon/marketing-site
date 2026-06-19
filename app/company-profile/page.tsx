@@ -67,6 +67,7 @@ const t = {
     pipeline: "Pipeline",
     underConstruction: "Under Construction",
     planned: "Planned",
+    expected: "Expected",
     certs: "Certifications & Registrations",
     certNote: "Registered & compliant — documents available on request.",
     testimonialsTitle: "What Our Clients Say",
@@ -138,6 +139,7 @@ const t = {
     pipeline: "नियोजित",
     underConstruction: "बांधकाम सुरू",
     planned: "नियोजित",
+    expected: "अपेक्षित",
     certs: "प्रमाणपत्रे व नोंदणी",
     certNote: "नोंदणीकृत व अनुपालनशील — कागदपत्रे विनंतीनुसार उपलब्ध.",
     testimonialsTitle: "आमचे ग्राहक काय म्हणतात",
@@ -469,7 +471,8 @@ export default function CompanyProfilePage() {
                               </span>
                               {p.year && (
                                 <span className="flex items-center gap-1">
-                                  <CalendarDays className="h-3 w-3 text-amber" /> {p.year}
+                                  <CalendarDays className="h-3 w-3 text-amber" />
+                                  {group === "completed" ? p.year : `${c.expected} ${p.year}`}
                                 </span>
                               )}
                             </div>
