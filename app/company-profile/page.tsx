@@ -207,12 +207,6 @@ export default function CompanyProfilePage() {
   const completedCount = projects.filter((p) => p.status === "completed").length;
   const ongoingCount = projects.filter((p) => p.status === "ongoing").length;
 
-  // Real client testimonials pulled live from the projects data
-  const testimonials = projects
-    .map((p) => ({ slug: p.slug, location: p[lang].location, ...p[lang].testimonial }))
-    .filter((x): x is { slug: string; location: string; quote: string; author: string } => Boolean(x.quote))
-    .slice(0, 3);
-
   const handleShare = async () => {
     const url = `${WEBSITE}/company-profile`;
     if (typeof navigator !== "undefined" && navigator.share) {
@@ -468,31 +462,6 @@ export default function CompanyProfilePage() {
               );
             })}
           </section>
-
-          {/* Client testimonials — real quotes from completed projects */}
-          {testimonials.length > 0 && (
-            <section className="break-inside-avoid">
-              <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.testimonialsTitle}</h2>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {testimonials.map((tm) => (
-                  <figure key={tm.slug} className="flex flex-col rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                    <div className="mb-2 flex gap-0.5 text-amber">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} className="h-4 w-4 fill-amber" />
-                      ))}
-                    </div>
-                    <blockquote className="flex-1 text-sm italic leading-relaxed text-gray-700">
-                      &ldquo;{tm.quote}&rdquo;
-                    </blockquote>
-                    <figcaption className="mt-3 text-sm font-bold text-navy">
-                      {tm.author}
-                      <span className="block text-xs font-medium text-gray-500">{tm.location}</span>
-                    </figcaption>
-                  </figure>
-                ))}
-              </div>
-            </section>
-          )}
 
           {/* Founder message — placed near the end */}
           <section className="break-inside-avoid rounded-lg border border-amber/30 bg-amber/5 p-5 sm:p-6">
