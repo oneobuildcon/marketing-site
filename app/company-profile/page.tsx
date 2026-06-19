@@ -538,9 +538,11 @@ export default function CompanyProfilePage() {
                             <p className="truncate text-[11px] font-medium uppercase tracking-wide text-amber-light">{content.type}</p>
                             <p className="truncate text-xs text-white/60">{content.location}</p>
                             <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1.5 text-[11px] text-white/75">
-                              <span className="flex items-center gap-1">
-                                <Ruler className="h-3 w-3 text-amber" /> {p.area}
-                              </span>
+                              {p.area && p.area !== "On request" && (
+                                <span className="flex items-center gap-1">
+                                  <Ruler className="h-3 w-3 text-amber" /> {p.area}
+                                </span>
+                              )}
                               {p.year && (
                                 <span className="flex items-center gap-1">
                                   <CalendarDays className="h-3 w-3 text-amber" />
