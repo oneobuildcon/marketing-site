@@ -521,24 +521,23 @@ export default function CompanyProfilePage() {
                               sizes="(max-width: 640px) 50vw, 33vw"
                               className="object-cover"
                             />
-                            {group === "completed" && (
-                              <span className="absolute left-2 top-2 rounded bg-green-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow">
-                                {c.completed}
-                              </span>
-                            )}
-                            {group === "ongoing" && (
-                              <span className="absolute left-2 top-2 rounded bg-amber px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-navy shadow">
-                                {c.underConstruction}
-                              </span>
-                            )}
-                            {group === "pipeline" && (
-                              <span className="absolute left-2 top-2 rounded bg-sky-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow">
-                                {c.planned}
-                              </span>
-                            )}
                           </div>
                           <div className="px-3 py-2.5">
-                            <p className="truncate font-display text-base font-bold text-navy">{content.name}</p>
+                            <div className="flex items-center gap-1.5">
+                              <p className="truncate font-display text-base font-bold text-navy">{content.name}</p>
+                              <span
+                                className={`flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                                  group === "completed"
+                                    ? "bg-green-100 text-green-700"
+                                    : group === "ongoing"
+                                    ? "bg-amber/20 text-navy"
+                                    : "bg-sky-100 text-sky-700"
+                                }`}
+                              >
+                                <span className={`h-1.5 w-1.5 rounded-full ${group === "completed" ? "bg-green-500" : group === "ongoing" ? "bg-amber" : "bg-sky-500"}`} />
+                                {group === "completed" ? c.completed : group === "ongoing" ? c.underConstruction : c.planned}
+                              </span>
+                            </div>
                             <p className="truncate text-[11px] font-medium uppercase tracking-wide text-amber">{content.type}</p>
                             <p className="truncate text-xs text-gray-500">{content.location}</p>
                             <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-600">
