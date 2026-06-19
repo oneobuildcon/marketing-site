@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useLanguage } from "@/lib/LanguageContext";
 import { projects } from "@/lib/projects";
-import { Printer, Phone, Mail, MapPin, CheckCircle2 } from "lucide-react";
+import { Printer, Phone, Mail, MapPin, CheckCircle2, Share2 } from "lucide-react";
 
 const t = {
   en: {
@@ -39,6 +39,8 @@ const t = {
     address: "Address",
     addressVal: "Pune, Maharashtra, India",
     download: "Download PDF",
+    share: "Share",
+    copied: "Link copied!",
     cats: {
       bungalow: "Bungalow",
       rowhouse: "Row House",
@@ -82,6 +84,8 @@ const t = {
     address: "पत्ता",
     addressVal: "पुणे, महाराष्ट्र, भारत",
     download: "पीडीएफ डाउनलोड करा",
+    share: "शेअर करा",
+    copied: "लिंक कॉपी झाली!",
     cats: {
       bungalow: "बंगला",
       rowhouse: "रो हाउस",
@@ -109,10 +113,34 @@ export default function CompanyProfilePage() {
   const completedCount = projects.filter((p) => p.status === "completed").length;
   const ongoingCount = projects.filter((p) => p.status === "ongoing").length;
 
+  const handleShare = async () => {
+    const url = "https://oneobuildcon.com/company-profile";
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: "One O Buildcon — Company Profile", url });
+        return;
+      } catch {
+        return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      alert(c.copied);
+    } catch {
+      window.open(`https://wa.me/?text=${encodeURIComponent(url)}`, "_blank");
+    }
+  };
+
   return (
     <main className="bg-gray-100 min-h-screen py-8 print:bg-white print:py-0">
       {/* Action bar — hidden when printing */}
-      <div className="no-print mx-auto mb-6 flex max-w-4xl justify-end px-6">
+      <div className="no-print mx-auto mb-6 flex max-w-4xl justify-end gap-3 px-6">
+        <button
+          onClick={handleShare}
+          className="flex items-center gap-2 rounded-md border border-navy/30 px-5 py-2.5 font-semibold text-navy transition hover:bg-navy/5"
+        >
+          <Share2 className="h-4 w-4" /> {c.share}
+        </button>
         <button
           onClick={() => window.print()}
           className="flex items-center gap-2 rounded-md bg-amber px-5 py-2.5 font-semibold text-navy transition hover:bg-amber-light"
