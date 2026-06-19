@@ -13,8 +13,9 @@ export type Project = {
   slug: string;
   count: number;
   category: ProjectCategory;
-  status: "completed" | "ongoing";
+  status: "completed" | "ongoing" | "pipeline";
   area: string;
+  year?: string;
   duration: string;
   budget: string;
   en: ProjectContent;
@@ -27,7 +28,8 @@ export const projects: Project[] = [
     count: 5,
     category: "residential",
     status: "completed",
-    area: "On request",
+    area: "3,400 Sq.ft",
+    year: "2024",
     duration: "On request",
     budget: "On request",
     en: {
@@ -52,7 +54,7 @@ export const projects: Project[] = [
     count: 1,
     category: "residential",
     status: "ongoing",
-    area: "On request",
+    area: "5,100 Sq.ft",
     duration: "On request",
     budget: "On request",
     en: {
@@ -75,7 +77,7 @@ export const projects: Project[] = [
     count: 1,
     category: "farmhouse",
     status: "ongoing",
-    area: "On request",
+    area: "2,450 Sq.ft",
     duration: "On request",
     budget: "On request",
     en: {
@@ -98,7 +100,7 @@ export const projects: Project[] = [
     count: 3,
     category: "rowhouse",
     status: "completed",
-    area: "On request",
+    area: "3,600 Sq.ft",
     duration: "On request",
     budget: "On request",
     en: {
@@ -123,7 +125,7 @@ export const projects: Project[] = [
     count: 4,
     category: "bungalow",
     status: "ongoing",
-    area: "On request",
+    area: "5,700 Sq.ft",
     duration: "On request",
     budget: "On request",
     en: {
@@ -146,7 +148,7 @@ export const projects: Project[] = [
     count: 6,
     category: "residential",
     status: "ongoing",
-    area: "On request",
+    area: "7,890 Sq.ft",
     duration: "On request",
     budget: "On request",
     en: {
@@ -169,7 +171,7 @@ export const projects: Project[] = [
     count: 3,
     category: "bungalow",
     status: "ongoing",
-    area: "On request",
+    area: "3,900 Sq.ft",
     duration: "On request",
     budget: "On request",
     en: {
@@ -192,7 +194,7 @@ export const projects: Project[] = [
     count: 4,
     category: "bungalow",
     status: "completed",
-    area: "On request",
+    area: "5,565 Sq.ft",
     duration: "On request",
     budget: "On request",
     en: {
@@ -216,8 +218,8 @@ export const projects: Project[] = [
     slug: "tapkir",
     count: 2,
     category: "residential",
-    status: "ongoing",
-    area: "On request",
+    status: "pipeline",
+    area: "20,180 Sq.ft",
     duration: "On request",
     budget: "On request",
     en: {
@@ -240,7 +242,7 @@ export const projects: Project[] = [
     count: 8,
     category: "bungalow",
     status: "completed",
-    area: "On request",
+    area: "3,330 Sq.ft",
     duration: "On request",
     budget: "On request",
     en: {
@@ -265,7 +267,7 @@ export const projects: Project[] = [
     count: 5,
     category: "farmhouse",
     status: "completed",
-    area: "On request",
+    area: "1,800 Sq.ft",
     duration: "On request",
     budget: "On request",
     en: {

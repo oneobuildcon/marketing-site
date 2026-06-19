@@ -30,6 +30,7 @@ const ui = {
     status: "Status",
     completed: "Completed",
     ongoing: "Ongoing",
+    pipeline: "Pipeline",
     ctaTitle: "Interested in a Similar Project?",
     ctaSub: "Let our team bring your dream home to life. Get a free consultation today.",
     ctaBtn: "Get a Free Quote →",
@@ -49,6 +50,7 @@ const ui = {
     status: "स्थिती",
     completed: "पूर्ण",
     ongoing: "सुरू आहे",
+    pipeline: "नियोजित",
     ctaTitle: "अशाच प्रकल्पात स्वारस्य आहे?",
     ctaSub: "आमच्या टीमला तुमचे स्वप्नातील घर साकार करू द्या. आज मोफत सल्लामसलत घ्या.",
     ctaBtn: "मोफत कोटेशन मागवा →",
@@ -100,7 +102,7 @@ export default function ProjectDetail() {
   const t = ui[lang];
   const c = project[lang];
   const photos = Array.from({ length: project.count }, (_, i) => `/projects/${project.slug}/${i + 1}.jpg`);
-  const statusLabel = project.status === "completed" ? t.completed : t.ongoing;
+  const statusLabel = project.status === "completed" ? t.completed : project.status === "pipeline" ? t.pipeline : t.ongoing;
 
   const infoRows = [
     { icon: Tag, label: t.type, value: c.type },

@@ -64,7 +64,9 @@ const t = {
     portfolio: "Project Portfolio",
     completed: "Completed",
     ongoing: "Ongoing",
+    pipeline: "Pipeline",
     underConstruction: "Under Construction",
+    planned: "Planned",
     certs: "Certifications & Registrations",
     certNote: "Registered & compliant — documents available on request.",
     testimonialsTitle: "What Our Clients Say",
@@ -133,7 +135,9 @@ const t = {
     portfolio: "प्रकल्प पोर्टफोलिओ",
     completed: "पूर्ण",
     ongoing: "सुरू",
+    pipeline: "नियोजित",
     underConstruction: "बांधकाम सुरू",
+    planned: "नियोजित",
     certs: "प्रमाणपत्रे व नोंदणी",
     certNote: "नोंदणीकृत व अनुपालनशील — कागदपत्रे विनंतीनुसार उपलब्ध.",
     testimonialsTitle: "आमचे ग्राहक काय म्हणतात",
@@ -154,7 +158,7 @@ const t = {
 
 const statValues = [
   { v: "20+", icon: Building2 },
-  { v: "30,000+", icon: Ruler },
+  { v: "40,000+", icon: Ruler },
   { v: "25+", icon: Users },
   { v: "6+", icon: CalendarDays },
 ];
@@ -206,6 +210,7 @@ export default function CompanyProfilePage() {
   // Live counts derived from the actual projects data
   const completedCount = projects.filter((p) => p.status === "completed").length;
   const ongoingCount = projects.filter((p) => p.status === "ongoing").length;
+  const pipelineCount = projects.filter((p) => p.status === "pipeline").length;
 
   const handleShare = async () => {
     const url = `${WEBSITE}/company-profile`;
@@ -414,19 +419,19 @@ export default function CompanyProfilePage() {
           <section className="break-inside-avoid">
             <h2 className="mb-1 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.portfolio}</h2>
             <p className="mb-4 pl-3 text-sm text-gray-500">
-              {projects.length} {c.projectsWord} · {completedCount} {c.completed} · {ongoingCount} {c.ongoing}
+              {projects.length} {c.projectsWord} · {completedCount} {c.completed} · {ongoingCount} {c.ongoing} · {pipelineCount} {c.pipeline}
             </p>
-            {(["completed", "ongoing"] as const).map((group) => {
+            {(["completed", "ongoing", "pipeline"] as const).map((group) => {
               const items = projects.filter((p) => p.status === group);
               if (items.length === 0) return null;
+              const dot = group === "completed" ? "bg-green-500" : group === "ongoing" ? "bg-amber" : "bg-sky-500";
+              const heading = group === "completed" ? c.completed : group === "ongoing" ? c.ongoing : c.pipeline;
               return (
                 <div key={group} className="mt-5">
                   <div className="mb-3 flex items-center gap-2 pl-3">
-                    <span
-                      className={`h-2.5 w-2.5 rounded-full ${group === "completed" ? "bg-green-500" : "bg-amber"}`}
-                    />
+                    <span className={`h-2.5 w-2.5 rounded-full ${dot}`} />
                     <h3 className="font-display text-base font-bold text-navy">
-                      {group === "completed" ? c.completed : c.ongoing} {c.projectsWord}
+                      {heading} {c.projectsWord}
                     </h3>
                     <span className="text-sm text-gray-400">({items.length})</span>
                   </div>
@@ -448,11 +453,26 @@ export default function CompanyProfilePage() {
                                 {c.underConstruction}
                               </span>
                             )}
+                            {group === "pipeline" && (
+                              <span className="absolute left-2 top-2 rounded bg-sky-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow">
+                                {c.planned}
+                              </span>
+                            )}
                           </div>
                           <div className="px-3 py-2">
                             <p className="truncate text-sm font-semibold text-navy">{content.name}</p>
                             <p className="truncate text-xs font-medium text-amber">{content.type}</p>
                             <p className="truncate text-xs text-gray-500">{content.location}</p>
+                            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-600">
+                              <span className="flex items-center gap-1">
+                                <Ruler className="h-3 w-3 text-amber" /> {p.area}
+                              </span>
+                              {p.year && (
+                                <span className="flex items-center gap-1">
+                                  <CalendarDays className="h-3 w-3 text-amber" /> {p.year}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
