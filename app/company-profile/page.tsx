@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { projects } from "@/lib/projects";
-import { Printer, Phone, Mail, MapPin, CheckCircle2, Share2 } from "lucide-react";
+import { Printer, Phone, Mail, MapPin, CheckCircle2, Share2, ClipboardList, PencilRuler, Calculator, HardHat, ShieldCheck, KeyRound } from "lucide-react";
 
 const t = {
   en: {
@@ -31,6 +31,8 @@ const t = {
       "Transparent pricing and clear timelines",
       "Dedicated project management on every site",
     ],
+    process: "How We Work",
+    processSteps: ["Planning", "Design", "Estimation", "Construction", "Quality Inspection", "Handover"],
     portfolio: "Project Portfolio",
     completed: "Completed",
     ongoing: "Ongoing",
@@ -77,6 +79,8 @@ const t = {
       "पारदर्शक किंमत आणि स्पष्ट कालमर्यादा",
       "प्रत्येक साइटवर समर्पित प्रकल्प व्यवस्थापन",
     ],
+    process: "आम्ही कसे काम करतो",
+    processSteps: ["नियोजन", "डिझाइन", "अंदाजपत्रक", "बांधकाम", "गुणवत्ता तपासणी", "हस्तांतरण"],
     portfolio: "प्रकल्प पोर्टफोलिओ",
     completed: "पूर्ण",
     ongoing: "सुरू",
@@ -107,6 +111,8 @@ const statValues = [
   { n: 25, s: "+" },
   { n: 3, s: "" },
 ];
+
+const processIcons = [ClipboardList, PencilRuler, Calculator, HardHat, ShieldCheck, KeyRound];
 
 export default function CompanyProfilePage() {
   const { lang } = useLanguage();
@@ -249,6 +255,25 @@ export default function CompanyProfilePage() {
                   </li>
                 ))}
               </ul>
+            </div>
+          </section>
+
+          {/* Process flow — how projects are delivered */}
+          <section className="break-inside-avoid">
+            <h2 className="mb-4 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.process}</h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+              {c.processSteps.map((step, i) => {
+                const Icon = processIcons[i];
+                return (
+                  <div key={step} className="relative flex flex-col items-center rounded-lg bg-navy/5 px-2 py-4 text-center">
+                    <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-navy text-amber">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <span className="text-[11px] font-bold text-amber">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="mt-0.5 text-xs font-semibold leading-tight text-navy">{step}</span>
+                  </div>
+                );
+              })}
             </div>
           </section>
 
