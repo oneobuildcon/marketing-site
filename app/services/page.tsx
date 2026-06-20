@@ -127,16 +127,9 @@ export default function Services() {
                     <div className="absolute top-0 bottom-0 w-1/3 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" style={{ animation: "shimmerCard 0.8s ease-in-out" }} />
                   </div>
 
-                  <div className="relative h-52 w-full overflow-hidden">
-                    {/* Cover image as card background */}
-                    <Image src="/services/cover.png" alt="" fill className="object-cover opacity-30" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-navy/70" />
-                    {/* Service illustration on top */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="relative w-44 h-44 [filter:drop-shadow(0_8px_16px_rgba(0,0,0,0.5))]">
-                        <Image src={service.img} alt={service.title} fill className="object-contain transition-transform duration-700 group-hover:scale-110" />
-                      </div>
-                    </div>
+                  <div className="relative h-52 w-full overflow-hidden bg-[radial-gradient(circle_at_50%_38%,#ffffff_0%,#dfe5ec_70%,#c7cfda_100%)]">
+                    <Image src={service.img} alt={service.title} fill className="object-contain p-5 transition-transform duration-700 group-hover:scale-110 [filter:drop-shadow(0_10px_14px_rgba(11,31,58,0.35))]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy/10 to-transparent" />
                     <motion.div whileHover={{ rotate: [0, -15, 15, 0], scale: 1.2 }} transition={{ duration: 0.4 }} className="absolute bottom-4 left-4 flex h-10 w-10 items-center justify-center rounded-lg bg-amber">
                       <Icon className="h-5 w-5 text-navy-dark" />
                     </motion.div>
