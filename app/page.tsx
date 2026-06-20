@@ -522,7 +522,7 @@ export default function Home() {
       <section className="bg-white py-20">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 lg:grid-cols-2 items-center">
           <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="relative h-96 w-full overflow-hidden rounded-2xl shadow-2xl bg-[radial-gradient(circle_at_50%_38%,#ffffff_0%,#dfe5ec_70%,#c7cfda_100%)]">
-            <Image src="/homepage.png" alt="Why choose One O Buildcon" fill className="object-contain object-center p-8 [filter:drop-shadow(0_12px_16px_rgba(11,31,58,0.35))]" />
+            <Image src="/homepage.png" alt="Why choose One O Buildcon" fill className="object-contain object-center p-12 [filter:drop-shadow(0_16px_22px_rgba(11,31,58,0.45))]" />
             <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent" />
             <div className="absolute bottom-6 left-6 rounded-lg bg-amber px-4 py-2">
               <p className="font-bold text-navy-dark text-lg">{t.yearsLabel}</p>
