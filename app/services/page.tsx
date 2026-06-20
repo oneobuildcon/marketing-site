@@ -84,6 +84,7 @@ export default function Services() {
           </div>
         ))}
         <div className="relative mx-auto max-w-6xl px-6">
+          <div className="flex items-center justify-between gap-8">
           <motion.div initial="hidden" animate="visible" variants={stagger}>
             <motion.div variants={fadeUp} className="flex items-center gap-2 mb-3">
               <HardHat className="h-5 w-5 text-amber" />
@@ -99,6 +100,10 @@ export default function Services() {
               <div className="absolute inset-y-0 w-12 bg-amber/80 rounded-full" style={{ animation: "shimmerLine 2s ease-in-out infinite" }} />
             </motion.div>
           </motion.div>
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }} className="hidden md:block shrink-0">
+            <Image src="/services/cover.png" alt="Construction planning and structural work" width={340} height={340} className="drop-shadow-2xl" priority />
+          </motion.div>
+          </div>
         </div>
       </section>
 
