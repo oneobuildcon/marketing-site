@@ -392,7 +392,7 @@ export default function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden bg-navy text-white" style={{ minHeight: "90vh", display: "flex", alignItems: "center" }}>
         <motion.div className="absolute inset-0" style={{ y: heroImgY }}>
-          <Image src="/homepage.png" alt="We Build — construction services" fill priority className="object-cover object-center opacity-25 sm:object-contain sm:object-right sm:opacity-70" />
+          <Image src="/homepage.png" alt="We Build — construction services" fill priority className="object-cover object-center opacity-25 sm:object-right sm:opacity-45" />
         </motion.div>
         <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "40px 40px", animation: "dotGridMove 8s linear infinite" }} />
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
