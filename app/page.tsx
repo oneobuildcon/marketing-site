@@ -392,7 +392,7 @@ export default function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden bg-navy text-white" style={{ minHeight: "90vh", display: "flex", alignItems: "center" }}>
         <motion.div className="absolute inset-0" style={{ y: heroImgY }}>
-          <Image src="/homepage.png" alt="We Build — construction services" fill priority className="object-contain object-center opacity-30" />
+          <Image src="/homepage.png" alt="We Build — construction services" fill priority className="object-cover object-center opacity-20 sm:object-contain sm:opacity-30" />
         </motion.div>
         <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "40px 40px", animation: "dotGridMove 8s linear infinite" }} />
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
@@ -406,13 +406,13 @@ export default function Home() {
         {/* Animated tower crane */}
         <CraneAnimation className="pointer-events-none absolute bottom-0 right-1 h-[45%] w-auto opacity-30 sm:right-4 sm:h-[65%] sm:opacity-50 lg:h-[90%] lg:opacity-90 xl:right-16" />
 
-        <div className="relative mx-auto max-w-6xl px-6 py-28 w-full">
+        <div className="relative mx-auto max-w-6xl px-6 py-20 sm:py-28 w-full">
           <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col items-start gap-6">
             <motion.div variants={fadeUp} className="flex items-center gap-2">
               <HardHat className="h-5 w-5 text-amber" />
               <p className="text-sm font-semibold uppercase tracking-widest text-amber-light">{t.badge}</p>
             </motion.div>
-            <motion.h1 variants={fadeUp} className="max-w-2xl text-4xl font-bold leading-tight sm:text-6xl">
+            <motion.h1 variants={fadeUp} className="max-w-2xl text-3xl font-bold leading-tight sm:text-6xl">
               {t.heroTitle1}{" "}
               <span className="text-amber">{t.heroHighlight}</span>{" "}
               {t.heroTitle2}
@@ -427,14 +427,14 @@ export default function Home() {
             <motion.div variants={fadeUp} className="w-48 h-0.5 bg-amber/30 relative overflow-hidden rounded-full">
               <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-transparent via-amber to-transparent" style={{ animation: "shimmerSweep 2.5s ease-in-out infinite" }} />
             </motion.div>
-            <motion.div variants={fadeUp} className="flex flex-wrap gap-4">
-              <Link href="/contact" className="rounded-md bg-amber px-8 py-3 font-semibold text-navy-dark transition hover:bg-amber-light hover:scale-105 transform">
+            <motion.div variants={fadeUp} className="flex flex-col w-full gap-3 sm:flex-row sm:flex-wrap sm:w-auto sm:gap-4">
+              <Link href="/contact" className="rounded-md bg-amber px-8 py-3 text-center font-semibold text-navy-dark transition hover:bg-amber-light hover:scale-105 transform">
                 {t.ctaMain}
               </Link>
-              <Link href="/projects" className="rounded-md border border-white/30 px-8 py-3 font-semibold transition hover:bg-white/10">
+              <Link href="/projects" className="rounded-md border border-white/30 px-8 py-3 text-center font-semibold transition hover:bg-white/10">
                 {t.ctaProjects}
               </Link>
-              <Link href="/company-profile" className="flex items-center gap-2 rounded-md border border-amber/50 px-8 py-3 font-semibold text-amber transition hover:bg-amber/10">
+              <Link href="/company-profile" className="flex items-center justify-center gap-2 rounded-md border border-amber/50 px-8 py-3 font-semibold text-amber transition hover:bg-amber/10">
                 <Download className="h-4 w-4" />
                 {t.ctaProfile}
               </Link>
