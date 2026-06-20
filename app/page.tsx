@@ -181,10 +181,10 @@ const processIcons = [MessageSquare, PencilRuler, HardHat, KeyRound];
 
 // ── Project images ────────────────────────────────────────────────────────────
 const projectImgs = [
-  "https://picsum.photos/seed/proj1/400/300",
-  "https://picsum.photos/seed/proj2/400/300",
-  "https://picsum.photos/seed/proj3/400/300",
-  "https://picsum.photos/seed/proj4/400/300",
+  "/services/bungalow.png",     // Premium Bungalow
+  "/services/rowhouse.png",     // Row House Development
+  "/services/residential.png",  // Residential Tower
+  "/services/farmhouse.png",    // Countryside Farmhouse
 ];
 
 // ── Testimonial avatars ───────────────────────────────────────────────────────
@@ -564,11 +564,11 @@ export default function Home() {
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {t.projects.map((project, i) => (
-              <motion.div key={project.name} variants={fadeUp} whileHover={{ y: -8, scale: 1.02 }} className="group relative h-56 overflow-hidden rounded-2xl shadow-lg cursor-pointer">
-                <motion.div className="absolute inset-0" whileHover={{ scale: 1.1 }} transition={{ duration: 0.6, ease: "easeOut" }}>
-                  <Image src={projectImgs[i]} alt={project.name} fill className="object-cover" />
+              <motion.div key={project.name} variants={fadeUp} whileHover={{ y: -8, scale: 1.02 }} className="group relative h-56 overflow-hidden rounded-2xl shadow-lg cursor-pointer bg-[radial-gradient(circle_at_50%_38%,#ffffff_0%,#dfe5ec_70%,#c7cfda_100%)]">
+                <motion.div className="absolute inset-0 flex items-end" whileHover={{ scale: 1.05 }} transition={{ duration: 0.6, ease: "easeOut" }}>
+                  <Image src={projectImgs[i]} alt={project.name} fill className="object-contain p-4 [filter:drop-shadow(0_8px_12px_rgba(11,31,58,0.3))]" />
                 </motion.div>
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-dark/90 via-navy-dark/30 to-transparent transition-opacity duration-300 group-hover:opacity-80" />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-dark/90 via-navy-dark/20 to-transparent transition-opacity duration-300 group-hover:opacity-80" />
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 overflow-hidden pointer-events-none">
                   <div className="absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/10 to-transparent" style={{ animation: "shimmerSweep 1.5s ease-in-out" }} />
                 </div>
