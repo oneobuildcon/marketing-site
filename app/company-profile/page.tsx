@@ -172,9 +172,18 @@ const t = {
   },
 };
 
+// Total square footage built — summed live from every project's area,
+// so it grows automatically each time a new project is added.
+const totalSqft = projects.reduce((sum, p) => {
+  const n = parseInt(p.area.replace(/[^0-9]/g, ""), 10);
+  return sum + (isNaN(n) ? 0 : n);
+}, 0);
+// Round down to the nearest 1,000 for a clean "X,000+" headline figure.
+const sqftDisplay = `${(Math.floor(totalSqft / 1000) * 1000).toLocaleString("en-IN")}+`;
+
 const statValues = [
   { v: "20+", icon: Building2 },
-  { v: "60,000+", icon: Ruler },
+  { v: sqftDisplay, icon: Ruler },
   { v: "25+", icon: Users },
   { v: "6+", icon: CalendarDays },
 ];
