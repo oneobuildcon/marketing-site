@@ -471,12 +471,17 @@ export default function Home() {
             {t.services.map((service, i) => {
               const Icon = serviceIcons[i];
               return (
-                <motion.div key={service.title} variants={fadeUp} whileHover={{ y: -6, scale: 1.02 }} className="rounded-xl bg-white/5 p-6 border border-white/10 hover:bg-white/10 hover:border-amber/40 transition-colors cursor-default group">
-                  <motion.div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber/10 border border-amber/20" whileHover={{ rotate: [0, -15, 15, -8, 8, 0], scale: 1.15 }} transition={{ duration: 0.5 }}>
-                    <Icon className="h-6 w-6 text-amber" strokeWidth={1.5} />
-                  </motion.div>
-                  <h3 className="mt-4 font-semibold text-white text-lg">{service.title}</h3>
-                  <p className="mt-1 text-sm text-white/60">{service.desc}</p>
+                <motion.div key={service.title} variants={fadeUp} whileHover={{ y: -6, scale: 1.02 }} className="relative overflow-hidden rounded-xl p-6 border border-white/10 hover:border-amber/40 transition-colors cursor-default group">
+                  {/* Cover image background */}
+                  <Image src="/services/cover.png" alt="" fill className="object-cover opacity-20 transition-opacity group-hover:opacity-30" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-navy/95 via-navy/90 to-navy/80" />
+                  <div className="relative">
+                    <motion.div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber/10 border border-amber/20" whileHover={{ rotate: [0, -15, 15, -8, 8, 0], scale: 1.15 }} transition={{ duration: 0.5 }}>
+                      <Icon className="h-6 w-6 text-amber" strokeWidth={1.5} />
+                    </motion.div>
+                    <h3 className="mt-4 font-semibold text-white text-lg">{service.title}</h3>
+                    <p className="mt-1 text-sm text-white/60">{service.desc}</p>
+                  </div>
                 </motion.div>
               );
             })}
