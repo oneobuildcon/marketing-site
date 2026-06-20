@@ -127,8 +127,8 @@ export default function Services() {
                     <div className="absolute top-0 bottom-0 w-1/3 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" style={{ animation: "shimmerCard 0.8s ease-in-out" }} />
                   </div>
 
-                  <div className="relative h-52 w-full overflow-hidden">
-                    <Image src={service.img} alt={service.title} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <div className="relative h-52 w-full overflow-hidden bg-gradient-to-br from-navy via-navy-dark to-navy">
+                    <Image src={service.img} alt={service.title} fill className="object-contain p-4 transition-transform duration-700 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-navy/70 to-transparent" />
                     <motion.div whileHover={{ rotate: [0, -15, 15, 0], scale: 1.2 }} transition={{ duration: 0.4 }} className="absolute bottom-4 left-4 flex h-10 w-10 items-center justify-center rounded-lg bg-amber">
                       <Icon className="h-5 w-5 text-navy-dark" />
