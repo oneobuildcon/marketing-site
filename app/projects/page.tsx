@@ -6,7 +6,7 @@ import { HardHat, MapPin, Tag, Images, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
-import { projects, type ProjectCategory } from "@/lib/projects";
+import { projects, type ProjectCategory, type Project } from "@/lib/projects";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -24,6 +24,13 @@ const filterDefs: { category: ProjectCategory | "all"; en: string; mr: string }[
   { category: "rowhouse", en: "Row House", mr: "रो हाउस" },
   { category: "residential", en: "Residential Building", mr: "निवासी इमारत" },
   { category: "farmhouse", en: "Farmhouse", mr: "फार्महाउस" },
+];
+
+const statusDefs: { status: Project["status"] | "all"; en: string; mr: string }[] = [
+  { status: "all", en: "All Phases", mr: "सर्व टप्पे" },
+  { status: "completed", en: "Completed", mr: "पूर्ण" },
+  { status: "ongoing", en: "Under Construction", mr: "बांधकाम सुरू" },
+  { status: "pipeline", en: "Upcoming", mr: "नियोजित" },
 ];
 
 const ui = {
@@ -65,9 +72,15 @@ export default function Projects() {
   const { lang } = useLanguage();
   const t = ui[lang];
   const [activeIndex, setActiveIndex] = useState(0);
+  const [statusIndex, setStatusIndex] = useState(0);
 
   const activeCategory = filterDefs[activeIndex].category;
-  const filtered = activeCategory === "all" ? projects : projects.filter((p) => p.category === activeCategory);
+  const activeStatus = statusDefs[statusIndex].status;
+  const filtered = projects.filter(
+    (p) =>
+      (activeCategory === "all" || p.category === activeCategory) &&
+      (activeStatus === "all" || p.status === activeStatus)
+  );
 
   return (
     <main className="overflow-hidden">
@@ -109,7 +122,8 @@ export default function Projects() {
 
       {/* Filter tabs */}
       <section className="bg-white border-b border-black/8 py-5 sticky top-16 z-40">
-        <div className="mx-auto max-w-6xl px-6">
+        <div className="mx-auto max-w-6xl px-6 space-y-3">
+          {/* Category filter */}
           <div className="flex gap-2 overflow-x-auto pb-1">
             {filterDefs.map((f, i) => (
               <motion.button
@@ -120,6 +134,20 @@ export default function Projects() {
                 className={`shrink-0 rounded-xl px-4 py-2 text-sm font-medium transition-all border ${activeIndex === i ? "bg-navy text-white border-navy shadow-md" : "bg-gray-50 text-navy/60 border-black/8 hover:border-amber/40 hover:bg-amber/5"}`}
               >
                 {f[lang]}
+              </motion.button>
+            ))}
+          </div>
+          {/* Status / phase filter */}
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {statusDefs.map((s, i) => (
+              <motion.button
+                key={s.status}
+                onClick={() => setStatusIndex(i)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-all border ${statusIndex === i ? "bg-amber text-navy-dark border-amber shadow-sm" : "bg-gray-50 text-navy/50 border-black/8 hover:border-amber/40 hover:bg-amber/5"}`}
+              >
+                {s[lang]}
               </motion.button>
             ))}
           </div>
