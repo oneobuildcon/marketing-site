@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
-import { projects } from "@/lib/projects";
+import { projects as staticProjects } from "@/lib/projects";
+import type { DbProject } from "@/lib/db";
 import {
   Printer, Phone, Mail, MapPin, CheckCircle2, Share2, ClipboardList, PencilRuler,
   Calculator, HardHat, ShieldCheck, KeyRound, Globe, Camera, MessageCircle, Building2,
@@ -172,21 +173,6 @@ const t = {
   },
 };
 
-// Total square footage built — summed live from every project's area,
-// so it grows automatically each time a new project is added.
-const totalSqft = projects.reduce((sum, p) => {
-  const n = parseInt(p.area.replace(/[^0-9]/g, ""), 10);
-  return sum + (isNaN(n) ? 0 : n);
-}, 0);
-// Round down to the nearest 1,000 for a clean "X,000+" headline figure.
-const sqftDisplay = `${(Math.floor(totalSqft / 1000) * 1000).toLocaleString("en-IN")}+`;
-
-const statValues = [
-  { v: "20+", icon: Building2 },
-  { v: sqftDisplay, icon: Ruler },
-  { v: "25+", icon: Users },
-  { v: "6+", icon: CalendarDays },
-];
 
 const processIcons = [ClipboardList, PencilRuler, Calculator, HardHat, ShieldCheck, KeyRound];
 const serviceIcons = [Home, Layers, Building2, Warehouse, Hammer, PaintBucket];
@@ -197,6 +183,40 @@ export default function CompanyProfilePage() {
   const { lang, setLang } = useLanguage();
   const c = t[lang];
   const [downloading, setDownloading] = useState(false);
+
+  // Live projects (from the admin-managed API), falling back to static data.
+  const [projects, setProjects] = useState<DbProject[]>(
+    staticProjects.map((p) => ({
+      ...p,
+      photos: Array.from({ length: p.count }, (_, i) => `/projects/${p.slug}/${i + 1}.jpg`),
+    }))
+  );
+  useEffect(() => {
+    let active = true;
+    fetch("/api/projects")
+      .then((r) => r.json())
+      .then((data: DbProject[]) => {
+        if (active && Array.isArray(data) && data.length) setProjects(data);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Total square footage built — summed live from every project's area.
+  const totalSqft = projects.reduce((sum, p) => {
+    const n = parseInt((p.area || "").replace(/[^0-9]/g, ""), 10);
+    return sum + (isNaN(n) ? 0 : n);
+  }, 0);
+  const sqftDisplay = `${(Math.floor(totalSqft / 1000) * 1000).toLocaleString("en-IN")}+`;
+
+  const statValues = [
+    { v: "20+", icon: Building2 },
+    { v: sqftDisplay, icon: Ruler },
+    { v: "25+", icon: Users },
+    { v: "6+", icon: CalendarDays },
+  ];
 
   const handleDownload = async () => {
     const el = document.getElementById("profile-doc");
@@ -524,7 +544,7 @@ export default function CompanyProfilePage() {
                         <div key={p.slug} className="flex break-inside-avoid flex-col overflow-hidden rounded-lg border border-gray-200 shadow-sm">
                           <div className="relative aspect-[4/3] w-full bg-gray-100">
                             <Image
-                              src={`/projects/${p.slug}/1.jpg`}
+                              src={p.photos?.[0] ?? `/projects/${p.slug}/1.jpg`}
                               alt={content.name}
                               fill
                               sizes="(max-width: 640px) 50vw, 33vw"
