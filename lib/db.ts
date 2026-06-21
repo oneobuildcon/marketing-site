@@ -87,13 +87,21 @@ export async function getProjects(): Promise<DbProject[]> {
   if (!hasSupabase()) {
     return staticProjects.map(staticToDb);
   }
-  const supabase = createServerClient();
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .order('sort_order', { ascending: true });
-  if (error) throw error;
-  return (data ?? []).map(rowToProject);
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .order('sort_order', { ascending: true });
+    if (error) throw error;
+    // Empty DB (not yet seeded) → fall back to static projects.
+    if (!data || data.length === 0) return staticProjects.map(staticToDb);
+    return data.map(rowToProject);
+  } catch (e) {
+    // Never let a Supabase outage / bad key take the public site down.
+    console.error('getProjects: falling back to static projects:', e);
+    return staticProjects.map(staticToDb);
+  }
 }
 
 export async function getProject(slug: string): Promise<DbProject | null> {
@@ -101,10 +109,16 @@ export async function getProject(slug: string): Promise<DbProject | null> {
     const p = staticProjects.find((x) => x.slug === slug);
     return p ? staticToDb(p) : null;
   }
-  const supabase = createServerClient();
-  const { data, error } = await supabase.from('projects').select('*').eq('slug', slug).maybeSingle();
-  if (error) throw error;
-  return data ? rowToProject(data) : null;
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase.from('projects').select('*').eq('slug', slug).maybeSingle();
+    if (error) throw error;
+    if (data) return rowToProject(data);
+  } catch (e) {
+    console.error('getProject: falling back to static project:', e);
+  }
+  const p = staticProjects.find((x) => x.slug === slug);
+  return p ? staticToDb(p) : null;
 }
 
 export async function createProject(
