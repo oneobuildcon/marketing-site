@@ -566,13 +566,13 @@ export default function Home() {
               </div>
 
               {/* Years badge */}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <div className="rounded-lg bg-amber px-4 py-2">
                   <p className="font-bold text-navy-dark text-lg leading-none">{yearsLabel}</p>
                   <p className="text-[11px] text-navy-dark/80 mt-0.5">{t.yearsSubLabel}</p>
                 </div>
-                <div className="flex items-center gap-1.5 text-white/70 text-xs">
-                  <ShieldCheck className="h-4 w-4 text-amber" strokeWidth={1.5} />
+                <div className="flex min-w-0 items-center gap-1.5 text-white/70 text-[11px]">
+                  <ShieldCheck className="h-4 w-4 shrink-0 text-amber" strokeWidth={1.5} />
                   {lang === "en" ? "Licensed & Insured" : "परवानाधारक आणि विमाधारक"}
                 </div>
               </div>

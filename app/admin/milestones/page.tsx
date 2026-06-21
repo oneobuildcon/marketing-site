@@ -75,14 +75,23 @@ export default function AdminMilestonesPage() {
       <div className="space-y-3">
         {items.map((m, i) => (
           <div key={i} className="rounded-2xl bg-white border border-black/8 shadow-sm p-4">
-            <div className="flex items-start gap-3">
-              <div className="w-20 shrink-0">
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-navy/40 mb-1">Year</label>
-                <input
-                  value={m.year}
-                  onChange={(e) => update(i, "year", e.target.value)}
-                  className="w-full rounded-lg border border-black/15 px-2 py-2 text-sm font-bold text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
-                />
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+              <div className="flex items-end gap-3 sm:block">
+                <div className="w-24 shrink-0 sm:w-20">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-navy/40 mb-1">Year</label>
+                  <input
+                    value={m.year}
+                    onChange={(e) => update(i, "year", e.target.value)}
+                    className="w-full rounded-lg border border-black/15 px-2 py-2 text-base font-bold text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                  />
+                </div>
+                <button
+                  onClick={() => removeRow(i)}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-red-200 text-red-500 transition hover:bg-red-50 sm:hidden"
+                  aria-label="Remove milestone"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
               <div className="flex-1 space-y-2">
                 <div>
@@ -91,7 +100,7 @@ export default function AdminMilestonesPage() {
                     value={m.en}
                     onChange={(e) => update(i, "en", e.target.value)}
                     placeholder="e.g. Completed 30+ projects"
-                    className="w-full rounded-lg border border-black/15 px-3 py-2 text-sm text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                    className="w-full rounded-lg border border-black/15 px-3 py-2 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
                   />
                 </div>
                 <div>
@@ -100,13 +109,13 @@ export default function AdminMilestonesPage() {
                     value={m.mr}
                     onChange={(e) => update(i, "mr", e.target.value)}
                     placeholder="मराठी मजकूर (रिकामे ठेवल्यास इंग्रजी वापरले जाईल)"
-                    className="w-full rounded-lg border border-black/15 px-3 py-2 text-sm text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                    className="w-full rounded-lg border border-black/15 px-3 py-2 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
                   />
                 </div>
               </div>
               <button
                 onClick={() => removeRow(i)}
-                className="mt-6 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-200 text-red-500 transition hover:bg-red-50"
+                className="mt-6 hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-200 text-red-500 transition hover:bg-red-50 sm:flex"
                 aria-label="Remove milestone"
               >
                 <Trash2 className="h-4 w-4" />
