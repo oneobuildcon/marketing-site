@@ -27,6 +27,11 @@ const T = {
     housePct: "100% of slab",
     parking: "Parking",
     parkingPct: "50% of slab",
+    mixed: "Mixed",
+    mixedPct: "Custom split",
+    houseArea: "House / Brick Work (sq ft)",
+    parkingArea: "Parking (sq ft)",
+    groundTotal: "Ground total:",
     upperFloors: "Upper Floors (above Ground)",
     none: "None",
     slabPerFloor: "Slab Area per Floor (sq ft)",
@@ -83,6 +88,11 @@ const T = {
     housePct: "स्लॅबच्या १००%",
     parking: "पार्किंग",
     parkingPct: "स्लॅबच्या ५०%",
+    mixed: "मिश्र",
+    mixedPct: "कस्टम विभाजन",
+    houseArea: "घर / विटकाम (चौ.फू.)",
+    parkingArea: "पार्किंग (चौ.फू.)",
+    groundTotal: "तळ एकूण:",
     upperFloors: "वरचे मजले (तळमजल्याच्या वर)",
     none: "नाही",
     slabPerFloor: "प्रति मजला स्लॅब क्षेत्र (चौ.फू.)",
@@ -146,6 +156,7 @@ function displayFloorLabel(label: string, lang: "en" | "mr"): string {
   if (lang === "en") return label;
   if (label === "Ground Floor (Parking)") return "तळमजला (पार्किंग)";
   if (label === "Ground Floor (House)") return "तळमजला (घर)";
+  if (label === "Ground Floor (Mixed)") return "तळमजला (मिश्र)";
   const m = label.match(/^(\d+)/);
   if (m) return `${m[1]}वा मजला`;
   return label;
@@ -176,19 +187,20 @@ function formatINR(num: number) {
 }
 
 type FloorRow = { id: string; label: string; slab: string };
+type GroundUsage = "house" | "parking" | "mixed";
 
 type ResultData = {
-  rows: { label: string; slab: number; builtUp: number }[];
+  rows: { label: string; slab: number; builtUp: number; houseArea?: number; parkingArea?: number }[];
   plinthSlab: number; topSlab: number; plinthArea: number;
   terraceArea: number; totalArea: number;
   base: number; gstAmount: number; total: number;
+  groundUsage: GroundUsage;
 };
 
 async function exportPDF(
   result: ResultData,
   pkg: { id: string; name: string; price: number },
   upperFloors: number,
-  parking: boolean,
   gst: boolean,
   clientName: string,
   projectLocation: string,
@@ -261,7 +273,7 @@ async function exportPDF(
   doc.setFont("helvetica", "bold");
   doc.text("Config:", W - 100, 61);
   doc.setFont("helvetica", "normal");
-  doc.text(`${upperFloors === 0 ? "G" : `G+${upperFloors}`}  |  Ground: ${parking ? "Parking" : "House"}`, W - 85, 61);
+  doc.text(`${upperFloors === 0 ? "G" : `G+${upperFloors}`}  |  Ground: ${result.groundUsage === "parking" ? "Parking" : result.groundUsage === "mixed" ? "Mixed" : "House"}`, W - 85, 61);
 
   // Area breakdown table
   let y = 82;
@@ -282,9 +294,18 @@ async function exportPDF(
   doc.text("Built-up Area (sqft)", C4, y + 5.5, { align: "right" });
   y += 8;
 
+  const groundRow0 = result.rows[0];
+  const groundTableRows = result.groundUsage === "mixed"
+    ? [
+        { label: "Ground Floor - House Work", slab: groundRow0.houseArea ?? 0, pct: "100%", builtUp: groundRow0.houseArea ?? 0 },
+        { label: "Ground Floor - Parking", slab: groundRow0.parkingArea ?? 0, pct: "50%", builtUp: Math.round((groundRow0.parkingArea ?? 0) * 0.5) },
+      ]
+    : [{ label: groundRow0.label, slab: groundRow0.slab, pct: result.groundUsage === "parking" ? "50%" : "100%", builtUp: groundRow0.builtUp }];
+
   const tableRows = [
     { label: `Plinth (Ground slab: ${result.plinthSlab.toLocaleString()} sqft)`, slab: result.plinthSlab, pct: "50%", builtUp: result.plinthArea },
-    ...result.rows.map((r, i) => ({ label: r.label, slab: r.slab, pct: i === 0 && parking ? "50%" : "100%", builtUp: r.builtUp })),
+    ...groundTableRows,
+    ...result.rows.slice(1).map((r) => ({ label: r.label, slab: r.slab, pct: "100%", builtUp: r.builtUp })),
     { label: `Terrace (Highest slab: ${result.topSlab.toLocaleString()} sqft)`, slab: result.topSlab, pct: "35%", builtUp: result.terraceArea },
   ];
 
@@ -453,7 +474,6 @@ async function exportExcel(
   result: ResultData,
   pkg: { id: string; name: string; price: number },
   upperFloors: number,
-  parking: boolean,
   gst: boolean,
   clientName: string,
   projectLocation: string,
@@ -477,12 +497,19 @@ async function exportExcel(
     [],
     ["PROJECT DETAILS"],
     ["Package:", `${pkg.name} @ Rs.${pkg.price}/sqft (excl. GST)`],
-    ["Configuration:", `${upperFloors === 0 ? "G" : `G+${upperFloors}`} | Ground Floor: ${parking ? "Parking" : "House"}`],
+    ["Configuration:", `${upperFloors === 0 ? "G" : `G+${upperFloors}`} | Ground Floor: ${result.groundUsage === "parking" ? "Parking" : result.groundUsage === "mixed" ? "Mixed" : "House"}`],
     [],
     ["BUILT-UP AREA BREAKDOWN"],
     ["Floor / Component", "Slab Area (sqft)", "% Applied", "Built-up Area (sqft)"],
     [`Plinth (Ground slab)`, result.plinthSlab, "50%", result.plinthArea],
-    ...result.rows.map((r, i): (string | number)[] => [r.label, r.slab, i === 0 && parking ? "50%" : "100%", r.builtUp]),
+    ...(result.groundUsage === "mixed"
+      ? [
+          ["Ground Floor - House Work", result.rows[0].houseArea ?? 0, "100%", result.rows[0].houseArea ?? 0] as (string | number)[],
+          ["Ground Floor - Parking", result.rows[0].parkingArea ?? 0, "50%", Math.round((result.rows[0].parkingArea ?? 0) * 0.5)] as (string | number)[],
+          ...result.rows.slice(1).map((r): (string | number)[] => [r.label, r.slab, "100%", r.builtUp]),
+        ]
+      : result.rows.map((r, i): (string | number)[] => [r.label, r.slab, i === 0 && result.groundUsage === "parking" ? "50%" : "100%", r.builtUp])
+    ),
     [`Terrace (Highest slab)`, result.topSlab, "35%", result.terraceArea],
     ["TOTAL BUILT-UP AREA", "", "", result.totalArea],
     [],
@@ -528,9 +555,12 @@ async function exportExcel(
   XLSX.writeFile(wb, `OneO_Buildcon_Quotation_${quotationNo}.xlsx`);
 }
 
-function buildFloorRows(upperFloors: number, parking: boolean): FloorRow[] {
+function buildFloorRows(upperFloors: number, groundUsage: GroundUsage): FloorRow[] {
+  const groundLabel = groundUsage === "parking" ? "Ground Floor (Parking)"
+    : groundUsage === "mixed" ? "Ground Floor (Mixed)"
+    : "Ground Floor (House)";
   const rows: FloorRow[] = [
-    { id: "ground", label: parking ? "Ground Floor (Parking)" : "Ground Floor (House)", slab: "" },
+    { id: "ground", label: groundLabel, slab: "" },
   ];
   for (let i = 1; i <= upperFloors; i++) {
     rows.push({ id: `f${i}`, label: `${i}${i === 1 ? "st" : i === 2 ? "nd" : i === 3 ? "rd" : "th"} Floor`, slab: "" });
@@ -543,8 +573,10 @@ export default function CalculatorPage() {
   const c = T[lang];
   const [selectedPkg, setSelectedPkg] = useState(packages[1]);
   const [upperFloors, setUpperFloors] = useState(0);
-  const [parking, setParking] = useState(false);
-  const [floorRows, setFloorRows] = useState<FloorRow[]>(buildFloorRows(0, false));
+  const [groundUsage, setGroundUsage] = useState<GroundUsage>("house");
+  const [groundHouseSqft, setGroundHouseSqft] = useState("");
+  const [groundParkingSqft, setGroundParkingSqft] = useState("");
+  const [floorRows, setFloorRows] = useState<FloorRow[]>(buildFloorRows(0, "house"));
   const [clientName, setClientName] = useState("");
   const [projectLocation, setProjectLocation] = useState("");
   const [clientPhone, setClientPhone] = useState("");
@@ -566,13 +598,13 @@ export default function CalculatorPage() {
       .catch(() => {});
   }, []);
 
-  // Rebuild floor rows when floor count or parking changes, preserve existing slab values
+  // Rebuild floor rows when floor count or ground usage changes, preserve existing slab values
   useEffect(() => {
     setFloorRows((prev) => {
-      const newRows = buildFloorRows(upperFloors, parking);
+      const newRows = buildFloorRows(upperFloors, groundUsage);
       return newRows.map((r, i) => ({ ...r, slab: prev[i]?.slab ?? "" }));
     });
-  }, [upperFloors, parking]);
+  }, [upperFloors, groundUsage]);
 
   function handleSubmitDetails() {
     const phone = clientPhone.replace(/\D/g, "");
@@ -607,19 +639,31 @@ export default function CalculatorPage() {
   }
 
   function calculate() {
+    const groundHouse = groundUsage === "mixed" ? (parseFloat(groundHouseSqft) || 0) : 0;
+    const groundParking = groundUsage === "mixed" ? (parseFloat(groundParkingSqft) || 0) : 0;
     const slabs = floorRows.map((r) => parseFloat(r.slab) || 0);
-    if (slabs.every((s) => s <= 0)) return;
 
-    const groundSlab = slabs[0];
-    const maxSlab = Math.max(...slabs);
+    const groundSlab = groundUsage === "mixed" ? (groundHouse + groundParking) : slabs[0];
+    if (groundUsage === "mixed" && groundSlab === 0 && slabs.slice(1).every(s => s <= 0)) return;
+    if (groundUsage !== "mixed" && slabs.every((s) => s <= 0)) return;
+
+    const maxSlab = Math.max(groundSlab, ...slabs.slice(1));
     const plinthArea = Math.round(groundSlab * 0.50);
     const terraceArea = Math.round(maxSlab * 0.35);
 
-    const rows = floorRows.map((r, i) => {
-      const slab = parseFloat(r.slab) || 0;
-      const pct = i === 0 && parking ? 0.50 : 1.00;
-      return { label: r.label, slab, builtUp: Math.round(slab * pct) };
-    });
+    const rows: ResultData["rows"] = [];
+    if (groundUsage === "mixed") {
+      const builtUp = Math.round(groundHouse * 1.00 + groundParking * 0.50);
+      rows.push({ label: "Ground Floor (Mixed)", slab: groundSlab, builtUp, houseArea: groundHouse, parkingArea: groundParking });
+    } else {
+      const slab = slabs[0];
+      const pct = groundUsage === "parking" ? 0.50 : 1.00;
+      rows.push({ label: floorRows[0].label, slab, builtUp: Math.round(slab * pct) });
+    }
+    for (let i = 1; i < floorRows.length; i++) {
+      const slab = slabs[i];
+      rows.push({ label: floorRows[i].label, slab, builtUp: Math.round(slab * 1.00) });
+    }
 
     const floorTotal = rows.reduce((s, r) => s + r.builtUp, 0);
     const totalArea = plinthArea + floorTotal + terraceArea;
@@ -627,13 +671,13 @@ export default function CalculatorPage() {
     const gstAmount = Math.round(base * 0.18);
     const total = base + gstAmount;
 
-    setResult({ rows, plinthSlab: groundSlab, topSlab: maxSlab, plinthArea, terraceArea, totalArea, base, gstAmount, total });
+    setResult({ rows, plinthSlab: groundSlab, topSlab: maxSlab, plinthArea, terraceArea, totalArea, base, gstAmount, total, groundUsage });
   }
 
   useEffect(() => {
     calculate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [floorRows, selectedPkg]);
+  }, [floorRows, selectedPkg, groundHouseSqft, groundParkingSqft, groundUsage]);
 
   return (
     <main className="overflow-hidden">
@@ -724,10 +768,14 @@ export default function CalculatorPage() {
               {/* Ground floor type */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
                 <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">{c.groundUsage}</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {[{ label: c.house, sub: c.housePct, value: false }, { label: c.parking, sub: c.parkingPct, value: true }].map((opt) => (
-                    <motion.button key={String(opt.value)} onClick={() => setParking(opt.value)} whileHover={{ scale: 1.02 }}
-                      className={`rounded-xl border-2 p-3 text-center transition-all ${parking === opt.value ? "border-amber bg-amber/10 shadow-md" : "border-black/10 bg-gray-50 hover:border-amber/40"}`}>
+                <div className="grid grid-cols-3 gap-3">
+                  {([
+                    { label: c.house, sub: c.housePct, value: "house" as GroundUsage },
+                    { label: c.parking, sub: c.parkingPct, value: "parking" as GroundUsage },
+                    { label: c.mixed, sub: c.mixedPct, value: "mixed" as GroundUsage },
+                  ]).map((opt) => (
+                    <motion.button key={opt.value} onClick={() => setGroundUsage(opt.value)} whileHover={{ scale: 1.02 }}
+                      className={`rounded-xl border-2 p-3 text-center transition-all ${groundUsage === opt.value ? "border-amber bg-amber/10 shadow-md" : "border-black/10 bg-gray-50 hover:border-amber/40"}`}>
                       <p className="font-semibold text-sm text-navy">{opt.label}</p>
                       <p className="text-[11px] text-navy/40 mt-0.5">{opt.sub}</p>
                     </motion.button>
@@ -754,17 +802,50 @@ export default function CalculatorPage() {
                 <p className="text-xs text-navy/40 mb-4">{c.slabNote}</p>
                 <div className="space-y-3">
                   {floorRows.map((row, i) => (
-                    <div key={row.id} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                      <span className="text-sm font-medium text-navy sm:w-44 sm:shrink-0">{displayFloorLabel(row.label, lang)}</span>
-                      <input
-                        type="number"
-                        value={row.slab}
-                        onChange={(e) => updateSlab(i, e.target.value)}
-                        placeholder={c.enterSqft}
-                        min={0}
-                        className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base font-bold text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
-                      />
-                    </div>
+                    i === 0 && groundUsage === "mixed" ? (
+                      <div key={row.id} className="rounded-xl border border-amber/30 bg-amber/5 p-3 space-y-2">
+                        <p className="text-sm font-semibold text-navy">{displayFloorLabel("Ground Floor (Mixed)", lang)}</p>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <div className="flex-1">
+                            <label className="text-[11px] text-navy/50 mb-1 block">{c.houseArea}</label>
+                            <input
+                              type="number"
+                              value={groundHouseSqft}
+                              onChange={(e) => setGroundHouseSqft(e.target.value)}
+                              placeholder={c.enterSqft}
+                              min={0}
+                              className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base font-bold text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <label className="text-[11px] text-navy/50 mb-1 block">{c.parkingArea}</label>
+                            <input
+                              type="number"
+                              value={groundParkingSqft}
+                              onChange={(e) => setGroundParkingSqft(e.target.value)}
+                              placeholder={c.enterSqft}
+                              min={0}
+                              className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base font-bold text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                            />
+                          </div>
+                        </div>
+                        {(parseFloat(groundHouseSqft) || 0) + (parseFloat(groundParkingSqft) || 0) > 0 && (
+                          <p className="text-[11px] text-navy/40">{c.groundTotal} {((parseFloat(groundHouseSqft) || 0) + (parseFloat(groundParkingSqft) || 0)).toLocaleString()} sqft</p>
+                        )}
+                      </div>
+                    ) : (
+                      <div key={row.id} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
+                        <span className="text-sm font-medium text-navy sm:w-44 sm:shrink-0">{displayFloorLabel(row.label, lang)}</span>
+                        <input
+                          type="number"
+                          value={row.slab}
+                          onChange={(e) => updateSlab(i, e.target.value)}
+                          placeholder={c.enterSqft}
+                          min={0}
+                          className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base font-bold text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                        />
+                      </div>
+                    )
                   ))}
                 </div>
               </motion.div>
@@ -840,7 +921,7 @@ export default function CalculatorPage() {
                     <div className="rounded-2xl bg-navy text-white shadow-xl overflow-hidden">
                       <div className="bg-amber/20 px-6 py-4 border-b border-white/10">
                         <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">{c.yourEstimate}</p>
-                        <p className="text-sm text-white/60 mt-0.5">{displayPkgName(selectedPkg.id, selectedPkg.name, lang)} · {upperFloors === 0 ? "G" : `G+${upperFloors}`} · {parking ? c.parking : c.house}</p>
+                        <p className="text-sm text-white/60 mt-0.5">{displayPkgName(selectedPkg.id, selectedPkg.name, lang)} · {upperFloors === 0 ? "G" : `G+${upperFloors}`} · {groundUsage === "parking" ? c.parking : groundUsage === "mixed" ? c.mixed : c.house}</p>
                       </div>
                       <div className="px-6 py-6">
                         <motion.p key={result.total} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-5xl font-black text-amber">
@@ -856,9 +937,16 @@ export default function CalculatorPage() {
                             <span>{result.plinthArea.toLocaleString()} sqft</span>
                           </div>
                           {result.rows.map((r) => (
-                            <div key={r.label} className="flex justify-between">
-                              <span className="text-white/60">{displayFloorLabel(r.label, lang)} ({r.slab.toLocaleString()} sqft)</span>
-                              <span>{r.builtUp.toLocaleString()} sqft</span>
+                            <div key={r.label}>
+                              <div className="flex justify-between">
+                                <span className="text-white/60">{displayFloorLabel(r.label, lang)} ({r.slab.toLocaleString()} sqft)</span>
+                                <span>{r.builtUp.toLocaleString()} sqft</span>
+                              </div>
+                              {r.houseArea !== undefined && r.parkingArea !== undefined && (
+                                <p className="text-[10px] text-white/30 pl-2 mt-0.5">
+                                  House {r.houseArea.toLocaleString()}@100% + Parking {r.parkingArea.toLocaleString()}@50%
+                                </p>
+                              )}
                             </div>
                           ))}
                           <div className="flex justify-between">
@@ -895,14 +983,14 @@ export default function CalculatorPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => result && exportPDF(result, selectedPkg, upperFloors, parking, true, clientName, projectLocation, pkgContent, cats)}
+                        onClick={() => result && exportPDF(result, selectedPkg, upperFloors, true, clientName, projectLocation, pkgContent, cats)}
                         className="flex items-center justify-center gap-2 rounded-xl bg-navy py-3 font-semibold text-white hover:bg-navy/90 transition text-sm"
                       >
                         <FileText className="h-4 w-4" /> {c.downloadPdf}
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => result && exportExcel(result, selectedPkg, upperFloors, parking, true, clientName, projectLocation, pkgContent, cats)}
+                        onClick={() => result && exportExcel(result, selectedPkg, upperFloors, true, clientName, projectLocation, pkgContent, cats)}
                         className="flex items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 transition text-sm"
                       >
                         <FileSpreadsheet className="h-4 w-4" /> {c.downloadExcel}
