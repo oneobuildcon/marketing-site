@@ -521,12 +521,45 @@ export default function Home() {
       {/* WHY CHOOSE US */}
       <section className="bg-white py-20">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 lg:grid-cols-2 items-center">
-          <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="relative h-96 w-full overflow-hidden rounded-2xl shadow-2xl bg-[radial-gradient(circle_at_50%_38%,#ffffff_0%,#dfe5ec_70%,#c7cfda_100%)]">
-            <Image src="/homepage.png" alt="Why choose One O Buildcon" fill className="object-contain object-center p-12 [filter:contrast(1.15)_saturate(1.2)_brightness(1.05)_drop-shadow(0_16px_22px_rgba(11,31,58,0.45))]" />
-            <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent" />
-            <div className="absolute bottom-6 left-6 rounded-lg bg-amber px-4 py-2">
-              <p className="font-bold text-navy-dark text-lg">{t.yearsLabel}</p>
-              <p className="text-xs text-navy-dark/80">{t.yearsSubLabel}</p>
+          <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="relative h-96 w-full overflow-hidden rounded-2xl shadow-2xl bg-navy">
+            {/* Blueprint grid texture */}
+            <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+            <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-amber/10 blur-2xl" />
+            <div className="absolute -left-8 bottom-0 h-40 w-40 rounded-full bg-amber/10 blur-2xl" />
+
+            <div className="relative flex h-full flex-col justify-between p-8">
+              {/* Brand mark */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber/15 border border-amber/30">
+                  <HardHat className="h-6 w-6 text-amber" strokeWidth={1.5} />
+                </div>
+                <div>
+                  <p className="font-bold text-white text-lg leading-tight">One O <span className="text-amber-light">Buildcon</span></p>
+                  <p className="text-xs text-white/50">{t.heroDesc.split("—")[0].trim().slice(0, 36)}…</p>
+                </div>
+              </div>
+
+              {/* Stat grid */}
+              <div className="grid grid-cols-2 gap-3">
+                {t.stats.map((stat) => (
+                  <div key={stat.label} className="rounded-xl bg-white/5 border border-white/10 px-4 py-3 backdrop-blur-sm">
+                    <p className="text-2xl font-black text-amber">{stat.value}{stat.suffix}</p>
+                    <p className="text-[11px] text-white/60 leading-tight mt-0.5">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Years badge */}
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-amber px-4 py-2">
+                  <p className="font-bold text-navy-dark text-lg leading-none">{t.yearsLabel}</p>
+                  <p className="text-[11px] text-navy-dark/80 mt-0.5">{t.yearsSubLabel}</p>
+                </div>
+                <div className="flex items-center gap-1.5 text-white/70 text-xs">
+                  <ShieldCheck className="h-4 w-4 text-amber" strokeWidth={1.5} />
+                  {lang === "en" ? "Licensed & Insured" : "परवानाधारक आणि विमाधारक"}
+                </div>
+              </div>
             </div>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
