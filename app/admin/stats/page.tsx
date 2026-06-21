@@ -7,13 +7,15 @@ export default function AdminStatsPage() {
   const [startYear, setStartYear] = useState("");
   const [clients, setClients] = useState("");
   const [cities, setCities] = useState("");
-  const [projects, setProjects] = useState<number | null>(null);
+  const [projectsBase, setProjectsBase] = useState("");
+  const [addedCount, setAddedCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
   const currentYear = new Date().getFullYear();
   const computedYears = startYear ? Math.max(1, currentYear - (parseInt(startYear, 10) || currentYear)) : null;
+  const projectsTotal = (parseInt(projectsBase, 10) || 0) + addedCount;
 
   useEffect(() => {
     Promise.all([
@@ -24,7 +26,10 @@ export default function AdminStatsPage() {
         setStartYear(String(cfg.startYear ?? ""));
         setClients(String(cfg.clients ?? ""));
         setCities(String(cfg.cities ?? ""));
-        setProjects(typeof live.projects === "number" ? live.projects : null);
+        setProjectsBase(String(cfg.projectsBase ?? ""));
+        // added = live total minus saved baseline = projects added through admin
+        const total = typeof live.projects === "number" ? live.projects : 0;
+        setAddedCount(Math.max(0, total - (Number(cfg.projectsBase) || 0)));
       })
       .catch(() => setMsg({ type: "err", text: "Could not load current stats." }))
       .finally(() => setLoading(false));
@@ -41,6 +46,7 @@ export default function AdminStatsPage() {
           startYear: parseInt(startYear, 10),
           clients: parseInt(clients, 10),
           cities: parseInt(cities, 10),
+          projectsBase: parseInt(projectsBase, 10),
         }),
       });
       if (!res.ok) {
@@ -66,7 +72,7 @@ export default function AdminStatsPage() {
           <BarChart3 className="h-6 w-6 text-amber" /> Homepage Stats
         </h1>
         <p className="text-sm text-navy/50 mt-1">
-          These are the four numbers shown on the homepage. Projects and Years update automatically — you only edit Clients and Cities (and your founding year).
+          These are the four numbers shown on the homepage. Projects and Years update automatically — you only set the starting baseline, your founding year, Clients and Cities.
         </p>
       </div>
 
@@ -76,9 +82,9 @@ export default function AdminStatsPage() {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-navy/5 mb-3">
             <FolderKanban className="h-5 w-5 text-navy" />
           </div>
-          <p className="text-3xl font-bold text-navy">{projects ?? "—"}</p>
+          <p className="text-3xl font-bold text-navy">{projectsTotal}+</p>
           <p className="text-sm text-navy/50 mt-0.5">Projects Completed <span className="text-emerald-600 font-medium">· auto</span></p>
-          <p className="text-xs text-navy/40 mt-1">Counts every project you add. Add a project to increase this.</p>
+          <p className="text-xs text-navy/40 mt-1">{projectsBase || 0} baseline + {addedCount} added in admin. Add a project to increase this.</p>
         </div>
         <div className="rounded-2xl bg-white border border-black/8 shadow-sm p-5">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber/10 mb-3">
@@ -92,6 +98,17 @@ export default function AdminStatsPage() {
 
       {/* Editable fields */}
       <div className="rounded-2xl bg-white border border-black/8 shadow-sm p-6 space-y-5">
+        <div>
+          <label className="block text-sm font-semibold text-navy mb-1.5">Starting Project Count (baseline)</label>
+          <input
+            type="number"
+            value={projectsBase}
+            onChange={(e) => setProjectsBase(e.target.value)}
+            min={0}
+            className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base font-medium text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+          />
+          <p className="text-xs text-navy/40 mt-1">Projects you completed before tracking (set to 20). Every new project you add in admin is added on top automatically — shown as "{projectsTotal}+".</p>
+        </div>
         <div>
           <label className="block text-sm font-semibold text-navy mb-1.5">Founding Year</label>
           <input

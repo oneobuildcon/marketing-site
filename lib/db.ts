@@ -104,6 +104,24 @@ export async function getProjects(): Promise<DbProject[]> {
   }
 }
 
+// Real number of projects in the DB table (0 if no DB / empty / error).
+// Unlike getProjects(), this does NOT fall back to the static portfolio, so it
+// only reflects projects actually added through the admin panel.
+export async function getProjectsCount(): Promise<number> {
+  if (!hasSupabase()) return 0;
+  try {
+    const supabase = createServerClient();
+    const { count, error } = await supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true });
+    if (error) throw error;
+    return count ?? 0;
+  } catch (e) {
+    console.error('getProjectsCount: returning 0:', e);
+    return 0;
+  }
+}
+
 export async function getProject(slug: string): Promise<DbProject | null> {
   if (!hasSupabase()) {
     const p = staticProjects.find((x) => x.slug === slug);

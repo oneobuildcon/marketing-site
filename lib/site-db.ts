@@ -57,10 +57,10 @@ export async function savePackagesData(value: PackagesData): Promise<void> {
 // ── Homepage stats ──────────────────────────────────────────────────────────
 // "projects" auto-counts from the projects table; "years" auto-ticks from the
 // founding year; "clients" and "cities" are admin-editable numbers.
-export type HomeStatsConfig = { startYear: number; clients: number; cities: number };
+export type HomeStatsConfig = { startYear: number; clients: number; cities: number; projectsBase: number };
 export type HomeStats = { projects: number; years: number; clients: number; cities: number };
 
-const DEFAULT_HOME_STATS: HomeStatsConfig = { startYear: 2020, clients: 25, cities: 2 };
+const DEFAULT_HOME_STATS: HomeStatsConfig = { startYear: 2020, clients: 25, cities: 2, projectsBase: 20 };
 
 export async function getHomeStatsConfig(): Promise<HomeStatsConfig> {
   if (!hasSupabase()) return DEFAULT_HOME_STATS;
@@ -78,6 +78,7 @@ export async function getHomeStatsConfig(): Promise<HomeStatsConfig> {
         startYear: Number(v.startYear) || DEFAULT_HOME_STATS.startYear,
         clients: Number(v.clients) || DEFAULT_HOME_STATS.clients,
         cities: Number(v.cities) || DEFAULT_HOME_STATS.cities,
+        projectsBase: v.projectsBase == null ? DEFAULT_HOME_STATS.projectsBase : Number(v.projectsBase),
       };
     }
   } catch (e) {
@@ -94,10 +95,12 @@ export async function saveHomeStatsConfig(value: HomeStatsConfig): Promise<void>
   if (error) throw error;
 }
 
-export async function getHomeStats(projectsCount: number): Promise<HomeStats> {
+// addedCount = projects actually added through the admin panel. The displayed
+// "Projects Completed" is the baseline (work done before tracking) plus those.
+export async function getHomeStats(addedCount: number): Promise<HomeStats> {
   const cfg = await getHomeStatsConfig();
   const years = Math.max(1, new Date().getFullYear() - cfg.startYear);
-  return { projects: projectsCount, years, clients: cfg.clients, cities: cfg.cities };
+  return { projects: cfg.projectsBase + addedCount, years, clients: cfg.clients, cities: cfg.cities };
 }
 
 export type Lead = { id: string; created_at: string; data: Record<string, unknown> };

@@ -18,11 +18,12 @@ export async function PUT(req: NextRequest) {
       startYear: Number(body.startYear),
       clients: Number(body.clients),
       cities: Number(body.cities),
+      projectsBase: Number(body.projectsBase),
     };
     if (!value.startYear || value.startYear < 1990 || value.startYear > new Date().getFullYear()) {
       return NextResponse.json({ error: 'Invalid founding year' }, { status: 400 });
     }
-    if (value.clients < 0 || value.cities < 0) {
+    if (value.clients < 0 || value.cities < 0 || value.projectsBase < 0 || Number.isNaN(value.projectsBase)) {
       return NextResponse.json({ error: 'Numbers must be positive' }, { status: 400 });
     }
     await saveHomeStatsConfig(value);

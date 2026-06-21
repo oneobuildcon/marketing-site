@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { unstable_noStore as noStore } from 'next/cache';
 import { getHomeStats } from '@/lib/site-db';
-import { getProjects } from '@/lib/db';
+import { getProjectsCount } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -10,8 +10,8 @@ export const fetchCache = 'force-no-store';
 export async function GET() {
   noStore();
   try {
-    const projects = await getProjects();
-    const stats = await getHomeStats(projects.length);
+    const addedCount = await getProjectsCount();
+    const stats = await getHomeStats(addedCount);
     return new NextResponse(JSON.stringify(stats), {
       headers: {
         'content-type': 'application/json',
