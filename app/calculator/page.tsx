@@ -127,6 +127,19 @@ const T = {
   },
 };
 
+// Marathi display names for packages (stored English names are used in the PDF).
+const pkgNameMr: Record<string, string> = {
+  structure: "फक्त स्ट्रक्चर",
+  basic: "बेसिक",
+  standard: "स्टँडर्ड",
+  premium: "प्रीमियम",
+  royal: "रॉयल",
+  luxury: "लक्झरी",
+};
+function displayPkgName(id: string, name: string, lang: "en" | "mr"): string {
+  return lang === "mr" ? (pkgNameMr[id] ?? name) : name;
+}
+
 // Translate a stored (English) floor label for display only — the stored label
 // itself stays English so the generated PDF/Excel render correctly.
 function displayFloorLabel(label: string, lang: "en" | "mr"): string {
@@ -694,7 +707,7 @@ export default function CalculatorPage() {
                         <div className={`mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full ${isSelected ? "bg-amber/20" : "bg-navy/5"}`}>
                           <span className={`text-lg font-black ${isSelected ? "text-amber" : "text-navy/40"}`}>{String(i + 1).padStart(2, "0")}</span>
                         </div>
-                        <p className={`font-bold text-sm ${isSelected ? "text-white" : "text-navy"}`}>{pkg.name}</p>
+                        <p className={`font-bold text-sm ${isSelected ? "text-white" : "text-navy"}`}>{displayPkgName(pkg.id, pkg.name, lang)}</p>
                         <p className="text-xs mt-1 font-semibold text-amber">₹{pkg.price}</p>
                         <p className={`text-[10px] ${isSelected ? "text-white/50" : "text-navy/40"}`}>{c.perSqft}</p>
                         {isSelected && (
@@ -827,7 +840,7 @@ export default function CalculatorPage() {
                     <div className="rounded-2xl bg-navy text-white shadow-xl overflow-hidden">
                       <div className="bg-amber/20 px-6 py-4 border-b border-white/10">
                         <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">{c.yourEstimate}</p>
-                        <p className="text-sm text-white/60 mt-0.5">{selectedPkg.name} · {upperFloors === 0 ? "G" : `G+${upperFloors}`} · {parking ? c.parking : c.house}</p>
+                        <p className="text-sm text-white/60 mt-0.5">{displayPkgName(selectedPkg.id, selectedPkg.name, lang)} · {upperFloors === 0 ? "G" : `G+${upperFloors}`} · {parking ? c.parking : c.house}</p>
                       </div>
                       <div className="px-6 py-6">
                         <motion.p key={result.total} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-5xl font-black text-amber">
