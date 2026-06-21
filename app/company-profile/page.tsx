@@ -19,7 +19,7 @@ const t = {
     rating: "5.0 Rating on Google",
     about: "About Us",
     aboutText:
-      "One O Buildcon is a Pune-based construction company specializing in premium residential, commercial and farmhouse projects. With 6+ years of experience and 20+ completed projects, we provide end-to-end construction solutions — from planning and RCC work to interior finishing — ensuring quality, transparency and timely delivery on every site we take on.",
+      "One O Buildcon is a Pune-based construction company specializing in premium residential, commercial and farmhouse projects. With {YEARS}+ years of experience and {PROJECTS}+ completed projects, we provide end-to-end construction solutions — from planning and RCC work to interior finishing — ensuring quality, transparency and timely delivery on every site we take on.",
     founderTitle: "Our Commitment",
     founderName: "Avinash Shinde",
     founderRole: "Managing Director",
@@ -98,7 +98,7 @@ const t = {
     rating: "गूगलवर ५.० रेटिंग",
     about: "आमच्याबद्दल",
     aboutText:
-      "वन ओ बिल्डकॉन ही पुणेस्थित बांधकाम कंपनी आहे, जी प्रीमियम निवासी, व्यावसायिक आणि फार्महाउस प्रकल्पांमध्ये तज्ञ आहे. ६+ वर्षांचा अनुभव आणि २०+ पूर्ण झालेल्या प्रकल्पांसह, आम्ही नियोजन आणि आरसीसी कामापासून इंटेरियर फिनिशिंगपर्यंत संपूर्ण बांधकाम उपाय देतो — प्रत्येक साइटवर दर्जा, पारदर्शकता आणि वेळेवर पूर्णत्वाची हमी देत.",
+      "वन ओ बिल्डकॉन ही पुणेस्थित बांधकाम कंपनी आहे, जी प्रीमियम निवासी, व्यावसायिक आणि फार्महाउस प्रकल्पांमध्ये तज्ञ आहे. {YEARS}+ वर्षांचा अनुभव आणि {PROJECTS}+ पूर्ण झालेल्या प्रकल्पांसह, आम्ही नियोजन आणि आरसीसी कामापासून इंटेरियर फिनिशिंगपर्यंत संपूर्ण बांधकाम उपाय देतो — प्रत्येक साइटवर दर्जा, पारदर्शकता आणि वेळेवर पूर्णत्वाची हमी देत.",
     founderTitle: "आमची बांधिलकी",
     founderName: "अविनाश शिंदे",
     founderRole: "व्यवस्थापकीय संचालक",
@@ -236,6 +236,15 @@ export default function CompanyProfilePage() {
     };
   }, []);
 
+  // Live homepage stats (admin-managed) so the profile matches the website.
+  const [liveStats, setLiveStats] = useState<{ projects: number; years: number; clients: number; cities: number } | null>(null);
+  useEffect(() => {
+    fetch("/api/site-stats", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d && typeof d.projects === "number") setLiveStats(d); })
+      .catch(() => {});
+  }, []);
+
   // Total square footage built — summed live from every project's area.
   const totalSqft = projects.reduce((sum, p) => {
     const n = parseInt((p.area || "").replace(/[^0-9]/g, ""), 10);
@@ -244,10 +253,10 @@ export default function CompanyProfilePage() {
   const sqftDisplay = `${(Math.floor(totalSqft / 1000) * 1000).toLocaleString("en-IN")}+`;
 
   const statValues = [
-    { v: "20+", icon: Building2 },
+    { v: `${liveStats?.projects ?? 20}+`, icon: Building2 },
     { v: sqftDisplay, icon: Ruler },
-    { v: "25+", icon: Users },
-    { v: "6+", icon: CalendarDays },
+    { v: `${liveStats?.clients ?? 25}+`, icon: Users },
+    { v: `${liveStats?.years ?? 6}+`, icon: CalendarDays },
   ];
 
   const handleDownload = async () => {
@@ -422,7 +431,11 @@ export default function CompanyProfilePage() {
           {/* About */}
           <section>
             <h2 className="mb-3 border-l-4 border-amber pl-3 font-display text-xl font-bold">{c.about}</h2>
-            <p className="leading-loose text-gray-700">{c.aboutText}</p>
+            <p className="leading-loose text-gray-700">
+              {c.aboutText
+                .replace("{YEARS}", String(liveStats?.years ?? 6))
+                .replace("{PROJECTS}", String(liveStats?.projects ?? 20))}
+            </p>
           </section>
 
           {/* Stats — corporate navy band */}
