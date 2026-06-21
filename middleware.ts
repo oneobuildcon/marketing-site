@@ -11,13 +11,13 @@ export async function middleware(request: NextRequest) {
   const isAdminApi = pathname.startsWith('/api/admin') && !isAuthApi;
   const isLoginPath = pathname === '/admin/login';
 
-  if (isAuthApi) return pass();
-
   // Forward the current pathname to server components via a request header,
   // so the admin layout can tell the login route apart from the shell.
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-pathname', pathname);
   const pass = () => NextResponse.next({ request: { headers: requestHeaders } });
+
+  if (isAuthApi) return pass();
 
   if (!isAdminPath && !isAdminApi) return pass();
 
