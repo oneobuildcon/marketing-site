@@ -75,7 +75,7 @@ export default function RootLayout({
     description:
       "One O Buildcon is a trusted construction company in Pune specialising in premium bungalows, row houses, residential buildings and farmhouses.",
     url: "https://oneobuildcon.com",
-    telephone: "+918806029907",
+    telephone: "+919607407474",
     email: "oneobuildcon@gmail.com",
     address: {
       "@type": "PostalAddress",
@@ -87,7 +87,7 @@ export default function RootLayout({
     openingHoursSpecification: [
       { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], opens: "09:00", closes: "18:00" },
     ],
-    sameAs: ["https://wa.me/918806029907"],
+    sameAs: ["https://wa.me/919607407474"],
     priceRange: "₹₹₹",
     areaServed: { "@type": "State", name: "Maharashtra" },
     knowsAbout: ["Bungalow Construction","Row House Construction","Residential Building","Farmhouse Construction","RCC Contractors","Home Construction Pune"],

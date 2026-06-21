@@ -406,8 +406,8 @@ export default function CompanyProfilePage() {
               <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 font-semibold text-white">
                 <Star className="h-4 w-4 fill-amber text-amber" /> {c.rating}
               </span>
-              <a href="tel:+918806029907" className="flex items-center gap-1.5">
-                <PhoneIcon className="h-3.5 w-3.5 text-amber" /> +91 88060 29907
+              <a href="tel:+919607407474" className="flex items-center gap-1.5">
+                <PhoneIcon className="h-3.5 w-3.5 text-amber" /> +91 96074 07474
               </a>
               <a href={WEBSITE} className="flex items-center gap-1.5">
                 <Globe className="h-3.5 w-3.5 text-amber" /> oneobuildcon.com
@@ -686,7 +686,7 @@ export default function CompanyProfilePage() {
             <p className="mb-4 text-sm text-white/70">{c.contactSub}</p>
             {/* Lead-generation call-to-action */}
             <a
-              href="tel:+918806029907"
+              href="tel:+919607407474"
               className="mb-6 flex flex-col items-start gap-2 rounded-lg border border-amber/40 bg-amber/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
             >
               <span className="font-display text-lg font-bold text-amber-light">{c.ctaTitle}</span>
@@ -696,10 +696,10 @@ export default function CompanyProfilePage() {
             </a>
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-3.5 text-base sm:text-lg">
-                <a href="tel:+918806029907" className="flex items-center gap-2.5">
-                  <Phone className="h-5 w-5 shrink-0 text-amber" /> +91 88060 29907
+                <a href="tel:+919607407474" className="flex items-center gap-2.5">
+                  <Phone className="h-5 w-5 shrink-0 text-amber" /> +91 96074 07474
                 </a>
-                <a href="https://wa.me/918806029907" className="flex items-center gap-2.5">
+                <a href="https://wa.me/919607407474" className="flex items-center gap-2.5">
                   <MessageCircle className="h-5 w-5 shrink-0 text-amber" /> WhatsApp
                 </a>
                 <a href="mailto:oneobuildcon@gmail.com" className="flex items-center gap-2.5 break-all">

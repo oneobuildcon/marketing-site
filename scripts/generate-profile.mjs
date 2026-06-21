@@ -30,7 +30,7 @@ function footer(page) {
   const y = 287;
   setDraw(MGRAY); doc.line(14, y, W - 14, y);
   doc.setFontSize(7.5); doc.setFont("helvetica", "normal"); setTxt(DGRAY);
-  doc.text("One O Buildcon  |  +91 88060 29907  |  oneobuildcon@gmail.com  |  Pune, Maharashtra, India", W / 2, y + 4, { align: "center" });
+  doc.text("One O Buildcon  |  +91 96074 07474  |  oneobuildcon@gmail.com  |  Pune, Maharashtra, India", W / 2, y + 4, { align: "center" });
   doc.text(`Page ${page}`, W - 14, y + 4, { align: "right" });
 }
 
@@ -91,7 +91,7 @@ doc.text("Residential  ·  Commercial  ·  Renovation", W / 2, 183, { align: "ce
 // Contact band
 setFill(LGRAY); doc.rect(0, 200, W, 24, "F");
 doc.setFontSize(10); doc.setFont("helvetica", "bold"); setTxt(NAVY);
-doc.text("+91 88060 29907", 30, 214);
+doc.text("+91 96074 07474", 30, 214);
 doc.text("oneobuildcon@gmail.com", W / 2, 214, { align: "center" });
 doc.text("Pune, Maharashtra, India", W - 30, 214, { align: "right" });
 
@@ -299,11 +299,11 @@ setFill(LGRAY); doc.roundedRect(14, y, W - 28, 48, 3, 3, "F");
 setFill(AMBER); doc.rect(14, y, 3, 48, "F");
 
 y += 8;
-y = infoRow("Phone :", "+91 88060 29907", 22, y);
+y = infoRow("Phone :", "+91 96074 07474", 22, y);
 y = infoRow("Email :", "oneobuildcon@gmail.com", 22, y);
 y = infoRow("Address :", "Pune, Maharashtra, India", 22, y);
 y = infoRow("Hours :", "Monday – Saturday, 9:00 AM – 6:00 PM", 22, y);
-y = infoRow("WhatsApp :", "+91 88060 29907 (Quick responses)", 22, y);
+y = infoRow("WhatsApp :", "+91 96074 07474 (Quick responses)", 22, y);
 
 y += 8;
 

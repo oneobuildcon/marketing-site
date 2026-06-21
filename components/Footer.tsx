@@ -46,7 +46,7 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold text-white">{t.contact}</h4>
           <ul className="mt-2 space-y-1 text-sm">
-            <li>{t.phone}: +91 88060 29907</li>
+            <li>{t.phone}: +91 96074 07474</li>
             <li>{t.email}: oneobuildcon@gmail.com</li>
             <li>{t.address}: Pune, Maharashtra, India</li>
           </ul>

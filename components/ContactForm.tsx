@@ -160,7 +160,7 @@ export default function ContactForm() {
       </button>
       {status === "error" && (
         <p role="alert" className="text-sm text-red-600">
-          Something went wrong. Please try again, or call us at +91 88060 29907.
+          Something went wrong. Please try again, or call us at +91 96074 07474.
         </p>
       )}
     </form>

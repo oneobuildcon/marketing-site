@@ -25,7 +25,7 @@ const translations = {
     getInTouch: "Get in Touch",
     sendMessage: "Send a Message",
     contactInfo: [
-      { label: "Phone", value: "+91 88060 29907" },
+      { label: "Phone", value: "+91 96074 07474" },
       { label: "Email", value: "oneobuildcon@gmail.com" },
       { label: "Address", value: "Pune, Maharashtra, India" },
       { label: "Hours", value: "Mon - Sat, 9am - 6pm" },
@@ -39,7 +39,7 @@ const translations = {
     getInTouch: "संपर्क करा",
     sendMessage: "संदेश पाठवा",
     contactInfo: [
-      { label: "फोन", value: "+91 88060 29907" },
+      { label: "फोन", value: "+91 96074 07474" },
       { label: "ईमेल", value: "oneobuildcon@gmail.com" },
       { label: "पत्ता", value: "पुणे, महाराष्ट्र, भारत" },
       { label: "वेळ", value: "सोम - शनि, सकाळी ९ - संध्या ६" },

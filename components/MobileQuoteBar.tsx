@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Phone, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 
-const PHONE = "+918806029907";
+const PHONE = "+919607407474";
 
 export default function MobileQuoteBar() {
   const { lang } = useLanguage();

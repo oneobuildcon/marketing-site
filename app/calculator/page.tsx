@@ -4,12 +4,139 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { HardHat, Calculator, Phone, ArrowRight, Info, FileText, FileSpreadsheet, ChevronDown } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
 import {
   defaultPackageContent,
   categories as defaultCategories,
   type PackageContent,
   type CategoryMeta,
 } from "@/data/packagesData";
+
+const T = {
+  en: {
+    freeTool: "Free Tool",
+    title1: "Construction",
+    titleHi: "Cost Calculator",
+    heroSub: "Get an instant estimate — enter each floor's slab area and see your total built-up area and cost.",
+    estimateOnly: "Estimate only — final cost depends on site conditions and finishes.",
+    selectPackage: "Select Package",
+    popular: "Popular",
+    perSqft: "per sqft",
+    groundUsage: "Ground Floor Usage",
+    house: "House / Residential",
+    housePct: "100% of slab",
+    parking: "Parking",
+    parkingPct: "50% of slab",
+    upperFloors: "Upper Floors (above Ground)",
+    none: "None",
+    slabPerFloor: "Slab Area per Floor (sq ft)",
+    slabNote: "Plinth & Terrace calculated from the largest slab area automatically.",
+    enterSqft: "Enter sqft",
+    yourDetails: "Your Details",
+    detailsNote: "Fill in your details and click Submit to view your estimate.",
+    yourName: "Your Name",
+    projectLocation: "Project Location",
+    mobile: "Mobile Number",
+    namePh: "e.g. Rajesh Sharma",
+    locationPh: "e.g. Kothrud, Pune",
+    phonePh: "98765 43210",
+    submit: "Submit & See My Estimate →",
+    submitted: "✓ Details submitted — your estimate is ready on the right.",
+    errName: "Please enter your name.",
+    errLocation: "Please enter your project location.",
+    errPhone: "Enter a valid 10-digit mobile number.",
+    yourEstimate: "Your Estimate",
+    totalCostIncl: "Total estimated cost (incl. 18% GST)",
+    areaBreakdown: "Built-up Area Breakdown",
+    plinthLabel: (s: string) => `Plinth (50% of ground ${s} sqft)`,
+    terraceLabel: (s: string) => `Terrace (35% of highest slab ${s} sqft)`,
+    totalArea: "Total Built-up Area",
+    gst: "GST (18%)",
+    total: "Total",
+    downloadPdf: "Download PDF",
+    downloadExcel: "Download Excel",
+    ctaTitle: "Get an accurate quote!",
+    ctaSub: "This is an estimate. Our team will give you a detailed, site-specific quote — free of charge.",
+    getQuote: "Get Free Quote →",
+    whatsapp: "WhatsApp Us",
+    emptyTitle: "Submit your details to see the estimate",
+    emptySub1: "Enter your",
+    emptyName: "Name",
+    emptyLoc: "Project Location",
+    emptyMob: "Mobile Number",
+    emptySub2: "and click",
+    emptySub3: ", then fill in the floor slab areas to view your cost estimate.",
+    emptyFlow: "Submit details → Select package → Enter slab areas",
+    disclaimer: "Disclaimer: This calculator provides an approximate estimate based on standard construction rates in Pune, Maharashtra. Actual costs may vary depending on site conditions, material choices, design complexity, and current market rates. Contact us for a detailed, accurate quotation.",
+  },
+  mr: {
+    freeTool: "मोफत साधन",
+    title1: "बांधकाम",
+    titleHi: "खर्च कॅल्क्युलेटर",
+    heroSub: "त्वरित अंदाज मिळवा — प्रत्येक मजल्याचे स्लॅब क्षेत्र भरा आणि तुमचे एकूण बांधकाम क्षेत्र व खर्च पाहा.",
+    estimateOnly: "केवळ अंदाज — अंतिम खर्च साइट परिस्थिती आणि फिनिशवर अवलंबून असतो.",
+    selectPackage: "पॅकेज निवडा",
+    popular: "लोकप्रिय",
+    perSqft: "प्रति चौ.फू.",
+    groundUsage: "तळमजल्याचा वापर",
+    house: "घर / निवासी",
+    housePct: "स्लॅबच्या १००%",
+    parking: "पार्किंग",
+    parkingPct: "स्लॅबच्या ५०%",
+    upperFloors: "वरचे मजले (तळमजल्याच्या वर)",
+    none: "नाही",
+    slabPerFloor: "प्रति मजला स्लॅब क्षेत्र (चौ.फू.)",
+    slabNote: "प्लिंथ व टेरेस सर्वात मोठ्या स्लॅब क्षेत्रावरून आपोआप मोजले जाते.",
+    enterSqft: "चौ.फू. भरा",
+    yourDetails: "तुमची माहिती",
+    detailsNote: "तुमची माहिती भरा आणि अंदाज पाहण्यासाठी सबमिट क्लिक करा.",
+    yourName: "तुमचे नाव",
+    projectLocation: "प्रकल्पाचे ठिकाण",
+    mobile: "मोबाईल नंबर",
+    namePh: "उदा. राजेश शर्मा",
+    locationPh: "उदा. कोथरूड, पुणे",
+    phonePh: "98765 43210",
+    submit: "सबमिट करा आणि अंदाज पाहा →",
+    submitted: "✓ माहिती सबमिट झाली — तुमचा अंदाज उजवीकडे तयार आहे.",
+    errName: "कृपया तुमचे नाव भरा.",
+    errLocation: "कृपया प्रकल्पाचे ठिकाण भरा.",
+    errPhone: "वैध १० अंकी मोबाईल नंबर भरा.",
+    yourEstimate: "तुमचा अंदाज",
+    totalCostIncl: "एकूण अंदाजित खर्च (१८% GST सह)",
+    areaBreakdown: "बांधकाम क्षेत्राचा तपशील",
+    plinthLabel: (s: string) => `प्लिंथ (तळ ${s} चौ.फू. च्या ५०%)`,
+    terraceLabel: (s: string) => `टेरेस (सर्वात मोठ्या स्लॅब ${s} चौ.फू. च्या ३५%)`,
+    totalArea: "एकूण बांधकाम क्षेत्र",
+    gst: "GST (१८%)",
+    total: "एकूण",
+    downloadPdf: "PDF डाउनलोड करा",
+    downloadExcel: "Excel डाउनलोड करा",
+    ctaTitle: "अचूक कोटेशन मिळवा!",
+    ctaSub: "हा एक अंदाज आहे. आमची टीम तुम्हाला तपशीलवार, साइट-विशिष्ट कोटेशन देईल — पूर्णपणे मोफत.",
+    getQuote: "मोफत कोटेशन →",
+    whatsapp: "व्हॉट्सअ‍ॅप करा",
+    emptyTitle: "अंदाज पाहण्यासाठी तुमची माहिती सबमिट करा",
+    emptySub1: "तुमचे",
+    emptyName: "नाव",
+    emptyLoc: "प्रकल्पाचे ठिकाण",
+    emptyMob: "मोबाईल नंबर",
+    emptySub2: "भरा आणि",
+    emptySub3: "क्लिक करा, नंतर खर्चाचा अंदाज पाहण्यासाठी मजल्यांचे स्लॅब क्षेत्र भरा.",
+    emptyFlow: "माहिती सबमिट करा → पॅकेज निवडा → स्लॅब क्षेत्र भरा",
+    disclaimer: "अस्वीकरण: हे कॅल्क्युलेटर पुणे, महाराष्ट्रातील मानक बांधकाम दरांवर आधारित अंदाजे अंदाज देते. प्रत्यक्ष खर्च साइट परिस्थिती, साहित्य निवड, डिझाइन जटिलता आणि सध्याच्या बाजारभावानुसार बदलू शकतो. तपशीलवार, अचूक कोटेशनसाठी आमच्याशी संपर्क साधा.",
+  },
+};
+
+// Translate a stored (English) floor label for display only — the stored label
+// itself stays English so the generated PDF/Excel render correctly.
+function displayFloorLabel(label: string, lang: "en" | "mr"): string {
+  if (lang === "en") return label;
+  if (label === "Ground Floor (Parking)") return "तळमजला (पार्किंग)";
+  if (label === "Ground Floor (House)") return "तळमजला (घर)";
+  const m = label.match(/^(\d+)/);
+  if (m) return `${m[1]}वा मजला`;
+  return label;
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -72,7 +199,7 @@ async function exportPDF(
     doc.setFontSize(7.5);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(150, 150, 150);
-    doc.text("One O Buildcon  |  +91 88060 29907  |  oneobuildcon@gmail.com", W / 2, footerY + 2, { align: "center" });
+    doc.text("One O Buildcon  |  +91 96074 07474  |  oneobuildcon@gmail.com", W / 2, footerY + 2, { align: "center" });
     doc.text(`Page ${pageNum}`, W - 14, footerY + 2, { align: "right" });
   }
 
@@ -90,7 +217,7 @@ async function exportPDF(
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(255, 255, 255);
-  doc.text("Pune, Maharashtra  |  +91 88060 29907  |  oneobuildcon@gmail.com", 14, 24);
+  doc.text("Pune, Maharashtra  |  +91 96074 07474  |  oneobuildcon@gmail.com", 14, 24);
   // Quotation label on right
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
@@ -353,7 +480,7 @@ async function exportExcel(
     ["TOTAL ESTIMATED COST", "", "", result.total],
     [],
     ["Disclaimer: This is an approximate estimate. Contact One O Buildcon for an accurate site-specific quotation."],
-    ["Phone: +91 88060 29907 | Email: oneobuildcon@gmail.com | Pune, Maharashtra"],
+    ["Phone: +91 96074 07474 | Email: oneobuildcon@gmail.com | Pune, Maharashtra"],
   ];
 
   const ws1 = XLSX.utils.aoa_to_sheet(areaRows);
@@ -379,7 +506,7 @@ async function exportExcel(
   });
 
   detailRows.push(["Disclaimer: Package inclusions are indicative. Exact specifications may be finalised during project consultation."]);
-  detailRows.push(["One O Buildcon | +91 88060 29907 | oneobuildcon@gmail.com | Pune, Maharashtra"]);
+  detailRows.push(["One O Buildcon | +91 96074 07474 | oneobuildcon@gmail.com | Pune, Maharashtra"]);
 
   const ws2 = XLSX.utils.aoa_to_sheet(detailRows);
   ws2["!cols"] = [{ wch: 30 }, { wch: 70 }];
@@ -399,6 +526,8 @@ function buildFloorRows(upperFloors: number, parking: boolean): FloorRow[] {
 }
 
 export default function CalculatorPage() {
+  const { lang } = useLanguage();
+  const c = T[lang];
   const [selectedPkg, setSelectedPkg] = useState(packages[1]);
   const [upperFloors, setUpperFloors] = useState(0);
   const [parking, setParking] = useState(false);
@@ -434,10 +563,10 @@ export default function CalculatorPage() {
 
   function handleSubmitDetails() {
     const phone = clientPhone.replace(/\D/g, "");
-    if (!clientName.trim()) { setDetailsError("Please enter your name."); return; }
-    if (!projectLocation.trim()) { setDetailsError("Please enter your project location."); return; }
+    if (!clientName.trim()) { setDetailsError(c.errName); return; }
+    if (!projectLocation.trim()) { setDetailsError(c.errLocation); return; }
     if (phone.length !== 10 || !/^[6-9]/.test(phone)) {
-      setDetailsError("Enter a valid 10-digit mobile number.");
+      setDetailsError(c.errPhone);
       return;
     }
     setDetailsError("");
@@ -512,19 +641,19 @@ export default function CalculatorPage() {
           <motion.div initial="hidden" animate="visible" variants={stagger}>
             <motion.div variants={fadeUp} className="flex items-center gap-2 mb-3">
               <Calculator className="h-5 w-5 text-amber" />
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">Free Tool</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">{c.freeTool}</p>
             </motion.div>
             <motion.h1 variants={fadeUp} className="text-4xl font-bold sm:text-5xl">
-              Construction <span className="text-amber">Cost Calculator</span>
+              {c.title1} <span className="text-amber">{c.titleHi}</span>
             </motion.h1>
             <motion.p variants={fadeUp} className="mt-3 max-w-2xl text-white/80 text-lg">
-              Get an instant estimate — enter each floor&apos;s slab area and see your total built-up area and cost.
+              {c.heroSub}
             </motion.p>
             <motion.div variants={fadeUp} className="relative mt-4 h-0.5 w-24 bg-amber/40 overflow-hidden rounded-full">
               <div className="absolute inset-y-0 w-12 bg-amber/80 rounded-full" style={{ animation: "shimmerLine 2s ease-in-out infinite" }} />
             </motion.div>
             <motion.p variants={fadeUp} className="mt-3 flex items-center gap-1 text-xs text-white/50">
-              <Info className="h-3 w-3" /> Estimate only — final cost depends on site conditions and finishes.
+              <Info className="h-3 w-3" /> {c.estimateOnly}
             </motion.p>
           </motion.div>
         </div>
@@ -540,7 +669,7 @@ export default function CalculatorPage() {
 
               {/* Package selector */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
-                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Select Package</label>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">{c.selectPackage}</label>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {packages.map((pkg, i) => {
                     const isSelected = selectedPkg.id === pkg.id;
@@ -559,7 +688,7 @@ export default function CalculatorPage() {
                       >
                         {isPopular && !isSelected && (
                           <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-amber px-2 py-0.5 text-[10px] font-bold text-navy-dark whitespace-nowrap">
-                            Popular
+                            {c.popular}
                           </span>
                         )}
                         <div className={`mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full ${isSelected ? "bg-amber/20" : "bg-navy/5"}`}>
@@ -567,7 +696,7 @@ export default function CalculatorPage() {
                         </div>
                         <p className={`font-bold text-sm ${isSelected ? "text-white" : "text-navy"}`}>{pkg.name}</p>
                         <p className="text-xs mt-1 font-semibold text-amber">₹{pkg.price}</p>
-                        <p className={`text-[10px] ${isSelected ? "text-white/50" : "text-navy/40"}`}>per sqft</p>
+                        <p className={`text-[10px] ${isSelected ? "text-white/50" : "text-navy/40"}`}>{c.perSqft}</p>
                         {isSelected && (
                           <div className="mt-2 flex justify-center">
                             <ChevronDown className="h-4 w-4 text-amber animate-bounce" />
@@ -581,9 +710,9 @@ export default function CalculatorPage() {
 
               {/* Ground floor type */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
-                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Ground Floor Usage</label>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">{c.groundUsage}</label>
                 <div className="grid grid-cols-2 gap-3">
-                  {[{ label: "House / Residential", sub: "100% of slab", value: false }, { label: "Parking", sub: "50% of slab", value: true }].map((opt) => (
+                  {[{ label: c.house, sub: c.housePct, value: false }, { label: c.parking, sub: c.parkingPct, value: true }].map((opt) => (
                     <motion.button key={String(opt.value)} onClick={() => setParking(opt.value)} whileHover={{ scale: 1.02 }}
                       className={`rounded-xl border-2 p-3 text-center transition-all ${parking === opt.value ? "border-amber bg-amber/10 shadow-md" : "border-black/10 bg-gray-50 hover:border-amber/40"}`}>
                       <p className="font-semibold text-sm text-navy">{opt.label}</p>
@@ -595,12 +724,12 @@ export default function CalculatorPage() {
 
               {/* Upper floors count */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
-                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Upper Floors (above Ground)</label>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">{c.upperFloors}</label>
                 <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
                   {upperFloorOptions.map((n) => (
                     <motion.button key={n} onClick={() => setUpperFloors(n)} whileHover={{ scale: 1.06 }}
                       className={`rounded-xl border-2 py-3 text-center font-bold text-sm transition-all ${upperFloors === n ? "border-amber bg-amber/10 shadow-md text-navy" : "border-black/10 bg-gray-50 text-navy/60 hover:border-amber/40"}`}>
-                      {n === 0 ? "None" : `+${n}`}
+                      {n === 0 ? c.none : `+${n}`}
                     </motion.button>
                   ))}
                 </div>
@@ -608,17 +737,17 @@ export default function CalculatorPage() {
 
               {/* Per-floor slab inputs */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
-                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1">Slab Area per Floor (sq ft)</label>
-                <p className="text-xs text-navy/40 mb-4">Plinth &amp; Terrace calculated from the largest slab area automatically.</p>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1">{c.slabPerFloor}</label>
+                <p className="text-xs text-navy/40 mb-4">{c.slabNote}</p>
                 <div className="space-y-3">
                   {floorRows.map((row, i) => (
                     <div key={row.id} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                      <span className="text-sm font-medium text-navy sm:w-44 sm:shrink-0">{row.label}</span>
+                      <span className="text-sm font-medium text-navy sm:w-44 sm:shrink-0">{displayFloorLabel(row.label, lang)}</span>
                       <input
                         type="number"
                         value={row.slab}
                         onChange={(e) => updateSlab(i, e.target.value)}
-                        placeholder="Enter sqft"
+                        placeholder={c.enterSqft}
                         min={0}
                         className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base font-bold text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
                       />
@@ -629,35 +758,35 @@ export default function CalculatorPage() {
 
               {/* Client Details — filled after slab config, unlocks the estimate */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
-                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Your Details</label>
-                <p className="text-xs text-navy/50 mb-3 -mt-1">Fill in your details and click Submit to view your estimate.</p>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">{c.yourDetails}</label>
+                <p className="text-xs text-navy/50 mb-3 -mt-1">{c.detailsNote}</p>
                 <div className="space-y-3">
                   <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-navy">Your Name <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-medium text-navy">{c.yourName} <span className="text-red-500">*</span></label>
                     <input
                       id="calc-name"
                       type="text"
                       value={clientName}
                       onChange={(e) => setClientName(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("calc-location")?.focus(); } }}
-                      placeholder="e.g. Rajesh Sharma"
+                      placeholder={c.namePh}
                       className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-navy">Project Location <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-medium text-navy">{c.projectLocation} <span className="text-red-500">*</span></label>
                     <input
                       id="calc-location"
                       type="text"
                       value={projectLocation}
                       onChange={(e) => setProjectLocation(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("calc-phone")?.focus(); } }}
-                      placeholder="e.g. Kothrud, Pune"
+                      placeholder={c.locationPh}
                       className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-navy">Mobile Number <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-medium text-navy">{c.mobile} <span className="text-red-500">*</span></label>
                     <div className="flex gap-2">
                       <span className="flex items-center rounded-xl border border-black/15 px-3 text-navy/60 font-medium text-sm bg-gray-50">+91</span>
                       <input
@@ -666,7 +795,7 @@ export default function CalculatorPage() {
                         value={clientPhone}
                         onChange={(e) => setClientPhone(e.target.value)}
                         onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSubmitDetails(); } }}
-                        placeholder="98765 43210"
+                        placeholder={c.phonePh}
                         maxLength={10}
                         className="flex-1 rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
                       />
@@ -679,10 +808,10 @@ export default function CalculatorPage() {
                       onClick={handleSubmitDetails}
                       className="w-full rounded-xl bg-amber py-3 text-sm font-bold text-navy-dark hover:bg-amber/90 transition"
                     >
-                      Submit &amp; See My Estimate →
+                      {c.submit}
                     </motion.button>
                   ) : (
-                    <p className="text-center text-xs font-medium text-emerald-600">✓ Details submitted — your estimate is ready on the right.</p>
+                    <p className="text-center text-xs font-medium text-emerald-600">{c.submitted}</p>
                   )}
                 </div>
               </motion.div>
@@ -697,35 +826,35 @@ export default function CalculatorPage() {
                     {/* Main estimate card */}
                     <div className="rounded-2xl bg-navy text-white shadow-xl overflow-hidden">
                       <div className="bg-amber/20 px-6 py-4 border-b border-white/10">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">Your Estimate</p>
-                        <p className="text-sm text-white/60 mt-0.5">{selectedPkg.name} · {upperFloors === 0 ? "G" : `G+${upperFloors}`} · {parking ? "Parking" : "House"}</p>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">{c.yourEstimate}</p>
+                        <p className="text-sm text-white/60 mt-0.5">{selectedPkg.name} · {upperFloors === 0 ? "G" : `G+${upperFloors}`} · {parking ? c.parking : c.house}</p>
                       </div>
                       <div className="px-6 py-6">
                         <motion.p key={result.total} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-5xl font-black text-amber">
                           {formatINR(result.total)}
                         </motion.p>
-                        <p className="text-white/50 text-sm mt-1">Total estimated cost (incl. 18% GST)</p>
+                        <p className="text-white/50 text-sm mt-1">{c.totalCostIncl}</p>
 
                         {/* Area breakdown */}
                         <div className="mt-5 rounded-xl bg-white/5 border border-white/10 p-4 space-y-1.5 text-xs">
-                          <p className="text-white/40 font-semibold uppercase tracking-widest mb-2">Built-up Area Breakdown</p>
+                          <p className="text-white/40 font-semibold uppercase tracking-widest mb-2">{c.areaBreakdown}</p>
                           <div className="flex justify-between">
-                            <span className="text-white/60">Plinth (50% of ground {result.plinthSlab.toLocaleString()} sqft)</span>
+                            <span className="text-white/60">{c.plinthLabel(result.plinthSlab.toLocaleString())}</span>
                             <span>{result.plinthArea.toLocaleString()} sqft</span>
                           </div>
                           {result.rows.map((r) => (
                             <div key={r.label} className="flex justify-between">
-                              <span className="text-white/60">{r.label} ({r.slab.toLocaleString()} sqft)</span>
+                              <span className="text-white/60">{displayFloorLabel(r.label, lang)} ({r.slab.toLocaleString()} sqft)</span>
                               <span>{r.builtUp.toLocaleString()} sqft</span>
                             </div>
                           ))}
                           <div className="flex justify-between">
-                            <span className="text-white/60">Terrace (35% of highest slab {result.topSlab.toLocaleString()} sqft)</span>
+                            <span className="text-white/60">{c.terraceLabel(result.topSlab.toLocaleString())}</span>
                             <span>{result.terraceArea.toLocaleString()} sqft</span>
                           </div>
                           <div className="h-px bg-white/10 my-1" />
                           <div className="flex justify-between font-bold">
-                            <span>Total Built-up Area</span>
+                            <span>{c.totalArea}</span>
                             <span className="text-amber">{result.totalArea.toLocaleString()} sqft</span>
                           </div>
                         </div>
@@ -737,12 +866,12 @@ export default function CalculatorPage() {
                             <span className="font-semibold">{formatINR(result.base)}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-white/60">GST (18%)</span>
+                            <span className="text-white/60">{c.gst}</span>
                             <span className="font-semibold">+{formatINR(result.gstAmount)}</span>
                           </div>
                           <div className="h-px bg-white/10" />
                           <div className="flex justify-between">
-                            <span className="font-bold">Total</span>
+                            <span className="font-bold">{c.total}</span>
                             <span className="font-black text-amber text-lg">{formatINR(result.total)}</span>
                           </div>
                         </div>
@@ -756,28 +885,28 @@ export default function CalculatorPage() {
                         onClick={() => result && exportPDF(result, selectedPkg, upperFloors, parking, true, clientName, projectLocation, pkgContent, cats)}
                         className="flex items-center justify-center gap-2 rounded-xl bg-navy py-3 font-semibold text-white hover:bg-navy/90 transition text-sm"
                       >
-                        <FileText className="h-4 w-4" /> Download PDF
+                        <FileText className="h-4 w-4" /> {c.downloadPdf}
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                         onClick={() => result && exportExcel(result, selectedPkg, upperFloors, parking, true, clientName, projectLocation, pkgContent, cats)}
                         className="flex items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 transition text-sm"
                       >
-                        <FileSpreadsheet className="h-4 w-4" /> Download Excel
+                        <FileSpreadsheet className="h-4 w-4" /> {c.downloadExcel}
                       </motion.button>
                     </div>
 
                     {/* CTA */}
                     <div className="rounded-2xl bg-amber p-6">
-                      <p className="font-bold text-navy-dark text-lg">Get an accurate quote!</p>
-                      <p className="text-navy/70 text-sm mt-1">This is an estimate. Our team will give you a detailed, site-specific quote — free of charge.</p>
+                      <p className="font-bold text-navy-dark text-lg">{c.ctaTitle}</p>
+                      <p className="text-navy/70 text-sm mt-1">{c.ctaSub}</p>
                       <div className="mt-4 flex flex-col sm:flex-row gap-3">
                         <Link href="/contact" className="flex-1 rounded-xl bg-navy py-3 text-center font-semibold text-white hover:bg-navy/90 transition text-sm">
-                          Get Free Quote →
+                          {c.getQuote}
                         </Link>
-                        <a href="https://wa.me/918806029907" target="_blank" rel="noopener noreferrer"
+                        <a href="https://wa.me/919607407474" target="_blank" rel="noopener noreferrer"
                           className="flex-1 flex items-center justify-center gap-2 rounded-xl border-2 border-navy py-3 font-semibold text-navy hover:bg-navy/10 transition text-sm">
-                          <Phone className="h-4 w-4" /> WhatsApp Us
+                          <Phone className="h-4 w-4" /> {c.whatsapp}
                         </a>
                       </div>
                     </div>
@@ -787,10 +916,10 @@ export default function CalculatorPage() {
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber/10 mx-auto mb-4">
                       <Calculator className="h-8 w-8 text-amber" />
                     </div>
-                    <p className="text-navy font-bold text-lg">Submit your details to see the estimate</p>
-                    <p className="text-navy/50 text-sm mt-2">Enter your <strong>Name</strong>, <strong>Project Location</strong> and <strong>Mobile Number</strong> and click <strong>Submit</strong>, then fill in the floor slab areas to view your cost estimate.</p>
+                    <p className="text-navy font-bold text-lg">{c.emptyTitle}</p>
+                    <p className="text-navy/50 text-sm mt-2">{c.emptySub1} <strong>{c.emptyName}</strong>, <strong>{c.emptyLoc}</strong> {lang === "en" ? "and" : "व"} <strong>{c.emptyMob}</strong> {c.emptySub2} <strong>{lang === "en" ? "Submit" : "सबमिट"}</strong>{c.emptySub3}</p>
                     <div className="mt-6 flex items-center justify-center gap-1 text-xs text-navy/30">
-                      <ArrowRight className="h-3 w-3" /> Submit details → Select package → Enter slab areas
+                      <ArrowRight className="h-3 w-3" /> {c.emptyFlow}
                     </div>
                   </motion.div>
                 )}
@@ -805,7 +934,7 @@ export default function CalculatorPage() {
       <section className="bg-white py-8 border-t border-black/5">
         <div className="mx-auto max-w-6xl px-6 text-center">
           <p className="text-xs text-navy/40 max-w-2xl mx-auto">
-            <strong>Disclaimer:</strong> This calculator provides an approximate estimate based on standard construction rates in Pune, Maharashtra. Actual costs may vary depending on site conditions, material choices, design complexity, and current market rates. Contact us for a detailed, accurate quotation.
+            {c.disclaimer}
           </p>
         </div>
       </section>
