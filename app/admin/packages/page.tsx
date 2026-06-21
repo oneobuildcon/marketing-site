@@ -248,38 +248,15 @@ export default function AdminPackages() {
             <h1 className="text-lg font-bold">Package Editor — One O Buildcon</h1>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => setShowExport(!showExport)} className="flex items-center gap-2 rounded-lg border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/10 transition">
-              <Copy className="h-4 w-4" /> Export
-            </button>
-            <button onClick={reset} className="flex items-center gap-2 rounded-lg border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/10 transition">
-              <RotateCcw className="h-4 w-4" /> Reset
-            </button>
             <button onClick={save} className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${saved ? "bg-green-500 text-white" : "bg-amber text-navy-dark hover:bg-amber-light"}`}>
               {saved ? <><CheckCircle2 className="h-4 w-4" /> Saved!</> : <><Save className="h-4 w-4" /> Save</>}
             </button>
-            <button onClick={logout} className="text-white/50 hover:text-white transition">
-              <LogOut className="h-4 w-4" />
+            <button onClick={logout} className="flex items-center gap-2 rounded-lg border border-white/20 px-4 py-2 text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition">
+              <LogOut className="h-4 w-4" /> Logout
             </button>
           </div>
         </div>
       </header>
-
-      {/* Export panel */}
-      {showExport && (
-        <div className="bg-navy-dark border-b border-white/10 px-6 py-4">
-          <div className="mx-auto max-w-7xl">
-            <p className="text-white/80 text-sm mb-2 font-medium">Copy JSON and send to your developer to apply permanently:</p>
-            <div className="relative">
-              <pre className="bg-black/40 text-green-400 text-xs rounded-lg p-4 overflow-auto max-h-40 font-mono">
-                {JSON.stringify({ content, pkgMeta, catMeta }, null, 2)}
-              </pre>
-              <button onClick={copyExport} className={`absolute top-2 right-2 rounded-md px-3 py-1 text-xs font-semibold transition ${copied ? "bg-green-500 text-white" : "bg-amber text-navy-dark"}`}>
-                {copied ? "Copied!" : "Copy"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="mx-auto max-w-7xl px-6 py-8">
 
