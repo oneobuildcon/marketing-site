@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Lock } from "lucide-react";
+import { Lock, Eye, EyeOff } from "lucide-react";
 
 export default function AdminLogin() {
   const router = useRouter();
   const [pwd, setPwd] = useState("");
+  const [show, setShow] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -49,19 +50,29 @@ export default function AdminLogin() {
               <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-1.5">
                 Password
               </label>
-              <input
-                type="password"
-                name="admin-passcode"
-                autoComplete="new-password"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck={false}
-                value={pwd}
-                onChange={(e) => setPwd(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && login()}
-                placeholder="Enter admin password"
-                className="w-full rounded-xl border border-black/15 px-4 py-3 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
-              />
+              <div className="relative">
+                <input
+                  type={show ? "text" : "password"}
+                  name="admin-passcode"
+                  autoComplete="new-password"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  value={pwd}
+                  onChange={(e) => setPwd(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && login()}
+                  placeholder="Enter admin password"
+                  className="w-full rounded-xl border border-black/15 px-4 py-3 pr-12 text-navy font-medium focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShow((s) => !s)}
+                  aria-label={show ? "Hide password" : "Show password"}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-navy/40 hover:text-navy"
+                >
+                  {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </div>
             {error && <p className="text-red-500 text-xs font-medium">{error}</p>}
             <motion.button
