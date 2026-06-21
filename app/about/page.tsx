@@ -36,8 +36,11 @@ const translations = {
     milestonesTitle: "Milestones",
     milestones: [
       { year: "2019", event: "One O Buildcon founded in Pune" },
+      { year: "2020", event: "Delivered our first premium residential bungalows" },
       { year: "2021", event: "Expanded to farmhouse and commercial builds" },
+      { year: "2022", event: "Completed 10+ projects across Pune" },
       { year: "2023", event: "Growing client base across Pune and Maharashtra" },
+      { year: "2024", event: "Introduced transparent package-based pricing" },
       { year: "2025", event: "Completed 20+ projects across residential & commercial" },
       { year: "2026", event: "Continuing to grow with new residential & commercial projects" },
     ],
@@ -65,8 +68,11 @@ const translations = {
     milestonesTitle: "टप्पे",
     milestones: [
       { year: "२०१९", event: "पुण्यात वन ओ बिल्डकॉनची स्थापना" },
+      { year: "२०२०", event: "आमचे पहिले प्रीमियम निवासी बंगले पूर्ण केले" },
       { year: "२०२१", event: "फार्महाउस आणि व्यावसायिक बांधकामापर्यंत विस्तार" },
+      { year: "२०२२", event: "पुण्यात १०+ प्रकल्प पूर्ण" },
       { year: "२०२३", event: "पुणे आणि महाराष्ट्रात ग्राहक आधार वाढवत आहे" },
+      { year: "२०२४", event: "पारदर्शक पॅकेज-आधारित किंमत सुरू केली" },
       { year: "२०२५", event: "निवासी आणि व्यावसायिक क्षेत्रात २०+ प्रकल्प पूर्ण" },
       { year: "२०२६", event: "नवीन निवासी आणि व्यावसायिक प्रकल्पांसह वाढ सुरू" },
     ],
