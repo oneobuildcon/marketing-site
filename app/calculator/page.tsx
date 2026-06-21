@@ -402,7 +402,6 @@ export default function CalculatorPage() {
   const [selectedPkg, setSelectedPkg] = useState(packages[1]);
   const [upperFloors, setUpperFloors] = useState(0);
   const [parking, setParking] = useState(false);
-  const [gst, setGst] = useState(true);
   const [floorRows, setFloorRows] = useState<FloorRow[]>(buildFloorRows(0, false));
   const [clientName, setClientName] = useState("");
   const [projectLocation, setProjectLocation] = useState("");
@@ -413,26 +412,16 @@ export default function CalculatorPage() {
   const [cats, setCats] = useState<CategoryMeta[]>(defaultCategories);
   const [result, setResult] = useState<null | ResultData>(null);
 
-  // Load package content and categories from localStorage on mount
+  // Load live package content from the database (same source as admin editor)
   useEffect(() => {
-    try {
-      const storedContent = localStorage.getItem("oneo_packages_content");
-      if (storedContent) {
-        const parsed = JSON.parse(storedContent) as PackageContent;
-        setPkgContent(parsed);
-      }
-    } catch {
-      // fallback to default already set
-    }
-    try {
-      const storedCats = localStorage.getItem("oneo_categories_meta");
-      if (storedCats) {
-        const parsed = JSON.parse(storedCats) as CategoryMeta[];
-        setCats(parsed);
-      }
-    } catch {
-      // fallback to default already set
-    }
+    fetch("/api/packages", { cache: "no-store" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (!data) return;
+        if (data.content) setPkgContent(data.content);
+        if (Array.isArray(data.catMeta) && data.catMeta.length) setCats(data.catMeta);
+      })
+      .catch(() => {});
   }, []);
 
   // Rebuild floor rows when floor count or parking changes, preserve existing slab values
@@ -493,7 +482,7 @@ export default function CalculatorPage() {
     const floorTotal = rows.reduce((s, r) => s + r.builtUp, 0);
     const totalArea = plinthArea + floorTotal + terraceArea;
     const base = Math.round(totalArea * selectedPkg.price);
-    const gstAmount = gst ? Math.round(base * 0.18) : 0;
+    const gstAmount = Math.round(base * 0.18);
     const total = base + gstAmount;
 
     setResult({ rows, plinthSlab: groundSlab, topSlab: maxSlab, plinthArea, terraceArea, totalArea, base, gstAmount, total });
@@ -502,7 +491,7 @@ export default function CalculatorPage() {
   useEffect(() => {
     calculate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [floorRows, selectedPkg, gst]);
+  }, [floorRows, selectedPkg]);
 
   return (
     <main className="overflow-hidden">
@@ -548,66 +537,6 @@ export default function CalculatorPage() {
 
             {/* LEFT — Inputs */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="space-y-6">
-
-              {/* Client Details */}
-              <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
-                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Client Details</label>
-                <p className="text-xs text-navy/50 mb-3 -mt-1">All fields are required to view your estimate.</p>
-                <div className="space-y-3">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-navy">Client Name <span className="text-red-500">*</span></label>
-                    <input
-                      id="calc-name"
-                      type="text"
-                      value={clientName}
-                      onChange={(e) => setClientName(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("calc-location")?.focus(); } }}
-                      placeholder="e.g. Rajesh Sharma"
-                      className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-navy">Project Location <span className="text-red-500">*</span></label>
-                    <input
-                      id="calc-location"
-                      type="text"
-                      value={projectLocation}
-                      onChange={(e) => setProjectLocation(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("calc-phone")?.focus(); } }}
-                      placeholder="e.g. Kothrud, Pune"
-                      className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-navy">Mobile Number <span className="text-red-500">*</span></label>
-                    <div className="flex gap-2">
-                      <span className="flex items-center rounded-xl border border-black/15 px-3 text-navy/60 font-medium text-sm bg-gray-50">+91</span>
-                      <input
-                        id="calc-phone"
-                        type="tel"
-                        value={clientPhone}
-                        onChange={(e) => setClientPhone(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSubmitDetails(); } }}
-                        placeholder="98765 43210"
-                        maxLength={10}
-                        className="flex-1 rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
-                      />
-                    </div>
-                  </div>
-                  {detailsError && <p className="text-red-500 text-xs font-medium">{detailsError}</p>}
-                  {!detailsSubmitted ? (
-                    <motion.button
-                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                      onClick={handleSubmitDetails}
-                      className="w-full rounded-xl bg-amber py-3 text-sm font-bold text-navy-dark hover:bg-amber/90 transition"
-                    >
-                      Submit &amp; See Estimate →
-                    </motion.button>
-                  ) : (
-                    <p className="text-center text-xs font-medium text-emerald-600">✓ Details submitted — enter slab areas below to see your estimate.</p>
-                  )}
-                </div>
-              </motion.div>
 
               {/* Package selector */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
@@ -698,13 +627,63 @@ export default function CalculatorPage() {
                 </div>
               </motion.div>
 
-              {/* GST toggle */}
+              {/* Client Details — filled after slab config, unlocks the estimate */}
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-navy">Include GST (18%)</span>
-                  <button onClick={() => setGst(!gst)} className={`relative h-6 w-11 rounded-full transition-colors ${gst ? "bg-amber" : "bg-gray-300"}`}>
-                    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${gst ? "translate-x-5" : "translate-x-0.5"}`} />
-                  </button>
+                <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">Your Details</label>
+                <p className="text-xs text-navy/50 mb-3 -mt-1">Fill in your details and click Submit to view your estimate.</p>
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-navy">Your Name <span className="text-red-500">*</span></label>
+                    <input
+                      id="calc-name"
+                      type="text"
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("calc-location")?.focus(); } }}
+                      placeholder="e.g. Rajesh Sharma"
+                      className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-navy">Project Location <span className="text-red-500">*</span></label>
+                    <input
+                      id="calc-location"
+                      type="text"
+                      value={projectLocation}
+                      onChange={(e) => setProjectLocation(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("calc-phone")?.focus(); } }}
+                      placeholder="e.g. Kothrud, Pune"
+                      className="w-full rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-navy">Mobile Number <span className="text-red-500">*</span></label>
+                    <div className="flex gap-2">
+                      <span className="flex items-center rounded-xl border border-black/15 px-3 text-navy/60 font-medium text-sm bg-gray-50">+91</span>
+                      <input
+                        id="calc-phone"
+                        type="tel"
+                        value={clientPhone}
+                        onChange={(e) => setClientPhone(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSubmitDetails(); } }}
+                        placeholder="98765 43210"
+                        maxLength={10}
+                        className="flex-1 rounded-xl border border-black/15 px-3 py-2.5 text-base text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                      />
+                    </div>
+                  </div>
+                  {detailsError && <p className="text-red-500 text-xs font-medium">{detailsError}</p>}
+                  {!detailsSubmitted ? (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                      onClick={handleSubmitDetails}
+                      className="w-full rounded-xl bg-amber py-3 text-sm font-bold text-navy-dark hover:bg-amber/90 transition"
+                    >
+                      Submit &amp; See My Estimate →
+                    </motion.button>
+                  ) : (
+                    <p className="text-center text-xs font-medium text-emerald-600">✓ Details submitted — your estimate is ready on the right.</p>
+                  )}
                 </div>
               </motion.div>
             </motion.div>
@@ -725,7 +704,7 @@ export default function CalculatorPage() {
                         <motion.p key={result.total} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-5xl font-black text-amber">
                           {formatINR(result.total)}
                         </motion.p>
-                        <p className="text-white/50 text-sm mt-1">Total estimated cost {gst ? "(incl. 18% GST)" : "(excl. GST)"}</p>
+                        <p className="text-white/50 text-sm mt-1">Total estimated cost (incl. 18% GST)</p>
 
                         {/* Area breakdown */}
                         <div className="mt-5 rounded-xl bg-white/5 border border-white/10 p-4 space-y-1.5 text-xs">
@@ -757,12 +736,10 @@ export default function CalculatorPage() {
                             <span className="text-white/60">{result.totalArea.toLocaleString()} sqft × ₹{selectedPkg.price}</span>
                             <span className="font-semibold">{formatINR(result.base)}</span>
                           </div>
-                          {gst && (
-                            <div className="flex justify-between">
-                              <span className="text-white/60">GST (18%)</span>
-                              <span className="font-semibold">+{formatINR(result.gstAmount)}</span>
-                            </div>
-                          )}
+                          <div className="flex justify-between">
+                            <span className="text-white/60">GST (18%)</span>
+                            <span className="font-semibold">+{formatINR(result.gstAmount)}</span>
+                          </div>
                           <div className="h-px bg-white/10" />
                           <div className="flex justify-between">
                             <span className="font-bold">Total</span>
@@ -776,14 +753,14 @@ export default function CalculatorPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => result && exportPDF(result, selectedPkg, upperFloors, parking, gst, clientName, projectLocation, pkgContent, cats)}
+                        onClick={() => result && exportPDF(result, selectedPkg, upperFloors, parking, true, clientName, projectLocation, pkgContent, cats)}
                         className="flex items-center justify-center gap-2 rounded-xl bg-navy py-3 font-semibold text-white hover:bg-navy/90 transition text-sm"
                       >
                         <FileText className="h-4 w-4" /> Download PDF
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => result && exportExcel(result, selectedPkg, upperFloors, parking, gst, clientName, projectLocation, pkgContent, cats)}
+                        onClick={() => result && exportExcel(result, selectedPkg, upperFloors, parking, true, clientName, projectLocation, pkgContent, cats)}
                         className="flex items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 transition text-sm"
                       >
                         <FileSpreadsheet className="h-4 w-4" /> Download Excel
