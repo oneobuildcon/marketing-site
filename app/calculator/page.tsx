@@ -178,6 +178,22 @@ const packages = [
   { id: "luxury",    name: "Luxury",         price: 2499, color: "border-yellow-300 bg-yellow-50" },
 ];
 
+// Fallback colours by package id, used when packages come live from the admin DB.
+const pkgColorById: Record<string, string> = {
+  structure: "border-gray-200 bg-gray-50",
+  basic:     "border-amber/40 bg-amber/5",
+  standard:  "border-blue-200 bg-blue-50",
+  premium:   "border-purple-200 bg-purple-50",
+  royal:     "border-rose-200 bg-rose-50",
+  luxury:    "border-yellow-300 bg-yellow-50",
+};
+
+// Parse a stored price string like "1,549" or "Rs. 1549/sqft" into a number.
+function parsePrice(raw: unknown): number {
+  const n = parseInt(String(raw ?? "").replace(/[^0-9]/g, ""), 10);
+  return Number.isFinite(n) ? n : 0;
+}
+
 const upperFloorOptions = [0, 1, 2, 3, 4, 5, 6];
 
 function formatINR(num: number) {
@@ -571,7 +587,9 @@ function buildFloorRows(upperFloors: number, groundUsage: GroundUsage): FloorRow
 export default function CalculatorPage() {
   const { lang } = useLanguage();
   const c = T[lang];
-  const [selectedPkg, setSelectedPkg] = useState(packages[1]);
+  const [livePackages, setLivePackages] = useState(packages);
+  const [selectedPkgId, setSelectedPkgId] = useState("basic");
+  const selectedPkg = livePackages.find((p) => p.id === selectedPkgId) ?? livePackages[0];
   const [upperFloors, setUpperFloors] = useState(0);
   const [groundUsage, setGroundUsage] = useState<GroundUsage>("house");
   const [groundHouseSqft, setGroundHouseSqft] = useState("");
@@ -594,6 +612,22 @@ export default function CalculatorPage() {
         if (!data) return;
         if (data.content) setPkgContent(data.content);
         if (Array.isArray(data.catMeta) && data.catMeta.length) setCats(data.catMeta);
+        // Sync prices + names from the admin-editable package list.
+        if (Array.isArray(data.pkgMeta) && data.pkgMeta.length) {
+          const live = data.pkgMeta.map((m: { id: string; name: string; price: string }) => ({
+            id: m.id,
+            name: m.name,
+            price: parsePrice(m.price),
+            color: pkgColorById[m.id] ?? "border-gray-200 bg-gray-50",
+          }));
+          setLivePackages(live);
+          // Keep the current selection valid; default to "basic" or the first package.
+          setSelectedPkgId((prev) =>
+            live.some((p: { id: string }) => p.id === prev)
+              ? prev
+              : (live.find((p: { id: string }) => p.id === "basic")?.id ?? live[0]?.id ?? prev)
+          );
+        }
       })
       .catch(() => {});
   }, []);
@@ -677,7 +711,7 @@ export default function CalculatorPage() {
   useEffect(() => {
     calculate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [floorRows, selectedPkg, groundHouseSqft, groundParkingSqft, groundUsage]);
+  }, [floorRows, selectedPkg.id, selectedPkg.price, groundHouseSqft, groundParkingSqft, groundUsage]);
 
   return (
     <main className="overflow-hidden">
@@ -728,13 +762,13 @@ export default function CalculatorPage() {
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
                 <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">{c.selectPackage}</label>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {packages.map((pkg, i) => {
+                  {livePackages.map((pkg, i) => {
                     const isSelected = selectedPkg.id === pkg.id;
                     const isPopular = pkg.id === "basic" || pkg.id === "standard";
                     return (
                       <motion.button
                         key={pkg.id}
-                        onClick={() => setSelectedPkg(pkg)}
+                        onClick={() => setSelectedPkgId(pkg.id)}
                         whileHover={{ y: -4 }}
                         whileTap={{ scale: 0.97 }}
                         className={`relative rounded-2xl p-4 text-center transition-all border-2 ${
