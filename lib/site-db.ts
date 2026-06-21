@@ -103,6 +103,46 @@ export async function getHomeStats(addedCount: number): Promise<HomeStats> {
   return { projects: cfg.projectsBase + addedCount, years, clients: cfg.clients, cities: cfg.cities };
 }
 
+// ── Milestones (About page timeline) ────────────────────────────────────────
+export type Milestone = { year: string; en: string; mr: string };
+
+const DEFAULT_MILESTONES: Milestone[] = [
+  { year: "2019", en: "One O Buildcon founded in Pune", mr: "पुण्यात वन ओ बिल्डकॉनची स्थापना" },
+  { year: "2020", en: "Delivered our first premium residential bungalows", mr: "आमचे पहिले प्रीमियम निवासी बंगले पूर्ण केले" },
+  { year: "2021", en: "Expanded to farmhouse and commercial builds", mr: "फार्महाउस आणि व्यावसायिक बांधकामापर्यंत विस्तार" },
+  { year: "2022", en: "Completed 10+ projects across Pune", mr: "पुण्यात १०+ प्रकल्प पूर्ण" },
+  { year: "2023", en: "Growing client base across Pune and Maharashtra", mr: "पुणे आणि महाराष्ट्रात ग्राहक आधार वाढवत आहे" },
+  { year: "2024", en: "Introduced transparent package-based pricing", mr: "पारदर्शक पॅकेज-आधारित किंमत सुरू केली" },
+  { year: "2025", en: "Completed 20+ projects across residential & commercial", mr: "निवासी आणि व्यावसायिक क्षेत्रात २०+ प्रकल्प पूर्ण" },
+  { year: "2026", en: "Continuing to grow with new residential & commercial projects", mr: "नवीन निवासी आणि व्यावसायिक प्रकल्पांसह वाढ सुरू" },
+];
+
+export async function getMilestones(): Promise<Milestone[]> {
+  if (!hasSupabase()) return DEFAULT_MILESTONES;
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'milestones')
+      .maybeSingle();
+    if (error) throw error;
+    const v = data?.value as Milestone[] | undefined;
+    if (Array.isArray(v) && v.length) return v;
+  } catch (e) {
+    console.error('getMilestones: falling back to defaults:', e);
+  }
+  return DEFAULT_MILESTONES;
+}
+
+export async function saveMilestones(value: Milestone[]): Promise<void> {
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert({ key: 'milestones', value, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}
+
 export type Lead = { id: string; created_at: string; data: Record<string, unknown> };
 
 export async function getLeads(): Promise<Lead[]> {

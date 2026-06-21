@@ -3,7 +3,11 @@
 import { motion } from "framer-motion";
 import { Award, Target, Handshake, HardHat } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
+
+type ApiMilestone = { year: string; en: string; mr: string };
+const MILESTONE_LIMIT = 6;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -87,6 +91,26 @@ const valueIcons = [Award, HardHat, Handshake];
 export default function About() {
   const { lang } = useLanguage();
   const t = translations[lang];
+
+  // Live, admin-editable milestones (fall back to the built-in list).
+  const [apiMilestones, setApiMilestones] = useState<ApiMilestone[] | null>(null);
+  useEffect(() => {
+    fetch("/api/milestones", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (Array.isArray(d) && d.length) setApiMilestones(d); })
+      .catch(() => {});
+  }, []);
+
+  // Build the display list, then auto-trim so the timeline never gets too long:
+  // always keep the founding (first) year, plus the most recent ones.
+  const allMilestones = apiMilestones
+    ? apiMilestones.map((m) => ({ year: m.year, event: lang === "mr" ? (m.mr || m.en) : m.en }))
+    : t.milestones;
+
+  const milestones =
+    allMilestones.length > MILESTONE_LIMIT
+      ? [allMilestones[0], ...allMilestones.slice(allMilestones.length - (MILESTONE_LIMIT - 1))]
+      : allMilestones;
 
   return (
     <main className="overflow-hidden">
@@ -185,7 +209,7 @@ export default function About() {
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="relative">
             <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-amber/20" />
-            {t.milestones.map((m, i) => (
+            {milestones.map((m, i) => (
               <motion.div key={m.year} variants={fadeUp} className="relative flex gap-6 mb-8 last:mb-0">
                 <motion.div whileInView={{ scale: [0, 1.3, 1] }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.4 }} className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber text-navy-dark font-bold text-xs" aria-hidden="true">
                   {m.year}
