@@ -5,8 +5,13 @@ import { jwtVerify } from 'jose';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAdminPath = pathname.startsWith('/admin');
-  const isAdminApi = pathname.startsWith('/api/admin');
+  // The auth endpoint must stay public — it is how you obtain the token in the
+  // first place. Protecting it would block every login attempt with a 401.
+  const isAuthApi = pathname === '/api/admin/auth';
+  const isAdminApi = pathname.startsWith('/api/admin') && !isAuthApi;
   const isLoginPath = pathname === '/admin/login';
+
+  if (isAuthApi) return pass();
 
   // Forward the current pathname to server components via a request header,
   // so the admin layout can tell the login route apart from the shell.
