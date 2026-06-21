@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Our Projects | One O Buildcon Pune",
     description: "Browse completed bungalows, row houses, residential buildings and farmhouses built by One O Buildcon in Pune, Maharashtra.",
-    url: "https://www.oneobuildcon.com/projects",
+    url: "https://oneobuildcon.com/projects",
   },
   twitter: {
     title: "Our Projects | One O Buildcon Pune",
