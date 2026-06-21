@@ -85,11 +85,29 @@ export default function AdminPackages() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content, pkgMeta, catMeta }),
       });
-      if (!res.ok) throw new Error("Save failed");
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(payload?.error || `Save failed (HTTP ${res.status})`);
+      }
+
+      // Verify the write actually persisted by reading it back from the server.
+      const check = await fetch("/api/admin/packages", { cache: "no-store" });
+      const saved = await check.json().catch(() => ({}));
+      const persisted =
+        JSON.stringify(saved?.pkgMeta) === JSON.stringify(pkgMeta) &&
+        JSON.stringify(saved?.content) === JSON.stringify(content);
+      if (!persisted) {
+        throw new Error(
+          "Server accepted the request but the data did not persist. " +
+            "This usually means the SUPABASE_SERVICE_ROLE_KEY is wrong, or " +
+            "Row Level Security is blocking writes to the site_settings table."
+        );
+      }
+
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
-    } catch {
-      alert("Could not save. Please make sure you are logged in and try again.");
+    } catch (e: any) {
+      alert("Could not save: " + (e?.message || "unknown error"));
     }
   }
 
