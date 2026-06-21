@@ -15,6 +15,7 @@ import {
   PackageId,
   CategoryId,
   PackageMeta,
+  CategoryMeta,
 } from "@/data/packagesData";
 import { useLanguage } from "@/lib/LanguageContext";
 
@@ -71,12 +72,27 @@ export default function Packages() {
   const [selectedCat, setSelectedCat] = useState<CategoryId>("designs");
 
   useEffect(() => {
-    const stored = localStorage.getItem("oneo_packages_content");
-    if (stored) { try { setContent(JSON.parse(stored)); } catch { /* ignore */ } }
-    const storedMeta = localStorage.getItem("oneo_packages_meta");
-    if (storedMeta) { try { setPkgMeta(JSON.parse(storedMeta)); } catch { /* ignore */ } }
-    const storedCat = localStorage.getItem("oneo_categories_meta");
-    if (storedCat) { try { setCatMeta(JSON.parse(storedCat)); } catch { /* ignore */ } }
+    // Load the latest packages from the database (managed in the admin panel).
+    // Falls back to the bundled defaults if the request fails.
+    fetch("/api/packages")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data) return;
+        if (data.content) setContent(data.content);
+        if (Array.isArray(data.pkgMeta) && data.pkgMeta.length) {
+          setPkgMeta(data.pkgMeta);
+          if (!data.pkgMeta.some((p: PackageMeta) => p.id === "basic")) {
+            setSelectedPkg(data.pkgMeta[0].id);
+          }
+        }
+        if (Array.isArray(data.catMeta) && data.catMeta.length) {
+          setCatMeta(data.catMeta);
+          if (!data.catMeta.some((c: CategoryMeta) => c.id === "designs")) {
+            setSelectedCat(data.catMeta[0].id);
+          }
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const items = content[selectedPkg]?.[selectedCat] ?? [];

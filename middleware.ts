@@ -3,16 +3,18 @@ import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
 export async function middleware(request: NextRequest) {
-  const isAdminPath = request.nextUrl.pathname.startsWith('/admin');
-  const isLoginPath = request.nextUrl.pathname === '/admin/login';
+  const { pathname } = request.nextUrl;
+  const isAdminPath = pathname.startsWith('/admin');
+  const isAdminApi = pathname.startsWith('/api/admin');
+  const isLoginPath = pathname === '/admin/login';
 
   // Forward the current pathname to server components via a request header,
   // so the admin layout can tell the login route apart from the shell.
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-pathname', request.nextUrl.pathname);
+  requestHeaders.set('x-pathname', pathname);
   const pass = () => NextResponse.next({ request: { headers: requestHeaders } });
 
-  if (!isAdminPath) return pass();
+  if (!isAdminPath && !isAdminApi) return pass();
 
   const token = request.cookies.get('admin_token')?.value;
   const secret = new TextEncoder().encode(
@@ -27,6 +29,12 @@ export async function middleware(request: NextRequest) {
     } catch {}
   }
 
+  // Admin API routes return JSON 401 instead of redirecting to the login page.
+  if (isAdminApi) {
+    if (!valid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return pass();
+  }
+
   if (!valid && !isLoginPath) {
     return NextResponse.redirect(new URL('/admin/login', request.url));
   }
@@ -37,5 +45,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/api/admin/:path*'],
 };

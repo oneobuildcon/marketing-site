@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createLead } from "@/lib/site-db";
 
 const SHEET_URL =
   process.env.GOOGLE_SHEET_URL ??
@@ -7,16 +8,26 @@ const SHEET_URL =
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    if (!SHEET_URL) return NextResponse.json({ ok: false, error: "Sheet URL not configured" }, { status: 500 });
 
-    const res = await fetch(SHEET_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    // Store the lead in Supabase so it shows in the admin Leads page on every
+    // device. Failures here must not block the Google Sheet / the response.
+    try {
+      await createLead(body);
+    } catch (e) {
+      console.error("save-lead: failed to store lead in Supabase:", e);
+    }
 
-    const text = await res.text();
-    return NextResponse.json({ ok: true, response: text });
+    let response = "";
+    if (SHEET_URL) {
+      const res = await fetch(SHEET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      response = await res.text();
+    }
+
+    return NextResponse.json({ ok: true, response });
   } catch (err) {
     return NextResponse.json({ ok: false, error: String(err) }, { status: 500 });
   }

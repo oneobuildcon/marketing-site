@@ -23,7 +23,9 @@ function buildEmptyRow(catIds: string[]): Record<string, string[]> {
 }
 
 export default function AdminPackages() {
-  const [authed, setAuthed] = useState(false);
+  // Access is enforced by the admin login (JWT middleware), so no separate
+  // password gate is needed here.
+  const [authed] = useState(true);
   const [password, setPassword] = useState("");
   const [wrongPw, setWrongPw] = useState(false);
 
@@ -48,40 +50,51 @@ export default function AdminPackages() {
   const [newCatName, setNewCatName] = useState("");
 
   useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY) === "1") setAuthed(true);
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) { try { setContent(JSON.parse(stored)); } catch { /* ignore */ } }
-    const storedMeta = localStorage.getItem(META_KEY);
-    if (storedMeta) { try { setPkgMeta(JSON.parse(storedMeta)); } catch { /* ignore */ } }
-    const storedCat = localStorage.getItem(CAT_KEY);
-    if (storedCat) { try { setCatMeta(JSON.parse(storedCat)); } catch { /* ignore */ } }
+    // Load the saved packages from the database (shared across all devices).
+    fetch("/api/packages")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data) return;
+        if (data.content) setContent(data.content);
+        if (Array.isArray(data.pkgMeta) && data.pkgMeta.length) {
+          setPkgMeta(data.pkgMeta);
+          setSelectedPkg(data.pkgMeta[0].id);
+        }
+        if (Array.isArray(data.catMeta) && data.catMeta.length) {
+          setCatMeta(data.catMeta);
+          setSelectedCat(data.catMeta[0].id);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   function login() {
     if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, "1");
-      setAuthed(true); setWrongPw(false);
+      setWrongPw(false);
     } else { setWrongPw(true); }
   }
 
   function logout() {
-    sessionStorage.removeItem(SESSION_KEY);
-    setAuthed(false); setPassword("");
+    window.location.href = "/admin";
   }
 
-  function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
-    localStorage.setItem(META_KEY, JSON.stringify(pkgMeta));
-    localStorage.setItem(CAT_KEY, JSON.stringify(catMeta));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  async function save() {
+    try {
+      const res = await fetch("/api/admin/packages", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content, pkgMeta, catMeta }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch {
+      alert("Could not save. Please make sure you are logged in and try again.");
+    }
   }
 
   function reset() {
-    if (!confirm("Reset everything to default? This cannot be undone.")) return;
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(META_KEY);
-    localStorage.removeItem(CAT_KEY);
+    if (!confirm("Reset everything to default? This will overwrite the live site on next save.")) return;
     setContent(defaultPackageContent);
     setPkgMeta(packages.map((p) => ({ ...p })));
     setCatMeta(defaultCategories.map((c) => ({ ...c })));
