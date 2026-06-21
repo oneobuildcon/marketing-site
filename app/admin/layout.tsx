@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import { LayoutDashboard, Building2 } from "lucide-react";
+import { LayoutDashboard, Building2, Package, Users } from "lucide-react";
 import LogoutButton from "./_LogoutButton";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -31,7 +31,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             href="/admin"
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/5 hover:text-white"
           >
-            <LayoutDashboard className="h-4 w-4 text-amber" /> Dashboard
+            <LayoutDashboard className="h-4 w-4 text-amber" /> Projects
+          </Link>
+          <Link
+            href="/admin/packages"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/5 hover:text-white"
+          >
+            <Package className="h-4 w-4 text-amber" /> Packages
+          </Link>
+          <Link
+            href="/admin/leads"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/5 hover:text-white"
+          >
+            <Users className="h-4 w-4 text-amber" /> Leads
           </Link>
         </nav>
 
