@@ -357,6 +357,22 @@ export default function Home() {
     if (processVisible) setProcessInView(true);
   }, [processVisible]);
 
+  // Live homepage stats: Projects auto-counts from the DB, Years auto-ticks
+  // from the founding year, Clients & Cities are admin-editable.
+  const [liveStats, setLiveStats] = useState<{ projects: number; years: number; clients: number; cities: number } | null>(null);
+  useEffect(() => {
+    fetch("/api/site-stats", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d && typeof d.projects === "number") setLiveStats(d); })
+      .catch(() => {});
+  }, []);
+
+  const statValues = liveStats ? [liveStats.projects, liveStats.years, liveStats.clients, liveStats.cities] : null;
+  const displayStats = statValues ? t.stats.map((s, i) => ({ ...s, value: statValues[i] })) : t.stats;
+  const yearsLabel = liveStats
+    ? `${liveStats.years}+ ${lang === "en" ? "Years" : "वर्षे"}`
+    : t.yearsLabel;
+
   return (
     <main>
       <style>{`
@@ -449,7 +465,7 @@ export default function Home() {
           <div className="absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/30 to-transparent" style={{ animation: "shimmerSweep 3s ease-in-out infinite" }} />
         </div>
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-6 sm:grid-cols-4 relative">
-          {t.stats.map((stat) => (
+          {displayStats.map((stat) => (
             <div key={stat.label} className="text-center">
               <p className="text-3xl font-bold text-navy-dark sm:text-4xl">
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} />
@@ -541,7 +557,7 @@ export default function Home() {
 
               {/* Stat grid */}
               <div className="grid grid-cols-2 gap-3">
-                {t.stats.map((stat) => (
+                {displayStats.map((stat) => (
                   <div key={stat.label} className="rounded-xl bg-white/5 border border-white/10 px-4 py-3 backdrop-blur-sm">
                     <p className="text-2xl font-black text-amber">{stat.value}{stat.suffix}</p>
                     <p className="text-[11px] text-white/60 leading-tight mt-0.5">{stat.label}</p>
@@ -552,7 +568,7 @@ export default function Home() {
               {/* Years badge */}
               <div className="flex items-center gap-3">
                 <div className="rounded-lg bg-amber px-4 py-2">
-                  <p className="font-bold text-navy-dark text-lg leading-none">{t.yearsLabel}</p>
+                  <p className="font-bold text-navy-dark text-lg leading-none">{yearsLabel}</p>
                   <p className="text-[11px] text-navy-dark/80 mt-0.5">{t.yearsSubLabel}</p>
                 </div>
                 <div className="flex items-center gap-1.5 text-white/70 text-xs">
