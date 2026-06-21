@@ -37,8 +37,9 @@ const translations = {
     milestones: [
       { year: "2019", event: "One O Buildcon founded in Pune" },
       { year: "2021", event: "Expanded to farmhouse and commercial builds" },
-      { year: "2023", event: "Completed 20+ projects across residential & commercial" },
-      { year: "2024", event: "Expanding client base across Pune and Maharashtra" },
+      { year: "2023", event: "Growing client base across Pune and Maharashtra" },
+      { year: "2025", event: "Completed 20+ projects across residential & commercial" },
+      { year: "2026", event: "Continuing to grow with new residential & commercial projects" },
     ],
     ctaTitle: "Ready to build with us?",
     ctaSub: "Let's discuss your project today — free consultation.",
@@ -65,8 +66,9 @@ const translations = {
     milestones: [
       { year: "२०१९", event: "पुण्यात वन ओ बिल्डकॉनची स्थापना" },
       { year: "२०२१", event: "फार्महाउस आणि व्यावसायिक बांधकामापर्यंत विस्तार" },
-      { year: "२०२३", event: "निवासी आणि व्यावसायिक क्षेत्रात २०+ प्रकल्प पूर्ण" },
-      { year: "२०२४", event: "पुणे आणि महाराष्ट्रात ग्राहक आधार वाढवत आहे" },
+      { year: "२०२३", event: "पुणे आणि महाराष्ट्रात ग्राहक आधार वाढवत आहे" },
+      { year: "२०२५", event: "निवासी आणि व्यावसायिक क्षेत्रात २०+ प्रकल्प पूर्ण" },
+      { year: "२०२६", event: "नवीन निवासी आणि व्यावसायिक प्रकल्पांसह वाढ सुरू" },
     ],
     ctaTitle: "आमच्यासोबत बांधण्यास तयार आहात?",
     ctaSub: "आज तुमच्या प्रकल्पाबद्दल चर्चा करा — मोफत सल्लामसलत.",
