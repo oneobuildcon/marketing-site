@@ -179,6 +179,38 @@ const serviceIcons = [Home, Layers, Building2, Warehouse, Hammer, PaintBucket];
 const valueIcons = [Gem, Eye, Handshake, ShieldCheck, Clock];
 const WEBSITE = "https://oneobuildcon.com";
 
+// Find a horizontal row of near-white pixels between `minY` and `target`,
+// scanning upward from `target`. Used to cut PDF pages only on the blank gaps
+// between cards/sections so a project card never splits across two pages.
+function findWhiteCut(canvas: HTMLCanvasElement, target: number, minY: number): number {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return target;
+  const top = Math.max(0, Math.floor(minY));
+  const height = Math.max(1, Math.floor(target) - top);
+  let strip: Uint8ClampedArray;
+  try {
+    strip = ctx.getImageData(0, top, canvas.width, height).data;
+  } catch {
+    return target; // tainted canvas — fall back to the fixed cut
+  }
+  const w = canvas.width;
+  const step = Math.max(1, Math.floor(w / 60)); // sample ~60 columns per row
+  for (let y = height - 1; y >= 0; y--) {
+    let white = true;
+    const base = y * w * 4;
+    for (let x = 0; x < w; x += step) {
+      const i = base + x * 4;
+      const a = strip[i + 3];
+      if (a > 10 && (strip[i] < 245 || strip[i + 1] < 245 || strip[i + 2] < 245)) {
+        white = false;
+        break;
+      }
+    }
+    if (white) return top + y;
+  }
+  return target;
+}
+
 export default function CompanyProfilePage() {
   const { lang, setLang } = useLanguage();
   const c = t[lang];
@@ -227,25 +259,61 @@ export default function CompanyProfilePage() {
         import("html2canvas"),
         import("jspdf"),
       ]);
-      const canvas = await html2canvas(el, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      });
-      const img = canvas.toDataURL("image/jpeg", 0.95);
+      // Force the desktop (multi-column) layout while capturing, so the PDF looks
+      // the same whether it is downloaded from a phone or a computer.
+      const PDF_WIDTH = 896; // matches the max-w-4xl document width
+      const prevWidth = el.style.width;
+      el.style.width = `${PDF_WIDTH}px`;
+      let canvas: HTMLCanvasElement;
+      try {
+        canvas = await html2canvas(el, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          windowWidth: 1024,
+          width: PDF_WIDTH,
+        });
+      } finally {
+        el.style.width = prevWidth;
+      }
       const pdf = new jsPDF({ unit: "mm", format: "a4" });
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
-      const imgH = (canvas.height * pageW) / canvas.width;
-      let heightLeft = imgH;
-      let position = 0;
-      pdf.addImage(img, "JPEG", 0, position, pageW, imgH);
-      heightLeft -= pageH;
-      while (heightLeft > 0) {
-        position -= pageH;
-        pdf.addPage();
-        pdf.addImage(img, "JPEG", 0, position, pageW, imgH);
-        heightLeft -= pageH;
+
+      // How many canvas pixels fit on one A4 page (image is scaled to page width).
+      const pagePx = (canvas.width * pageH) / pageW;
+
+      // Work out where to cut each page: aim for a full page, then snap the cut
+      // up to the nearest blank gap so cards/sections are never split in half.
+      const cuts: number[] = [0];
+      let startY = 0;
+      while (startY + pagePx < canvas.height) {
+        const target = startY + pagePx;
+        // Only search the lower part of the page so we never make a page tiny.
+        const minY = Math.max(startY + pagePx * 0.6, target - pagePx * 0.25);
+        const cut = findWhiteCut(canvas, target, minY);
+        // Guard against no progress (e.g. a block taller than a page).
+        startY = cut > startY + 1 ? cut : target;
+        cuts.push(startY);
+      }
+      cuts.push(canvas.height);
+
+      for (let i = 0; i < cuts.length - 1; i++) {
+        const sliceTop = cuts[i];
+        const sliceH = cuts[i + 1] - sliceTop;
+        if (sliceH <= 0) continue;
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceH;
+        const pctx = pageCanvas.getContext("2d");
+        if (!pctx) continue;
+        pctx.fillStyle = "#ffffff";
+        pctx.fillRect(0, 0, pageCanvas.width, sliceH);
+        pctx.drawImage(canvas, 0, sliceTop, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+        const img = pageCanvas.toDataURL("image/jpeg", 0.95);
+        const hmm = (sliceH * pageW) / canvas.width;
+        if (i > 0) pdf.addPage();
+        pdf.addImage(img, "JPEG", 0, 0, pageW, hmm);
       }
       pdf.save(lang === "mr" ? "One-O-Buildcon-Company-Profile-Marathi.pdf" : "One-O-Buildcon-Company-Profile.pdf");
     } finally {
@@ -279,24 +347,24 @@ export default function CompanyProfilePage() {
   return (
     <main className="bg-gray-100 min-h-screen py-8 print:bg-white print:py-0">
       {/* Action bar — hidden when printing */}
-      <div className="no-print mx-auto mb-6 flex max-w-4xl flex-wrap items-center justify-end gap-3 px-4 sm:px-6">
+      <div className="no-print mx-auto mb-6 grid max-w-4xl grid-cols-2 items-center gap-2 px-3 sm:flex sm:flex-wrap sm:justify-end sm:gap-3 sm:px-6">
         <button
           onClick={() => setLang(lang === "en" ? "mr" : "en")}
-          className="flex items-center gap-2 rounded-md border border-navy/30 px-5 py-2.5 font-semibold text-navy transition hover:bg-navy/5"
+          className="flex items-center justify-center gap-2 rounded-md border border-navy/30 px-3 py-2.5 text-sm font-semibold text-navy transition hover:bg-navy/5 sm:px-5 sm:text-base"
           aria-label="Toggle language"
         >
           <Languages className="h-4 w-4 text-amber" /> {lang === "en" ? "मराठी" : "English"}
         </button>
         <button
           onClick={handleShare}
-          className="flex items-center gap-2 rounded-md border border-navy/30 px-5 py-2.5 font-semibold text-navy transition hover:bg-navy/5"
+          className="flex items-center justify-center gap-2 rounded-md border border-navy/30 px-3 py-2.5 text-sm font-semibold text-navy transition hover:bg-navy/5 sm:px-5 sm:text-base"
         >
           <Share2 className="h-4 w-4" /> {c.share}
         </button>
         <button
           onClick={handleDownload}
           disabled={downloading}
-          className="flex items-center gap-2 rounded-md bg-amber px-5 py-2.5 font-semibold text-navy transition hover:bg-amber-light disabled:opacity-60"
+          className="col-span-2 flex items-center justify-center gap-2 rounded-md bg-amber px-3 py-2.5 text-sm font-semibold text-navy transition hover:bg-amber-light disabled:opacity-60 sm:col-span-1 sm:px-5 sm:text-base"
         >
           <Printer className="h-4 w-4" /> {downloading ? c.preparing : c.download}
         </button>
