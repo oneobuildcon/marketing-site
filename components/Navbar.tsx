@@ -79,12 +79,6 @@ export default function Navbar() {
             <Download className="h-3.5 w-3.5" />
             {lang === "en" ? "Profile" : "प्रोफाइल"}
           </Link>
-          <Link
-            href="/contact"
-            className="rounded-md bg-amber px-4 py-2 text-sm font-semibold text-navy-dark transition hover:bg-amber-light"
-          >
-            {t.getQuote}
-          </Link>
         </div>
 
         <button
@@ -111,15 +105,6 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
-          <li>
-            <Link
-              href="/contact"
-              onClick={() => setOpen(false)}
-              className="inline-block rounded-md bg-amber px-4 py-2 text-sm font-semibold text-navy-dark"
-            >
-              {t.getQuote}
-            </Link>
-          </li>
           <li>
             <Link
               href="/company-profile"
