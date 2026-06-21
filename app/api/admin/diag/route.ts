@@ -44,6 +44,20 @@ export async function GET() {
       .maybeSingle();
     result.readError = read.error?.message ?? null;
     result.readFoundDiagRow = !!read.data;
+
+    // Show what is ACTUALLY stored under the real 'packages' key right now, so
+    // we can tell whether the admin Save is landing in the database.
+    const pkgRows = await supabase
+      .from('site_settings')
+      .select('value, updated_at')
+      .eq('key', 'packages');
+    result.packagesRowCount = pkgRows.data?.length ?? 0;
+    result.packagesReadError = pkgRows.error?.message ?? null;
+    const pkgValue: any = pkgRows.data?.[0]?.value;
+    result.packagesUpdatedAt = pkgRows.data?.[0]?.updated_at ?? null;
+    result.storedPrices = Array.isArray(pkgValue?.pkgMeta)
+      ? pkgValue.pkgMeta.map((p: any) => ({ id: p.id, price: p.price }))
+      : null;
   } catch (e: any) {
     result.exception = e?.message ?? String(e);
   }
