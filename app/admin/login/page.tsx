@@ -51,6 +51,11 @@ export default function AdminLogin() {
               </label>
               <input
                 type="password"
+                name="admin-passcode"
+                autoComplete="new-password"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
                 value={pwd}
                 onChange={(e) => setPwd(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && login()}
