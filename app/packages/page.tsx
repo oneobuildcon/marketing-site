@@ -74,7 +74,7 @@ export default function Packages() {
   useEffect(() => {
     // Load the latest packages from the database (managed in the admin panel).
     // Falls back to the bundled defaults if the request fails.
-    fetch("/api/packages")
+    fetch("/api/packages", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!data) return;

@@ -51,7 +51,7 @@ export default function AdminPackages() {
 
   useEffect(() => {
     // Load the saved packages from the database (shared across all devices).
-    fetch("/api/packages")
+    fetch("/api/packages", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!data) return;
