@@ -5,6 +5,40 @@ import { Images, Save, Trash2, Upload, Loader2 } from "lucide-react";
 
 type GalleryImage = { url: string; caption?: string };
 
+// Phone photos are often 3–10 MB, over the serverless upload limit. Resize +
+// compress in the browser first: max 1600px on the long edge, JPEG ~82%.
+async function compressImage(file: File): Promise<File> {
+  if (!file.type.startsWith("image/")) return file;
+  const dataUrl: string = await new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result as string);
+    fr.onerror = reject;
+    fr.readAsDataURL(file);
+  });
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const im = new Image();
+    im.onload = () => resolve(im);
+    im.onerror = reject;
+    im.src = dataUrl;
+  });
+  const MAX = 1600;
+  let { width, height } = img;
+  if (width > MAX || height > MAX) {
+    if (width >= height) { height = Math.round((height * MAX) / width); width = MAX; }
+    else { width = Math.round((width * MAX) / height); height = MAX; }
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return file;
+  ctx.drawImage(img, 0, 0, width, height);
+  const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
+  if (!blob) return file;
+  const name = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+  return new File([blob], name, { type: "image/jpeg" });
+}
+
 export default function AdminGalleryPage() {
   const [items, setItems] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,13 +61,16 @@ export default function AdminGalleryPage() {
     setMsg(null);
     const added: GalleryImage[] = [];
     try {
-      for (const file of Array.from(files)) {
+      for (const original of Array.from(files)) {
+        const file = await compressImage(original);
         const form = new FormData();
         form.append("file", file);
         form.append("slug", "gallery");
         const res = await fetch("/api/admin/upload", { method: "POST", body: form });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Upload failed");
+        const text = await res.text();
+        let data: any = {};
+        try { data = JSON.parse(text); } catch { /* non-JSON error body */ }
+        if (!res.ok) throw new Error(data.error || (res.status === 413 ? "Image too large — try a smaller photo" : "Upload failed"));
         added.push({ url: data.url, caption: "" });
       }
       setItems((prev) => [...added, ...prev]);
