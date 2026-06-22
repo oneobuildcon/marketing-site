@@ -143,6 +143,35 @@ export async function saveMilestones(value: Milestone[]): Promise<void> {
   if (error) throw error;
 }
 
+// ── Gallery (self-hosted project photos) ────────────────────────────────────
+export type GalleryImage = { url: string; caption?: string };
+
+export async function getGallery(): Promise<GalleryImage[]> {
+  if (!hasSupabase()) return [];
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'gallery')
+      .maybeSingle();
+    if (error) throw error;
+    const v = data?.value as GalleryImage[] | undefined;
+    if (Array.isArray(v)) return v;
+  } catch (e) {
+    console.error('getGallery: returning empty list:', e);
+  }
+  return [];
+}
+
+export async function saveGallery(value: GalleryImage[]): Promise<void> {
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert({ key: 'gallery', value, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}
+
 export type Lead = { id: string; created_at: string; data: Record<string, unknown> };
 
 export async function getLeads(): Promise<Lead[]> {

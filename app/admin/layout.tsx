@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import { LayoutDashboard, Building2, Package, Users, BarChart3, Milestone } from "lucide-react";
+import { LayoutDashboard, Building2, Package, Users, BarChart3, Milestone, Images } from "lucide-react";
 import LogoutButton from "./_LogoutButton";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -56,6 +56,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/5 hover:text-white"
           >
             <Milestone className="h-4 w-4 text-amber" /> Milestones
+          </Link>
+          <Link
+            href="/admin/gallery"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/5 hover:text-white"
+          >
+            <Images className="h-4 w-4 text-amber" /> Gallery
           </Link>
         </nav>
 
