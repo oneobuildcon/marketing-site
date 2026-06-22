@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Wand2, Trash2, Upload, Loader2 } from "lucide-react";
 import type { DbProject } from "@/lib/db";
+import { compressImage } from "@/lib/imageCompress";
 
 type Content = DbProject["en"];
 
@@ -91,13 +92,16 @@ export default function ProjectForm({ project, isNew }: { project?: DbProject; i
     setError("");
     try {
       const newUrls: string[] = [];
-      for (const file of Array.from(files)) {
+      for (const original of Array.from(files)) {
+        const file = await compressImage(original);
         const fd = new FormData();
         fd.append("file", file);
         fd.append("slug", slug);
         const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Upload failed");
+        const text = await res.text();
+        let data: any = {};
+        try { data = JSON.parse(text); } catch { /* non-JSON error body */ }
+        if (!res.ok) throw new Error(data.error || (res.status === 413 ? "Image too large — try a smaller photo" : "Upload failed"));
         newUrls.push(data.url);
       }
       const next = [...photos, ...newUrls];
