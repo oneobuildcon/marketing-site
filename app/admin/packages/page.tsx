@@ -213,6 +213,27 @@ export default function AdminPackages() {
     setContent(updated);
   }
 
+  // Copy every item (all categories) from the currently selected package into
+  // all the other packages, overwriting theirs. Lets the admin fill one package
+  // fully, then duplicate it and tweak the others by hand.
+  function copyToAllPackages() {
+    const source = content[selectedPkg];
+    if (!source) return;
+    const srcName = pkgMeta.find((p) => p.id === selectedPkg)?.name ?? "this package";
+    const others = pkgMeta.filter((p) => p.id !== selectedPkg);
+    if (!others.length) return;
+    if (!confirm(`Copy ALL items from "${srcName}" into the other ${others.length} package(s)? This replaces their current items. You can still edit each one afterwards.`)) return;
+    setContent((prev) => {
+      const updated = { ...prev };
+      others.forEach((p) => {
+        const copy: Record<string, string[]> = {};
+        Object.keys(source).forEach((catId) => { copy[catId] = [...source[catId]]; });
+        updated[p.id] = copy;
+      });
+      return updated;
+    });
+  }
+
   function copyExport() {
     navigator.clipboard.writeText(JSON.stringify({ content, pkgMeta, catMeta }, null, 2));
     setCopied(true);
@@ -419,9 +440,14 @@ export default function AdminPackages() {
                   {currentPkg?.name ?? "—"} Package — {currentCat?.name ?? "—"}
                 </h2>
               </div>
-              <button onClick={addItem} className="flex items-center gap-2 rounded-lg bg-amber px-4 py-2 text-sm font-semibold text-navy-dark hover:bg-amber-light transition">
-                <Plus className="h-4 w-4" /> Add Item
-              </button>
+              <div className="flex items-center gap-2">
+                <button onClick={copyToAllPackages} title="Copy every item from this package into all the other packages" className="flex items-center gap-2 rounded-lg border border-navy/20 px-4 py-2 text-sm font-semibold text-navy hover:bg-navy/5 transition">
+                  <Copy className="h-4 w-4" /> Copy to all packages
+                </button>
+                <button onClick={addItem} className="flex items-center gap-2 rounded-lg bg-amber px-4 py-2 text-sm font-semibold text-navy-dark hover:bg-amber-light transition">
+                  <Plus className="h-4 w-4" /> Add Item
+                </button>
+              </div>
             </div>
 
             <div className="rounded-2xl bg-white border border-black/8 shadow-sm overflow-hidden">
