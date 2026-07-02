@@ -191,23 +191,27 @@ export default function Packages() {
             </Link>
           </div>
 
-          {/* Category tabs - horizontal scroll */}
-          <div className="flex gap-2 overflow-x-auto pb-2 mb-8 scrollbar-hide">
+          {/* Category cards - grid */}
+          <div className="grid grid-cols-2 gap-3 mb-8 sm:grid-cols-3 lg:grid-cols-4">
             {catMeta.map((cat) => {
               const Icon = categoryIcons[cat.id as CategoryId] ?? PencilRuler;
               const isActive = selectedCat === cat.id;
+              const count = content[selectedPkg]?.[cat.id]?.length ?? 0;
               return (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCat(cat.id as CategoryId)}
-                  className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all border ${
+                  className={`flex flex-col items-start gap-2 rounded-2xl border p-4 text-left transition-all ${
                     isActive
-                      ? "bg-navy text-white border-navy shadow-md"
-                      : "bg-gray-50 text-navy/60 border-black/8 hover:bg-amber/10 hover:text-navy hover:border-amber/30"
+                      ? "bg-navy border-navy shadow-lg shadow-navy/20"
+                      : "bg-white border-black/8 hover:border-amber/40 hover:shadow-md"
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${isActive ? "text-amber" : "text-navy/40"}`} strokeWidth={1.5} />
-                  {cat.name}
+                  <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${isActive ? "bg-amber/20" : "bg-amber/10"}`}>
+                    <Icon className="h-5 w-5 text-amber" strokeWidth={1.5} />
+                  </span>
+                  <span className={`text-sm font-semibold leading-tight ${isActive ? "text-white" : "text-navy"}`}>{cat.name}</span>
+                  <span className={`text-xs ${isActive ? "text-amber" : "text-navy/40"}`}>{count} {count === 1 ? "item" : "items"}</span>
                 </button>
               );
             })}
