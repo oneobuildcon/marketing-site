@@ -373,6 +373,8 @@ export default function Home() {
   const yearsLabel = liveStats
     ? `${liveStats.years}+ ${lang === "en" ? "Years" : "वर्षे"}`
     : t.yearsLabel;
+  // Auto years count — keeps every "Years of Experience" mention in sync.
+  const yearsNum = liveStats?.years ?? 6;
 
   return (
     <main>
@@ -588,12 +590,16 @@ export default function Home() {
             <motion.div variants={stagger} className="mt-8 grid gap-3 sm:grid-cols-2">
               {t.whyPoints.map((label, i) => {
                 const Icon = whyIcons[i];
+                // First point is the years of experience — keep it auto-updating.
+                const text = i === 0
+                  ? (lang === "en" ? `${yearsNum}+ Years of Experience` : `${yearsNum}+ वर्षांचा अनुभव`)
+                  : label;
                 return (
-                  <motion.div key={label} variants={fadeUp} whileHover={{ scale: 1.03 }} className="flex items-center gap-3 rounded-xl border border-black/8 p-4 hover:border-amber/40 hover:shadow-md transition-all">
+                  <motion.div key={i} variants={fadeUp} whileHover={{ scale: 1.03 }} className="flex items-center gap-3 rounded-xl border border-black/8 p-4 hover:border-amber/40 hover:shadow-md transition-all">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber/10">
                       <Icon className="h-5 w-5 text-amber" strokeWidth={1.5} />
                     </div>
-                    <span className="text-sm font-medium text-navy/80">{label}</span>
+                    <span className="text-sm font-medium text-navy/80">{text}</span>
                   </motion.div>
                 );
               })}
