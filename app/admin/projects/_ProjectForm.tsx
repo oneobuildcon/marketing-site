@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Wand2, Trash2, Upload, Loader2 } from "lucide-react";
+import { ArrowLeft, Wand2, Trash2, Upload, Loader2, Star } from "lucide-react";
 import type { DbProject } from "@/lib/db";
 import { compressImage } from "@/lib/imageCompress";
 
@@ -123,6 +123,19 @@ export default function ProjectForm({ project, isNew }: { project?: DbProject; i
 
   async function removePhoto(url: string) {
     const next = photos.filter((p) => p !== url);
+    setPhotos(next);
+    if (!isNew) {
+      await fetch(`/api/admin/projects/${slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photos: next }),
+      }).catch(() => {});
+    }
+  }
+
+  async function makeCover(url: string) {
+    // Cover = first photo. Move the chosen photo to the front.
+    const next = [url, ...photos.filter((p) => p !== url)];
     setPhotos(next);
     if (!isNew) {
       await fetch(`/api/admin/projects/${slug}`, {
@@ -332,22 +345,40 @@ export default function ProjectForm({ project, isNew }: { project?: DbProject; i
       {!isNew && (
         <section className="rounded-2xl bg-white border border-black/8 shadow-sm p-6 space-y-4">
           <h2 className="text-lg font-bold text-navy">Photos</h2>
-          <p className="text-xs text-navy/50">Cover photo: first photo in list.</p>
+          <p className="text-xs text-navy/50">The <strong>cover</strong> photo (shown on the Projects page) is marked below. Hover any other photo and click the ★ to make it the cover.</p>
           {photos.length > 0 && (
             <div className="flex flex-wrap gap-3">
-              {photos.map((url) => (
-                <div key={url} className="relative h-[100px] w-[100px] overflow-hidden rounded-lg border border-black/10 group">
-                  <Image src={url} alt="" fill className="object-cover" sizes="100px" />
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(url)}
-                    className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white opacity-0 transition group-hover:opacity-100"
-                    aria-label="Remove photo"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))}
+              {photos.map((url, i) => {
+                const isCover = i === 0;
+                return (
+                  <div key={url} className={`relative h-[100px] w-[100px] overflow-hidden rounded-lg border-2 group ${isCover ? "border-amber" : "border-black/10"}`}>
+                    <Image src={url} alt="" fill className="object-cover" sizes="100px" />
+                    {isCover ? (
+                      <span className="absolute left-1 top-1 flex items-center gap-1 rounded-full bg-amber px-2 py-0.5 text-[10px] font-bold text-navy-dark">
+                        <Star className="h-3 w-3 fill-current" /> Cover
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => makeCover(url)}
+                        className="absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition hover:bg-amber hover:text-navy-dark group-hover:opacity-100"
+                        aria-label="Make cover photo"
+                        title="Make cover photo"
+                      >
+                        <Star className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(url)}
+                      className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white opacity-0 transition group-hover:opacity-100"
+                      aria-label="Remove photo"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-black/20 px-4 py-3 text-sm font-medium text-navy hover:border-amber/50 hover:bg-amber/5">
