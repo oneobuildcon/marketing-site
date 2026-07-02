@@ -7,7 +7,7 @@ import {
   defaultPackageContent,
   PackageContent,
 } from "@/data/packagesData";
-import { Lock, Save, RotateCcw, Plus, Trash2, Copy, CheckCircle2, LogOut, Pencil, X } from "lucide-react";
+import { Lock, Save, RotateCcw, Plus, Trash2, Copy, CheckCircle2, LogOut, Pencil, X, ChevronUp, ChevronDown } from "lucide-react";
 
 const ADMIN_PASSWORD = "oneo2024";
 const STORAGE_KEY = "oneo_packages_content";
@@ -174,6 +174,19 @@ export default function AdminPackages() {
     if (!editingCatId || !editingCatName.trim()) return;
     setCatMeta((prev) => prev.map((c) => c.id === editingCatId ? { ...c, name: editingCatName.trim() } : c));
     setEditingCatId(null);
+  }
+
+  // Reorder categories — the sidebar order is the order shown on the public
+  // Packages page. dir -1 = up, +1 = down.
+  function moveCategory(id: string, dir: -1 | 1) {
+    setCatMeta((prev) => {
+      const i = prev.findIndex((c) => c.id === id);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= prev.length) return prev;
+      const next = [...prev];
+      [next[i], next[j]] = [next[j], next[i]];
+      return next;
+    });
   }
 
   // ── Item actions ─────────────────────────────────────────
@@ -354,7 +367,7 @@ export default function AdminPackages() {
             )}
 
             <div className="rounded-xl overflow-hidden border border-black/8 bg-white shadow-sm">
-              {catMeta.map((cat) => (
+              {catMeta.map((cat, idx) => (
                 <div key={cat.id} className={`group flex items-center border-b border-black/5 last:border-0 transition-all ${selectedCat === cat.id ? "bg-amber" : "hover:bg-gray-50"}`}>
                   {editingCatId === cat.id ? (
                     <div className="flex flex-1 items-center gap-1 px-2 py-2">
@@ -378,6 +391,12 @@ export default function AdminPackages() {
                   )}
                   {editingCatId !== cat.id && (
                     <div className="flex items-center gap-1 pr-2 opacity-0 group-hover:opacity-100 transition">
+                      <button onClick={() => moveCategory(cat.id, -1)} disabled={idx === 0} className="rounded p-1 hover:bg-amber/20 text-navy/40 hover:text-navy disabled:opacity-20 disabled:hover:bg-transparent" title="Move up">
+                        <ChevronUp className="h-3 w-3" />
+                      </button>
+                      <button onClick={() => moveCategory(cat.id, 1)} disabled={idx === catMeta.length - 1} className="rounded p-1 hover:bg-amber/20 text-navy/40 hover:text-navy disabled:opacity-20 disabled:hover:bg-transparent" title="Move down">
+                        <ChevronDown className="h-3 w-3" />
+                      </button>
                       <button onClick={() => startEditCat(cat)} className="rounded p-1 hover:bg-amber/20 text-navy/40 hover:text-navy" title="Rename">
                         <Pencil className="h-3 w-3" />
                       </button>
