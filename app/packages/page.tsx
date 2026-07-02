@@ -128,10 +128,8 @@ export default function Packages() {
       </section>
 
       {/* Package Cards */}
-      <section className="relative bg-white py-12 overflow-hidden">
-        {/* blueprint grid — same texture used across the site */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.035]" style={{ backgroundImage: "linear-gradient(#0B1F3A 1px, transparent 1px), linear-gradient(90deg, #0B1F3A 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="relative mx-auto max-w-6xl px-6">
+      <section className="bg-gray-50 py-12">
+        <div className="mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             {pkgMeta.map((pkg, i) => {
               const isSelected = selectedPkg === pkg.id;
@@ -172,9 +170,8 @@ export default function Packages() {
       </section>
 
       {/* Detail Panel */}
-      <section className="relative bg-white py-10 border-t border-black/5 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#0B1F3A 1px, transparent 1px), linear-gradient(90deg, #0B1F3A 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="relative mx-auto max-w-6xl px-6">
+      <section className="bg-white py-10 border-t border-black/5">
+        <div className="mx-auto max-w-6xl px-6">
 
           {/* Package header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
