@@ -39,6 +39,7 @@ export default function AdminPackages() {
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showExport, setShowExport] = useState(false);
+  const [copyMenu, setCopyMenu] = useState(false);
 
   const [editingPkgId, setEditingPkgId] = useState<string | null>(null);
   const [showAddPkg, setShowAddPkg] = useState(false);
@@ -232,6 +233,35 @@ export default function AdminPackages() {
       });
       return updated;
     });
+  }
+
+  // Copy every item from the selected package into ONE chosen target package.
+  function copyToPackage(targetId: string) {
+    const source = content[selectedPkg];
+    if (!source || targetId === selectedPkg) return;
+    const srcName = pkgMeta.find((p) => p.id === selectedPkg)?.name ?? "this package";
+    const tgtName = pkgMeta.find((p) => p.id === targetId)?.name ?? "that package";
+    if (!confirm(`Copy ALL items from "${srcName}" into "${tgtName}"? This replaces "${tgtName}"'s current items. You can still edit it afterwards.`)) return;
+    setContent((prev) => {
+      const copy: Record<string, string[]> = {};
+      Object.keys(source).forEach((catId) => { copy[catId] = [...source[catId]]; });
+      return { ...prev, [targetId]: copy };
+    });
+    setCopyMenu(false);
+  }
+
+  // Restore the selected package's items to the built-in defaults.
+  function resetPackage() {
+    const name = pkgMeta.find((p) => p.id === selectedPkg)?.name ?? "this package";
+    const def = defaultPackageContent[selectedPkg];
+    if (!def) { alert(`No built-in default exists for "${name}".`); return; }
+    if (!confirm(`Reset "${name}" back to the original built-in items? This discards its current items.`)) return;
+    setContent((prev) => {
+      const copy: Record<string, string[]> = {};
+      Object.keys(def).forEach((catId) => { copy[catId] = [...def[catId]]; });
+      return { ...prev, [selectedPkg]: copy };
+    });
+    setCopyMenu(false);
   }
 
   function copyExport() {
@@ -441,9 +471,29 @@ export default function AdminPackages() {
                 </h2>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={copyToAllPackages} title="Copy every item from this package into all the other packages" className="flex items-center gap-2 rounded-lg border border-navy/20 px-4 py-2 text-sm font-semibold text-navy hover:bg-navy/5 transition">
-                  <Copy className="h-4 w-4" /> Copy to all packages
+                <button onClick={resetPackage} title="Restore this package's items to the original built-in defaults" className="flex items-center gap-2 rounded-lg border border-navy/20 px-3 py-2 text-sm font-semibold text-navy hover:bg-navy/5 transition">
+                  <RotateCcw className="h-4 w-4" /> Reset this package
                 </button>
+                <div className="relative">
+                  <button onClick={() => setCopyMenu((v) => !v)} title="Copy every item from this package into another package" className="flex items-center gap-2 rounded-lg border border-navy/20 px-3 py-2 text-sm font-semibold text-navy hover:bg-navy/5 transition">
+                    <Copy className="h-4 w-4" /> Copy to <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                  {copyMenu && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setCopyMenu(false)} />
+                      <div className="absolute right-0 z-20 mt-1 w-56 overflow-hidden rounded-lg border border-black/10 bg-white shadow-lg">
+                        {pkgMeta.filter((p) => p.id !== selectedPkg).map((p) => (
+                          <button key={p.id} onClick={() => copyToPackage(p.id)} className="block w-full px-4 py-2.5 text-left text-sm text-navy hover:bg-amber/10">
+                            {p.name} <span className="text-navy/40">({p.price})</span>
+                          </button>
+                        ))}
+                        <button onClick={() => { setCopyMenu(false); copyToAllPackages(); }} className="block w-full border-t border-black/8 px-4 py-2.5 text-left text-sm font-semibold text-navy hover:bg-amber/10">
+                          All other packages
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
                 <button onClick={addItem} className="flex items-center gap-2 rounded-lg bg-amber px-4 py-2 text-sm font-semibold text-navy-dark hover:bg-amber-light transition">
                   <Plus className="h-4 w-4" /> Add Item
                 </button>
