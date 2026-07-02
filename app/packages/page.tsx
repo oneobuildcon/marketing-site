@@ -128,8 +128,10 @@ export default function Packages() {
       </section>
 
       {/* Package Cards */}
-      <section className="bg-gray-50 py-12">
-        <div className="mx-auto max-w-6xl px-6">
+      <section className="relative bg-white py-12 overflow-hidden">
+        {/* blueprint grid — same texture used across the site */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.035]" style={{ backgroundImage: "linear-gradient(#0B1F3A 1px, transparent 1px), linear-gradient(90deg, #0B1F3A 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+        <div className="relative mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             {pkgMeta.map((pkg, i) => {
               const isSelected = selectedPkg === pkg.id;
@@ -170,8 +172,9 @@ export default function Packages() {
       </section>
 
       {/* Detail Panel */}
-      <section className="bg-white py-10 border-t border-black/5">
-        <div className="mx-auto max-w-6xl px-6">
+      <section className="relative bg-white py-10 border-t border-black/5 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#0B1F3A 1px, transparent 1px), linear-gradient(90deg, #0B1F3A 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+        <div className="relative mx-auto max-w-6xl px-6">
 
           {/* Package header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -236,10 +239,10 @@ export default function Packages() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.04 }}
-                        className={`flex items-start gap-3 rounded-xl p-4 border ${
+                        className={`flex items-start gap-3 rounded-xl p-4 border transition-all ${
                           notIncluded
                             ? "bg-gray-50 border-black/5 opacity-50"
-                            : "bg-navy/2 border-navy/8 hover:border-amber/40 hover:bg-amber/5 transition-colors"
+                            : "bg-white border-black/8 hover:border-amber/40 hover:shadow-md"
                         }`}
                       >
                         <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${notIncluded ? "text-black/20" : "text-amber"}`} />
