@@ -22,6 +22,7 @@ import {
   PencilRuler,
   KeyRound,
   Download,
+  CalendarDays,
 } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import InstagramFeed from "@/components/InstagramFeed";
@@ -46,6 +47,9 @@ const translations = {
       { label: "Happy Clients",      value: 25, suffix: "+" },
       { label: "Cities Served",      value: 2,  suffix: "" },
     ],
+    numbersBadge: "Our Track Record",
+    numbersTitle: "By the Numbers",
+    numbersLabels: ["Projects Completed", "Sq.ft Constructed", "Satisfied Clients", "Years Experience"],
     servicesBadge: "What We Do",
     servicesTitle: "Our Services",
     services: [
@@ -116,6 +120,9 @@ const translations = {
       { label: "समाधानी ग्राहक",        value: 25, suffix: "+" },
       { label: "सेवा दिलेली शहरे",      value: 2,  suffix: "" },
     ],
+    numbersBadge: "आमची कामगिरी",
+    numbersTitle: "आकड्यांमध्ये",
+    numbersLabels: ["पूर्ण झालेले प्रकल्प", "बांधलेले चौ.फूट", "समाधानी ग्राहक", "वर्षांचा अनुभव"],
     servicesBadge: "आम्ही काय करतो",
     servicesTitle: "आमच्या सेवा",
     services: [
@@ -360,7 +367,7 @@ export default function Home() {
 
   // Live homepage stats: Projects auto-counts from the DB, Years auto-ticks
   // from the founding year, Clients & Cities are admin-editable.
-  const [liveStats, setLiveStats] = useState<{ projects: number; years: number; clients: number; cities: number } | null>(null);
+  const [liveStats, setLiveStats] = useState<{ projects: number; years: number; clients: number; cities: number; sqft?: number } | null>(null);
   useEffect(() => {
     fetch("/api/site-stats", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
@@ -370,9 +377,14 @@ export default function Home() {
 
   const statValues = liveStats ? [liveStats.projects, liveStats.years, liveStats.clients, liveStats.cities] : null;
   const displayStats = statValues ? t.stats.map((s, i) => ({ ...s, value: statValues[i] })) : t.stats;
-  const yearsLabel = liveStats
-    ? `${liveStats.years}+ ${lang === "en" ? "Years" : "वर्षे"}`
-    : t.yearsLabel;
+  // "By the Numbers" block (icon style, mirrors the company profile).
+  const sqftDisplay = liveStats?.sqft ? `${liveStats.sqft.toLocaleString("en-IN")}+` : "67,000+";
+  const numberStats = [
+    { v: `${liveStats?.projects ?? 20}+`, icon: Building2 },
+    { v: sqftDisplay,                     icon: Ruler },
+    { v: `${liveStats?.clients ?? 25}+`,  icon: Users },
+    { v: `${liveStats?.years ?? 6}+`,     icon: CalendarDays },
+  ];
 
   return (
     <main>
@@ -535,69 +547,35 @@ export default function Home() {
         </div>
       </section>
 
-      {/* WHY CHOOSE US */}
+      {/* BY THE NUMBERS */}
       <section className="bg-white py-20">
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 lg:grid-cols-2 items-center">
-          <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="relative h-96 w-full overflow-hidden rounded-2xl shadow-2xl bg-navy">
-            {/* Blueprint grid texture */}
-            <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-            <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-amber/10 blur-2xl" />
-            <div className="absolute -left-8 bottom-0 h-40 w-40 rounded-full bg-amber/10 blur-2xl" />
-
-            <div className="relative flex h-full flex-col justify-between p-8">
-              {/* Brand mark */}
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber/15 border border-amber/30">
-                  <HardHat className="h-6 w-6 text-amber" strokeWidth={1.5} />
-                </div>
-                <div>
-                  <p className="font-bold text-white text-lg leading-tight">One O <span className="text-amber-light">Buildcon</span></p>
-                  <p className="text-xs text-white/50">{t.heroDesc.split("—")[0].trim().slice(0, 36)}…</p>
-                </div>
-              </div>
-
-              {/* Stat grid */}
-              <div className="grid grid-cols-2 gap-3">
-                {displayStats.map((stat) => (
-                  <div key={stat.label} className="rounded-xl bg-white/5 border border-white/10 px-4 py-3 backdrop-blur-sm">
-                    <p className="text-2xl font-black text-amber">{stat.value}{stat.suffix}</p>
-                    <p className="text-[11px] text-white/60 leading-tight mt-0.5">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Years badge */}
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="rounded-lg bg-amber px-4 py-2">
-                  <p className="font-bold text-navy-dark text-lg leading-none">{yearsLabel}</p>
-                  <p className="text-[11px] text-navy-dark/80 mt-0.5">{t.yearsSubLabel}</p>
-                </div>
-                <div className="flex min-w-0 items-center gap-1.5 text-white/70 text-[11px]">
-                  <ShieldCheck className="h-4 w-4 shrink-0 text-amber" strokeWidth={1.5} />
-                  {lang === "en" ? "Licensed & Insured" : "परवानाधारक आणि विमाधारक"}
-                </div>
-              </div>
-            </div>
+        <div className="mx-auto max-w-6xl px-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-amber">{t.numbersBadge}</p>
+            <h2 className="mt-2 text-3xl font-bold text-navy">{t.numbersTitle}</h2>
           </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            <motion.div variants={fadeUp}>
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber">{t.whyBadge}</p>
-              <h2 className="mt-2 text-3xl font-bold text-navy">{t.whyTitle}</h2>
-              <p className="mt-3 text-navy/70">{t.whyDesc}</p>
-            </motion.div>
-            <motion.div variants={stagger} className="mt-8 grid gap-3 sm:grid-cols-2">
-              {t.whyPoints.map((label, i) => {
-                const Icon = whyIcons[i];
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative mt-10 overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-navy-dark shadow-2xl"
+          >
+            <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+            <div className="relative grid grid-cols-2 divide-x divide-white/10 sm:grid-cols-4 [&>*:nth-child(2)]:border-r-0 sm:[&>*:nth-child(2)]:border-r [&>*:nth-child(-n+2)]:border-b [&>*:nth-child(-n+2)]:border-white/10 sm:[&>*]:border-b-0">
+              {numberStats.map((s, i) => {
+                const Icon = s.icon;
                 return (
-                  <motion.div key={label} variants={fadeUp} whileHover={{ scale: 1.03 }} className="flex items-center gap-3 rounded-xl border border-black/8 p-4 hover:border-amber/40 hover:shadow-md transition-all">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber/10">
-                      <Icon className="h-5 w-5 text-amber" strokeWidth={1.5} />
+                  <motion.div key={i} variants={fadeUp} className="flex flex-col items-center px-4 py-8 text-center">
+                    <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-amber/15 text-amber ring-1 ring-amber/30">
+                      <Icon className="h-6 w-6" strokeWidth={1.5} />
                     </div>
-                    <span className="text-sm font-medium text-navy/80">{label}</span>
+                    <p className="text-3xl font-black text-amber sm:text-4xl">{s.v}</p>
+                    <p className="mt-1 text-xs font-medium text-white/70 sm:text-sm">{t.numbersLabels[i]}</p>
                   </motion.div>
                 );
               })}
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </section>
