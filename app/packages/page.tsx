@@ -98,6 +98,48 @@ export default function Packages() {
   const items = content[selectedPkg]?.[selectedCat] ?? [];
   const pkgInfo = pkgMeta.find((p) => p.id === selectedPkg)!;
 
+  // Shared items block — reused for the desktop right panel and the mobile
+  // accordion, so the description shows next to the category, not at the bottom.
+  const itemsBlock = (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={`${selectedPkg}-${selectedCat}`}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: 0.2 }}
+      >
+        {items.length === 0 ? (
+          <div className="rounded-2xl bg-gray-50 border border-black/8 py-16 text-center text-navy/30 text-sm">
+            {ui.noItems}
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {items.map((item, i) => {
+              const notIncluded = item.toLowerCase().includes("not included");
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.04 }}
+                  className={`flex items-start gap-3 rounded-xl p-4 border transition-all ${
+                    notIncluded
+                      ? "bg-gray-50 border-black/5 opacity-50"
+                      : "bg-white border-black/8 hover:border-amber/40 hover:shadow-md"
+                  }`}
+                >
+                  <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${notIncluded ? "text-black/20" : "text-amber"}`} />
+                  <span className={`text-sm leading-snug ${notIncluded ? "text-navy/30" : "text-navy/80"}`}>{item}</span>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+      </motion.div>
+    </AnimatePresence>
+  );
+
   return (
     <main>
       {/* Hero */}
@@ -191,70 +233,45 @@ export default function Packages() {
             </Link>
           </div>
 
-          {/* Category cards - grid */}
-          <div className="grid grid-cols-2 gap-3 mb-8 sm:grid-cols-3 lg:grid-cols-4">
-            {catMeta.map((cat) => {
-              const Icon = categoryIcons[cat.id as CategoryId] ?? PencilRuler;
-              const isActive = selectedCat === cat.id;
-              const count = content[selectedPkg]?.[cat.id]?.length ?? 0;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCat(cat.id as CategoryId)}
-                  className={`flex flex-col items-start gap-2 rounded-2xl border p-4 text-left transition-all ${
-                    isActive
-                      ? "bg-navy border-navy shadow-lg shadow-navy/20"
-                      : "bg-white border-black/8 hover:border-amber/40 hover:shadow-md"
-                  }`}
-                >
-                  <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${isActive ? "bg-amber/20" : "bg-amber/10"}`}>
-                    <Icon className="h-5 w-5 text-amber" strokeWidth={1.5} />
-                  </span>
-                  <span className={`text-sm font-semibold leading-tight ${isActive ? "text-white" : "text-navy"}`}>{cat.name}</span>
-                  <span className={`text-xs ${isActive ? "text-amber" : "text-navy/40"}`}>{count} {count === 1 ? "item" : "items"}</span>
-                </button>
-              );
-            })}
-          </div>
+          {/* Vertical category list (left) + items panel (right).
+              On mobile the items expand right under the tapped category. */}
+          <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+            {/* Category list */}
+            <div className="flex flex-col gap-2">
+              {catMeta.map((cat) => {
+                const Icon = categoryIcons[cat.id as CategoryId] ?? PencilRuler;
+                const isActive = selectedCat === cat.id;
+                const count = content[selectedPkg]?.[cat.id]?.length ?? 0;
+                return (
+                  <div key={cat.id}>
+                    <button
+                      onClick={() => setSelectedCat(cat.id as CategoryId)}
+                      className={`flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-all ${
+                        isActive
+                          ? "bg-navy border-navy shadow-md"
+                          : "bg-white border-black/8 hover:border-amber/40 hover:shadow-sm"
+                      }`}
+                    >
+                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${isActive ? "bg-amber/20" : "bg-amber/10"}`}>
+                        <Icon className="h-5 w-5 text-amber" strokeWidth={1.5} />
+                      </span>
+                      <span className={`flex-1 text-sm font-semibold leading-tight ${isActive ? "text-white" : "text-navy"}`}>{cat.name}</span>
+                      <span className={`text-xs ${isActive ? "text-amber" : "text-navy/40"}`}>{count}</span>
+                      <ChevronDown className={`h-4 w-4 shrink-0 transition-transform lg:hidden ${isActive ? "rotate-180 text-amber" : "text-navy/30"}`} />
+                    </button>
 
-          {/* Items grid */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${selectedPkg}-${selectedCat}`}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-            >
-              {items.length === 0 ? (
-                <div className="rounded-2xl bg-gray-50 border border-black/8 py-16 text-center text-navy/30 text-sm">
-                  {ui.noItems}
-                </div>
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {items.map((item, i) => {
-                    const notIncluded = item.toLowerCase().includes("not included");
-                    return (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.04 }}
-                        className={`flex items-start gap-3 rounded-xl p-4 border transition-all ${
-                          notIncluded
-                            ? "bg-gray-50 border-black/5 opacity-50"
-                            : "bg-white border-black/8 hover:border-amber/40 hover:shadow-md"
-                        }`}
-                      >
-                        <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${notIncluded ? "text-black/20" : "text-amber"}`} />
-                        <span className={`text-sm leading-snug ${notIncluded ? "text-navy/30" : "text-navy/80"}`}>{item}</span>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
+                    {/* Mobile: items expand directly under the active category */}
+                    {isActive && <div className="mt-3 mb-1 lg:hidden">{itemsBlock}</div>}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop: items panel on the right, stays in view */}
+            <div className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
+              {itemsBlock}
+            </div>
+          </div>
         </div>
       </section>
 
