@@ -19,6 +19,8 @@ export default function ContactForm() {
     const phone = (form.elements.namedItem("phone") as HTMLInputElement).value.trim();
     const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim();
     const message = (form.elements.namedItem("message") as HTMLTextAreaElement).value.trim();
+    // Honeypot — real users leave this empty; bots tend to fill every field.
+    const company = ((form.elements.namedItem("company") as HTMLInputElement)?.value ?? "").trim();
 
     // Validate required fields before sending
     const nextErrors: Errors = {};
@@ -39,6 +41,7 @@ export default function ContactForm() {
       phone,
       email,
       message,
+      company,
       source: "Contact Form",
       date: new Date().toLocaleString("en-IN"),
     };
@@ -89,6 +92,8 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      {/* Honeypot — hidden from real users, bots fill it and get rejected. */}
+      <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 opacity-0" />
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-navy">
           Name <span className="text-amber">*</span>

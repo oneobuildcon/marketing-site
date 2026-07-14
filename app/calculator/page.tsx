@@ -598,6 +598,7 @@ export default function CalculatorPage() {
   const [clientName, setClientName] = useState("");
   const [projectLocation, setProjectLocation] = useState("");
   const [clientPhone, setClientPhone] = useState("");
+  const [hpCompany, setHpCompany] = useState(""); // honeypot — stays empty for real users
   const [detailsSubmitted, setDetailsSubmitted] = useState(false);
   const [detailsError, setDetailsError] = useState("");
   const [pkgContent, setPkgContent] = useState<PackageContent>(defaultPackageContent);
@@ -661,6 +662,7 @@ export default function CalculatorPage() {
       location: projectLocation.trim(),
       source: "Cost Calculator",
       date: new Date().toLocaleString("en-IN"),
+      company: hpCompany, // honeypot
       // Calculation details
       package: selectedPkg.name,
       price: selectedPkg.price,
@@ -901,6 +903,8 @@ export default function CalculatorPage() {
               <motion.div variants={fadeUp} className="rounded-2xl bg-white border border-black/8 shadow-sm p-6">
                 <label className="block text-xs font-semibold uppercase tracking-widest text-navy/40 mb-3">{c.yourDetails}</label>
                 <p className="text-xs text-navy/50 mb-3 -mt-1">{c.detailsNote}</p>
+                {/* Honeypot — hidden from real users; bots fill it and get rejected. */}
+                <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" value={hpCompany} onChange={(e) => setHpCompany(e.target.value)} className="absolute left-[-9999px] h-0 w-0 opacity-0" />
                 <div className="space-y-3">
                   <div className="flex flex-col gap-1">
                     <label className="text-sm font-medium text-navy">{c.yourName} <span className="text-red-500">*</span></label>
