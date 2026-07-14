@@ -650,13 +650,26 @@ export default function CalculatorPage() {
     }
     setDetailsError("");
 
-    // Save the lead so it reaches the admin leads page + Google Sheet
+    // Save the lead so it reaches the admin leads page + Google Sheet.
+    // Include the calculation details so the email/admin shows package, area
+    // and estimated cost (not "undefined").
+    const floors = `G+${Math.max(0, floorRows.length - 1)}`;
+    const groundLabel = groundUsage === "mixed" ? "Mixed (House + Parking)" : groundUsage === "parking" ? "Parking" : "House";
     const leadData = {
       name: clientName.trim(),
       phone: `+91${phone}`,
       location: projectLocation.trim(),
       source: "Cost Calculator",
       date: new Date().toLocaleString("en-IN"),
+      // Calculation details
+      package: selectedPkg.name,
+      price: selectedPkg.price,
+      config: floors,
+      ground: groundLabel,
+      totalArea: result?.totalArea ?? "",
+      area: result?.totalArea ?? "",
+      estimatedCost: result?.total ?? "",
+      cost: result?.total ?? "",
     };
     try {
       const existing = JSON.parse(localStorage.getItem("oneo_leads") || "[]");

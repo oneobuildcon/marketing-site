@@ -81,6 +81,8 @@ export default function AdminLeads() {
             const location = val(d, "location");
             const message = val(d, "message");
             const pkg = val(d, "package");
+            const area = val(d, "totalArea") || val(d, "area");
+            const cost = val(d, "estimatedCost") || val(d, "cost");
             const date = val(d, "date") || new Date(lead.created_at).toLocaleString("en-IN");
             return (
               <motion.div
@@ -120,6 +122,16 @@ export default function AdminLeads() {
                   {pkg && (
                     <span className="flex items-center gap-1 rounded-lg bg-navy/5 px-3 py-1.5 font-medium text-navy/60">
                       <Tag className="h-3 w-3" /> {pkg}
+                    </span>
+                  )}
+                  {area && (
+                    <span className="flex items-center gap-1 rounded-lg bg-navy/5 px-3 py-1.5 font-medium text-navy/60">
+                      📐 {Number(area).toLocaleString("en-IN")} sqft
+                    </span>
+                  )}
+                  {cost && (
+                    <span className="flex items-center gap-1 rounded-lg bg-amber/10 px-3 py-1.5 font-semibold text-amber">
+                      💰 ₹{Number(cost).toLocaleString("en-IN")}
                     </span>
                   )}
                   {location && (
