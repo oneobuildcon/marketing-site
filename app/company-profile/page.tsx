@@ -421,6 +421,9 @@ export default function CompanyProfilePage() {
               <a href={WEBSITE} className="flex items-center gap-1.5">
                 <Globe className="h-3.5 w-3.5 text-amber" /> oneobuildcon.com
               </a>
+              <span className="flex items-center gap-1.5">
+                <ClipboardList className="h-3.5 w-3.5 text-amber" /> GSTIN: 27GKVPS6241G1ZE
+              </span>
             </div>
           </div>
           {/* Brand accent bar */}
@@ -726,6 +729,9 @@ export default function CompanyProfilePage() {
                 </a>
                 <p className="flex items-center gap-2.5">
                   <MapPin className="h-5 w-5 shrink-0 text-amber" /> Pune, Maharashtra, India
+                </p>
+                <p className="flex items-center gap-2.5">
+                  <ClipboardList className="h-5 w-5 shrink-0 text-amber" /> GSTIN: 27GKVPS6241G1ZE
                 </p>
               </div>
               <div className="flex flex-col items-center gap-2">

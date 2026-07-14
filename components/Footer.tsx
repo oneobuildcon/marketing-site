@@ -9,6 +9,7 @@ const translations = {
     phone: "Phone",
     email: "Email",
     address: "Address",
+    gst: "GSTIN",
     quickLinks: "Quick Links",
     services: "Services",
     projects: "Projects",
@@ -21,6 +22,7 @@ const translations = {
     phone: "फोन",
     email: "ईमेल",
     address: "पत्ता",
+    gst: "जीएसटीआयएन",
     quickLinks: "द्रुत दुवे",
     services: "सेवा",
     projects: "प्रकल्प",
@@ -49,6 +51,7 @@ export default function Footer() {
             <li>{t.phone}: +91 96074 07474</li>
             <li>{t.email}: oneobuildcon@gmail.com</li>
             <li>{t.address}: Pune, Maharashtra, India</li>
+            <li>{t.gst}: 27GKVPS6241G1ZE</li>
           </ul>
         </div>
 
