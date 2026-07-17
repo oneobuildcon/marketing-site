@@ -15,18 +15,31 @@ function spamReason(body: any): string | null {
   if (String(body?.company ?? body?._hp ?? "").trim()) return "honeypot";
   // Name must be a sensible length.
   if (name.length < 2 || name.length > 60) return "name-length";
+
   // Phone must be a valid Indian mobile (10 digits, starts 6-9).
   const last10 = phoneDigits.slice(-10);
   if (last10.length !== 10 || !/^[6-9]/.test(last10)) return "phone";
-  // Gibberish name: real names don't have several capitals mid-word
-  // (e.g. "gSuUeioqaiExeoQQBgyag").
+  // Fake/patterned phone numbers: too few unique digits, one digit repeated,
+  // or an alternating pattern like 9798989898.
+  if (new Set(last10).size <= 2) return "phone-pattern";
+  if (/(\d)\1{5,}/.test(last10)) return "phone-pattern";     // 999999...
+  if (/(\d\d)\1{2,}/.test(last10)) return "phone-pattern";   // ababab...
+
+  // Gibberish name: several capitals mid-word (e.g. "gSuUeioqaiExeoQQBgyag").
   const internalCaps = (name.match(/(?<=\w)[A-Z]/g) || []).length;
   if (internalCaps >= 3) return "gibberish-name";
-  // Gibberish name: a single long token with almost no vowels.
-  if (!name.includes(" ") && name.length >= 12) {
-    const vowels = (name.match(/[aeiouAEIOU]/g) || []).length;
-    if (vowels / name.length < 0.2) return "gibberish-name";
+  const lower = name.toLowerCase();
+  // Gibberish name: any word of 3+ letters with NO vowel (hghf, ssdd, xyz).
+  for (const tok of lower.split(/\s+/)) {
+    const t = tok.replace(/[^a-z]/g, "");
+    if (t.length >= 3 && !/[aeiou]/.test(t)) return "gibberish-name";
   }
+  // Gibberish name: same letter 3+ times in a row (aaa, sss).
+  if (/([a-z])\1{2,}/.test(lower)) return "gibberish-name";
+  // Keyboard mashing (asdf, qwer, zxcv, hjkl…).
+  const kb = ["asdf", "sdfg", "dfgh", "fghj", "ghjk", "hjkl", "qwer", "wert", "erty", "rtyu", "tyui", "uiop", "zxcv", "xcvb", "cvbn", "vbnm", "qazwsx"];
+  if (kb.some((k) => lower.includes(k))) return "gibberish-name";
+
   return null;
 }
 
