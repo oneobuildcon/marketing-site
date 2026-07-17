@@ -412,9 +412,9 @@ export default function CompanyProfilePage() {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-white/60 sm:text-sm">
-              <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 font-semibold text-white">
+              <a href="https://g.page/r/CQqH7cU9SpacEBM/review" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 font-semibold text-white transition hover:bg-white/20">
                 <Star className="h-4 w-4 fill-amber text-amber" /> {c.rating}
-              </span>
+              </a>
               <a href="tel:+919607407474" className="flex items-center gap-1.5">
                 <PhoneIcon className="h-3.5 w-3.5 text-amber" /> +91 96074 07474
               </a>

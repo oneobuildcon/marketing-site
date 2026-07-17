@@ -22,6 +22,7 @@ import {
   PencilRuler,
   KeyRound,
   Download,
+  Star,
 } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import InstagramFeed from "@/components/InstagramFeed";
@@ -641,9 +642,19 @@ export default function Home() {
       {/* TESTIMONIALS */}
       <section className="bg-navy-dark py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">{t.testimonialsBadge}</p>
-            <h2 className="mt-2 text-3xl font-bold text-white">{t.testimonialsTitle}</h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-light">{t.testimonialsBadge}</p>
+              <h2 className="mt-2 text-3xl font-bold text-white">{t.testimonialsTitle}</h2>
+            </div>
+            <a
+              href="https://g.page/r/CQqH7cU9SpacEBM/review"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-amber px-5 py-2.5 text-sm font-semibold text-navy-dark transition hover:bg-amber-light"
+            >
+              <Star className="h-4 w-4 fill-navy-dark" /> {lang === "en" ? "Review us on Google" : "Google वर रिव्ह्यू द्या"}
+            </a>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mt-10 grid gap-6 sm:grid-cols-3">
             {t.testimonials.map((testimonial, i) => (

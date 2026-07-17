@@ -10,6 +10,7 @@ const translations = {
     email: "Email",
     address: "Address",
     gst: "GSTIN",
+    review: "Review us on Google",
     quickLinks: "Quick Links",
     services: "Services",
     projects: "Projects",
@@ -23,6 +24,7 @@ const translations = {
     email: "ईमेल",
     address: "पत्ता",
     gst: "जीएसटीआयएन",
+    review: "Google वर रिव्ह्यू द्या",
     quickLinks: "द्रुत दुवे",
     services: "सेवा",
     projects: "प्रकल्प",
@@ -52,6 +54,11 @@ export default function Footer() {
             <li>{t.email}: oneobuildcon@gmail.com</li>
             <li>{t.address}: Pune, Maharashtra, India</li>
             <li>{t.gst}: 27GKVPS6241G1ZE</li>
+            <li>
+              <a href="https://g.page/r/CQqH7cU9SpacEBM/review" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 font-semibold text-amber-light hover:text-amber transition">
+                ⭐ {t.review}
+              </a>
+            </li>
           </ul>
         </div>
 
