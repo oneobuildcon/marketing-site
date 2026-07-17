@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import InstagramFeed from "@/components/InstagramFeed";
+import FAQ from "@/components/FAQ";
 import CraneAnimation from "@/components/CraneAnimation";
 
 // ── Translations ────────────────────────────────────────────────────────────
@@ -672,6 +673,9 @@ export default function Home() {
 
       {/* INSTAGRAM FEED */}
       <InstagramFeed />
+
+      {/* FAQ */}
+      <FAQ />
 
       {/* CTA BANNER */}
       <section className="relative overflow-hidden py-24 text-center text-white">

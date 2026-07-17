@@ -230,6 +230,14 @@ export default function ProjectDetailClient({ project }: { project: DbProject })
                   ))}
                 </ul>
               </motion.div>
+
+              {c.testimonial?.quote && (
+                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="rounded-2xl bg-amber/10 border border-amber/30 p-7">
+                  <h2 className="text-xl font-bold text-navy mb-3">{t.testimonial}</h2>
+                  <p className="text-navy/80 italic leading-relaxed">&ldquo;{c.testimonial.quote}&rdquo;</p>
+                  <p className="mt-3 text-sm font-semibold text-amber">— {c.testimonial.author}</p>
+                </motion.div>
+              )}
             </div>
           </div>
         </div>

@@ -99,8 +99,21 @@ export default function FAQ() {
   const { lang } = useLanguage();
   const faqs = faqsData[lang];
 
+  // FAQPage structured data (always English for search engines) so the Q&As
+  // can appear directly in Google search results.
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqsData.en.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <section className="bg-gray-50 py-20">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="mx-auto max-w-3xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

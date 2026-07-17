@@ -555,6 +555,19 @@ export default function CompanyProfilePage() {
             </div>
           </section>
 
+          {/* Certifications & Registrations */}
+          <section className="break-inside-avoid">
+            <h2 className="mb-3 flex items-center gap-2 border-l-4 border-amber pl-3 font-display text-xl font-bold">
+              {c.certs}
+            </h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="flex items-center gap-1.5 rounded-full border border-navy/15 bg-navy/5 px-3 py-1.5 text-sm font-medium text-navy">
+                <ClipboardList className="h-3.5 w-3.5 text-amber" /> GSTIN: 27GKVPS6241G1ZE
+              </span>
+            </div>
+            <p className="mt-2 text-sm text-gray-600">{c.certNote}</p>
+          </section>
+
           {/* Team + Service Areas (two columns) */}
           <section className="grid gap-8 sm:grid-cols-2">
             <div className="break-inside-avoid">
