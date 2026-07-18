@@ -8,15 +8,15 @@ type GalleryImage = { url: string; caption?: string };
 const copy = {
   en: {
     badge: "Our Work",
-    title: "Project Gallery",
-    desc: "A look at the bungalows, row houses and residential projects we've built across Pune.",
+    title: "Behind the Build",
+    desc: "Real photos from our active sites, showing the quality and precision we bring to every stage of construction.",
     empty: "Photos coming soon.",
     follow: "Follow us on Instagram",
   },
   mr: {
     badge: "आमचे काम",
-    title: "प्रकल्प गॅलरी",
-    desc: "पुण्यात आम्ही बांधलेले बंगले, रो हाऊस आणि निवासी प्रकल्प पहा.",
+    title: "बांधकामामागील मेहनत",
+    desc: "आमच्या सुरू असलेल्या साइट्सवरील खरे फोटो — बांधकामाच्या प्रत्येक टप्प्यावरील आमचा दर्जा आणि अचूकता दर्शवणारे.",
     empty: "लवकरच फोटो येत आहेत.",
     follow: "इंस्टाग्रामवर फॉलो करा",
   },
