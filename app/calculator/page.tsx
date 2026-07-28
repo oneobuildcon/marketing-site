@@ -1090,6 +1090,47 @@ export default function CalculatorPage() {
           </p>
         </div>
       </section>
+
+      {/* SEO content — written cost breakdown so the page has indexable text */}
+      <section className="bg-gray-50 py-16 border-t border-black/5">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            { "@type": "Question", name: "What is the construction cost per sq ft in Pune in 2026?", acceptedAnswer: { "@type": "Answer", text: "Construction cost in Pune depends on the package and finishes you choose. One O Buildcon packages start from ₹1,499 per sq.ft (incl. GST). Use the calculator on this page for an instant estimate for your specific home." } },
+            { "@type": "Question", name: "How is built-up area calculated?", acceptedAnswer: { "@type": "Answer", text: "Built-up area is estimated floor by floor. Our calculator adds each floor's slab area, plus about 50% of the ground slab for the plinth and 35% of the top slab for the terrace." } },
+            { "@type": "Question", name: "Does the estimate include GST?", acceptedAnswer: { "@type": "Answer", text: "Yes. The calculator shows both the base construction cost and the total including 18% GST." } },
+            { "@type": "Question", name: "Is the calculator estimate final?", acceptedAnswer: { "@type": "Answer", text: "It is an accurate ballpark based on your area and chosen package. For a fixed figure, our team does a free site visit and prepares a detailed quotation." } },
+          ],
+        }) }} />
+        <div className="mx-auto max-w-3xl px-6">
+          {lang === "en" ? (
+            <div className="prose-none space-y-4 text-navy/75">
+              <h2 className="text-2xl font-bold text-navy">How Construction Cost Is Calculated in Pune</h2>
+              <p>Your construction cost is based on the total <strong>built-up area</strong> of your home multiplied by a <strong>per-square-foot rate</strong> for the package you choose, plus 18% GST. For example, a 2,000 sq.ft built-up home at ₹1,650/sq.ft works out to ₹33,00,000 plus GST. The calculator above does this for you, floor by floor.</p>
+              <h3 className="text-lg font-bold text-navy pt-2">What is built-up area?</h3>
+              <p>Built-up area includes usable floor space plus walls, and a share for the plinth and terrace. Our calculator estimates the plinth at 50% of the ground slab and the terrace at 35% of the top slab, then adds each floor.</p>
+              <h3 className="text-lg font-bold text-navy pt-2">What affects your cost?</h3>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Built-up area and number of floors</li>
+                <li>Package and specification (Basic to Royal)</li>
+                <li>Material brands and finishes</li>
+                <li>Site conditions, soil and access</li>
+                <li>Ground-floor usage (parking vs living space)</li>
+              </ul>
+              <h3 className="text-lg font-bold text-navy pt-2">What's included in our packages?</h3>
+              <p>Every One O Buildcon package covers design &amp; drawings, earthwork, RCC structure, brickwork &amp; plaster, waterproofing, flooring, kitchen, bathroom, doors, windows, plumbing and electrical work. See our <Link href="/packages" className="text-amber font-semibold hover:underline">packages page</Link> for a full breakdown, or explore <Link href="/rcc-contractor-pune" className="text-amber font-semibold hover:underline">RCC contractor services in Pune</Link>.</p>
+              <p className="text-sm text-navy/50 pt-2">Construction cost per sq ft in Pune starts from ₹1,499 (incl. GST) with One O Buildcon. Get a free, detailed, site-specific quotation from our team.</p>
+            </div>
+          ) : (
+            <div className="space-y-4 text-navy/75">
+              <h2 className="text-2xl font-bold text-navy">पुण्यात बांधकाम खर्च कसा मोजला जातो</h2>
+              <p>तुमचा बांधकाम खर्च तुमच्या घराच्या एकूण <strong>बांधकाम क्षेत्रा</strong>ला तुम्ही निवडलेल्या पॅकेजच्या <strong>प्रति चौरस फूट दरा</strong>ने गुणून, अधिक १८% GST असा मोजला जातो. वरील कॅल्क्युलेटर हे मजल्यानुसार आपोआप करते.</p>
+              <p>खर्चावर परिणाम करणारे घटक: बांधकाम क्षेत्र व मजले, निवडलेले पॅकेज, मटेरियल ब्रँड, साइट परिस्थिती आणि ग्राउंड फ्लोअरचा वापर. संपूर्ण तपशीलासाठी आमचे <Link href="/packages" className="text-amber font-semibold hover:underline">पॅकेज पेज</Link> पहा.</p>
+            </div>
+          )}
+        </div>
+      </section>
     </main>
   );
 }
