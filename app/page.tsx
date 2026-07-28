@@ -191,11 +191,6 @@ const projectImgs = [
 ];
 
 // ── Testimonial avatars ───────────────────────────────────────────────────────
-const avatarImgs = [
-  "https://picsum.photos/seed/avatar1/80/80",
-  "https://picsum.photos/seed/avatar2/80/80",
-  "https://picsum.photos/seed/avatar3/80/80",
-];
 
 // ── Floating hero icons ───────────────────────────────────────────────────────
 const floatingIcons = [
@@ -690,8 +685,7 @@ export default function Home() {
       <FAQ />
 
       {/* CTA BANNER */}
-      <section className="relative overflow-hidden py-24 text-center text-white">
-        <Image src="https://picsum.photos/seed/ctabg/1600/600" alt="Construction project" fill className="object-cover opacity-25" />
+      <section className="relative overflow-hidden bg-navy py-24 text-center text-white">
         <div className="absolute inset-0 bg-navy/85" />
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="relative mx-auto max-w-2xl px-6">
