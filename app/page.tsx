@@ -656,28 +656,29 @@ export default function Home() {
               <Star className="h-4 w-4 fill-navy-dark" /> {lang === "en" ? "Review us on Google" : "Google वर रिव्ह्यू द्या"}
             </a>
           </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mt-10 grid gap-6 sm:grid-cols-3">
-            {t.testimonials.map((testimonial, i) => (
-              <motion.div key={testimonial.name} variants={fadeUp} whileHover={{ y: -4 }} className="rounded-2xl bg-white/5 border border-white/10 p-6 text-white hover:border-amber/30 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="relative h-12 w-12 overflow-hidden rounded-full ring-2 ring-amber/40">
-                    <Image src={avatarImgs[i]} alt={testimonial.name} fill className="object-cover" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">{testimonial.name}</p>
-                    <p className="text-xs text-amber-light">{testimonial.project}</p>
-                  </div>
-                </div>
-                <p className="mt-4 text-sm text-white/80 leading-relaxed">&ldquo;{testimonial.quote}&rdquo;</p>
-                <div className="mt-4 flex gap-1">
-                  {[...Array(5)].map((_, j) => (
-                    <svg key={j} className="h-4 w-4 fill-amber text-amber" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
+          {/* Real reviews live on Google — we link out instead of showing invented quotes. */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mt-10 rounded-2xl bg-white/5 border border-white/10 p-8 text-center">
+            <div className="flex items-center justify-center gap-1">
+              {[...Array(5)].map((_, j) => (
+                <svg key={j} className="h-6 w-6 fill-amber text-amber" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
+            <p className="mt-3 text-2xl font-bold text-white">4.9 <span className="text-base font-normal text-white/60">{lang === "en" ? "on Google" : "Google वर"}</span></p>
+            <p className="mx-auto mt-3 max-w-xl text-white/70">
+              {lang === "en"
+                ? "We let our work — and our clients — speak for us. Read genuine reviews from the families we've built homes for."
+                : "आमचे काम आणि आमचे ग्राहक स्वतः बोलतात. आम्ही ज्यांची घरे बांधली त्या कुटुंबांचे खरे रिव्ह्यू वाचा."}
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <a href="https://www.google.com/maps?cid=11283287545597495050" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10">
+                {lang === "en" ? "Read Google Reviews" : "Google रिव्ह्यू वाचा"}
+              </a>
+              <a href="https://g.page/r/CQqH7cU9SpacEBM/review" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl bg-amber px-5 py-2.5 text-sm font-semibold text-navy-dark transition hover:bg-amber-light">
+                <Star className="h-4 w-4 fill-navy-dark" /> {lang === "en" ? "Leave a Review" : "रिव्ह्यू द्या"}
+              </a>
+            </div>
           </motion.div>
         </div>
       </section>

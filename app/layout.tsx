@@ -79,18 +79,34 @@ export default function RootLayout({
     email: "oneobuildcon@gmail.com",
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Pune",
+      streetAddress: "Patharemala, Charholi Budruk",
+      addressLocality: "Pimpri Chinchwad, Pune",
       addressRegion: "Maharashtra",
+      postalCode: "412105",
       addressCountry: "IN",
     },
-    geo: { "@type": "GeoCoordinates", latitude: 18.5204, longitude: 73.8567 },
+    geo: { "@type": "GeoCoordinates", latitude: 18.5531, longitude: 73.8645 },
     openingHoursSpecification: [
-      { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], opens: "09:00", closes: "18:00" },
+      { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], opens: "07:30", closes: "20:00" },
     ],
-    sameAs: ["https://wa.me/919607407474"],
+    sameAs: ["https://wa.me/919607407474", "https://instagram.com/one_o_buildcon"],
     priceRange: "₹₹₹",
-    areaServed: { "@type": "State", name: "Maharashtra" },
+    areaServed: [
+      { "@type": "City", name: "Pune" },
+      { "@type": "City", name: "Pimpri-Chinchwad" },
+    ],
     knowsAbout: ["Bungalow Construction","Row House Construction","Residential Building","Farmhouse Construction","RCC Contractors","Home Construction Pune"],
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Construction Services",
+      itemListElement: [
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "RCC Work", description: "RCC framework — footings, columns, beams and slabs as per structural design." } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Bungalow Construction", description: "Custom premium bungalow construction in Pune and Pimpri-Chinchwad." } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Row House Construction", description: "Planned row house developments with durable, quality construction." } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Farmhouse Construction", description: "Farmhouse construction with end-to-end planning and finishing." } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Interior Finishing", description: "Flooring, kitchen, bathroom, doors, windows, plumbing and electrical finishing." } },
+      ],
+    },
   };
 
   return (
