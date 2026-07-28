@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { getProjects } from "@/lib/db";
+import { serviceAreas } from "@/lib/serviceAreas";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -17,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/packages`, priority: 0.6, changeFrequency: "monthly" as const },
     { url: `${base}/company-profile`, priority: 0.5, changeFrequency: "monthly" as const },
     { url: `${base}/gallery`, priority: 0.6, changeFrequency: "weekly" as const },
+    ...serviceAreas.map((a) => ({ url: `${base}/${a.slug}`, priority: 0.8, changeFrequency: "monthly" as const })),
   ];
 
   // Pull live projects from the DB so admin-added projects appear in the sitemap.

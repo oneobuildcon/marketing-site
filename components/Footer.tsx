@@ -68,6 +68,9 @@ export default function Footer() {
             <li><a href="/services" className="hover:text-amber-light">{t.services}</a></li>
             <li><a href="/projects" className="hover:text-amber-light">{t.projects}</a></li>
             <li><a href="/contact" className="hover:text-amber-light">{t.contactLink}</a></li>
+            <li><a href="/rcc-contractor-pune" className="hover:text-amber-light">RCC Contractor in Pune</a></li>
+            <li><a href="/bungalow-construction-pimpri-chinchwad" className="hover:text-amber-light">Bungalow Construction Pimpri-Chinchwad</a></li>
+            <li><a href="/construction-company-charholi" className="hover:text-amber-light">Construction Company Charholi</a></li>
           </ul>
         </div>
       </div>
