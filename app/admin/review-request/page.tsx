@@ -5,7 +5,9 @@ import { Star, Send, Copy, CheckCircle2, RotateCcw } from "lucide-react";
 
 // Template stored in localStorage so edits stick per browser.
 const TPL_KEY = "oneo_review_request_template";
-const REVIEW_LINK = "https://g.page/r/CQqH7cU9SpacEBM/review";
+// Branded short link — WhatsApp shows the One O Buildcon logo preview, then
+// redirects the visitor to the actual Google review URL.
+const REVIEW_LINK = "https://oneobuildcon.com/review";
 
 const defaultTemplate = `Hello {name},
 
