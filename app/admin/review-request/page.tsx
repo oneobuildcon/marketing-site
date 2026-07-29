@@ -38,6 +38,53 @@ export default function AdminReviewRequest() {
   const [location, setLocation] = useState("");
   const [locationMr, setLocationMr] = useState("");
   const [copied, setCopied] = useState(false);
+  // Track whether the admin manually edited the Marathi field. If they did,
+  // stop auto-transliterating so we don't clobber their edits.
+  const [nameMrEdited, setNameMrEdited] = useState(false);
+  const [locationMrEdited, setLocationMrEdited] = useState(false);
+
+  // Auto-transliterate English → Marathi via Google's public input tool.
+  async function transliterate(text: string): Promise<string> {
+    const t = text.trim();
+    if (!t) return "";
+    try {
+      const words = t.split(/\s+/);
+      const out: string[] = [];
+      for (const w of words) {
+        const r = await fetch(
+          `https://inputtools.google.com/request?text=${encodeURIComponent(w)}&itc=mr-t-i0-und&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8`
+        );
+        const d = await r.json();
+        out.push(d?.[0] === "SUCCESS" ? d[1][0][1][0] : w);
+      }
+      return out.join(" ");
+    } catch {
+      return t; // network failure — leave as English
+    }
+  }
+
+  // Debounced auto-transliteration when the English name changes.
+  useEffect(() => {
+    if (nameMrEdited) return;
+    if (!name.trim()) { setNameMr(""); return; }
+    const id = setTimeout(async () => {
+      const mr = await transliterate(name);
+      if (!nameMrEdited) setNameMr(mr);
+    }, 500);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name]);
+
+  useEffect(() => {
+    if (locationMrEdited) return;
+    if (!location.trim()) { setLocationMr(""); return; }
+    const id = setTimeout(async () => {
+      const mr = await transliterate(location);
+      if (!locationMrEdited) setLocationMr(mr);
+    }, 500);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
 
   useEffect(() => {
     try {
@@ -99,9 +146,9 @@ export default function AdminReviewRequest() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div><label className={label}>Client Name (English)</label><input className={input} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Rahul Sharma" /></div>
           <div><label className={label}>WhatsApp Number</label><input className={input} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="10-digit mobile" /></div>
-          <div><label className={label}>Client Name (Marathi) <span className="text-navy/40 font-normal">— optional</span></label><input className={input} value={nameMr} onChange={(e) => setNameMr(e.target.value)} placeholder="उदा. राहुल शर्मा" /></div>
+          <div><label className={label}>Client Name (Marathi) <span className="text-navy/40 font-normal">— auto</span></label><input className={input} value={nameMr} onChange={(e) => { setNameMr(e.target.value); setNameMrEdited(true); }} placeholder="Fills automatically…" /></div>
           <div><label className={label}>Project Location (English)</label><input className={input} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Wagholi, Pune" /></div>
-          <div><label className={label}>Project Location (Marathi) <span className="text-navy/40 font-normal">— optional</span></label><input className={input} value={locationMr} onChange={(e) => setLocationMr(e.target.value)} placeholder="उदा. वाघोली, पुणे" /></div>
+          <div><label className={label}>Project Location (Marathi) <span className="text-navy/40 font-normal">— auto</span></label><input className={input} value={locationMr} onChange={(e) => { setLocationMr(e.target.value); setLocationMrEdited(true); }} placeholder="Fills automatically…" /></div>
         </div>
       </section>
 
