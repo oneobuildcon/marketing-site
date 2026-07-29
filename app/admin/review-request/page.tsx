@@ -13,20 +13,21 @@ const REVIEW_LINK = "https://oneobuildcon.com/review-us";
 
 const defaultTemplate = `Hello {name},
 
-Thank you for choosing *One O Buildcon* for your construction project at {location}. 🏗️
+Thank you for trusting *One O Buildcon* with your construction project at {location}. It has been a pleasure working with you.
 
-A quick Google review would mean a lot to us and helps our small business grow. Please share your experience using the link below.
+Your feedback matters to us. If you're satisfied with our work, we would sincerely appreciate a short Google review — it helps us grow and reach more families like yours.
 
 👉 {link}
 
 नमस्कार {name_mr},
 
-{location_mr} येथील बांधकाम प्रकल्पासाठी *One O Buildcon* ची निवड केल्याबद्दल धन्यवाद. 🏗️
+{location_mr} येथील बांधकाम प्रकल्पासाठी *One O Buildcon* वर विश्वास ठेवल्याबद्दल मनःपूर्वक धन्यवाद. तुमच्यासोबत काम करणे आमच्यासाठी आनंदाची गोष्ट होती.
 
-तुमचा Google रिव्ह्यू आमच्यासाठी खूप महत्त्वाचा आहे. कृपया खालील लिंकवरून तुमचा अनुभव शेअर करा.
+तुमचा अभिप्राय आमच्यासाठी महत्त्वाचा आहे. आमच्या कामाबद्दल तुम्ही समाधानी असाल, तर कृपया Google वर एक छोटासा रिव्ह्यू द्यावा — यामुळे आम्हाला वाढण्यास आणि अधिक कुटुंबांपर्यंत पोहोचण्यास मदत होते.
 
 👉 {link}
 
+Warm regards,
 Team One O Buildcon
 📞 9607407474`;
 
