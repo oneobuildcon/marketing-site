@@ -6,22 +6,24 @@ import { redirect } from "next/navigation";
 // the visitor is bounced straight to the real Google review URL.
 const GOOGLE_REVIEW_URL = "https://g.page/r/CQqH7cU9SpacEBM/review";
 
+// Metadata omits `openGraph.images` so this route inherits the site's
+// auto-generated 1200x630 branded OG image (app/opengraph-image.tsx),
+// which WhatsApp renders as the link preview card.
 export const metadata: Metadata = {
   title: "Leave a Review | One O Buildcon",
   description:
     "Share your experience with One O Buildcon on Google. A quick review helps our small business grow — thank you!",
   openGraph: {
-    title: "Leave a Review | One O Buildcon",
+    title: "One O Buildcon — Leave a Review",
     description:
       "Share your experience with One O Buildcon on Google. Thank you for helping our small business grow.",
     url: "https://oneobuildcon.com/review",
-    images: [{ url: "/logo.png", width: 1024, height: 1024, alt: "One O Buildcon" }],
+    siteName: "One O Buildcon",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Leave a Review | One O Buildcon",
+    title: "One O Buildcon — Leave a Review",
     description: "Share your experience with One O Buildcon on Google.",
-    images: ["/logo.png"],
   },
 };
 
