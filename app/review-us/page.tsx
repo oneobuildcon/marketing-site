@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     title: "One O Buildcon — Leave a Review",
     description:
       "Share your experience with One O Buildcon on Google. Thank you for helping our small business grow.",
-    url: "https://oneobuildcon.com/review",
+    url: "https://oneobuildcon.com/review-us",
     siteName: "One O Buildcon",
     images: [{ url: OG_IMAGE, width: 1024, height: 1024, alt: "One O Buildcon" }],
   },
