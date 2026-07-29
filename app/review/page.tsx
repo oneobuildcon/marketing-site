@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import ReviewRedirect from "./ReviewRedirect";
 
-// Short branded link for WhatsApp / SMS review requests. WhatsApp reads the
-// OG tags here (with the site logo) and shows a branded preview card, then
-// the visitor is bounced straight to the real Google review URL.
+// Short branded link for WhatsApp review requests. IMPORTANT: this must
+// render HTML (not do a server redirect) so WhatsApp/Facebook crawlers can
+// read the OG tags and show the branded preview card. Real users are
+// bounced to Google by the client component below.
 const GOOGLE_REVIEW_URL = "https://g.page/r/CQqH7cU9SpacEBM/review";
 
-// Metadata omits `openGraph.images` so this route inherits the site's
-// auto-generated 1200x630 branded OG image (app/opengraph-image.tsx),
-// which WhatsApp renders as the link preview card.
 export const metadata: Metadata = {
   title: "Leave a Review | One O Buildcon",
   description:
@@ -27,6 +25,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ReviewRedirect() {
-  redirect(GOOGLE_REVIEW_URL);
+export default function Page() {
+  return <ReviewRedirect url={GOOGLE_REVIEW_URL} />;
 }
