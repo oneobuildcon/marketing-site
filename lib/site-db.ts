@@ -191,3 +191,30 @@ export async function createLead(payload: Record<string, unknown>): Promise<void
   const { error } = await supabase.from('leads').insert({ data: payload });
   if (error) throw error;
 }
+
+// Admin password hash (SHA-256 hex). Stored in site_settings so a password
+// reset via OTP persists across deploys without touching env vars.
+export async function getAdminPasswordHash(): Promise<string | null> {
+  if (!hasSupabase()) return null;
+  try {
+    const supabase = createServerClient();
+    const { data } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'adminPasswordHash')
+      .single();
+    const v = data?.value as { hash?: string } | undefined;
+    return v?.hash ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveAdminPasswordHash(hash: string): Promise<void> {
+  if (!hasSupabase()) throw new Error('Database not configured');
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert({ key: 'adminPasswordHash', value: { hash }, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
+import { getAdminPasswordHash } from '@/lib/site-db';
+import { hashPassword } from '@/lib/adminOtp';
 
 // Fallback password so the admin panel is always reachable even if the
 // ADMIN_PASSWORD env var is missing or got a stray space/newline when pasted
@@ -10,10 +12,12 @@ export async function POST(req: NextRequest) {
   const { password } = await req.json();
   const submitted = String(password ?? '').trim();
   const expected = (process.env.ADMIN_PASSWORD ?? '').trim();
+  const storedHash = await getAdminPasswordHash();
 
   const ok =
-    (expected.length > 0 && submitted === expected) ||
-    submitted === FALLBACK_PASSWORD;
+    (storedHash !== null && hashPassword(submitted) === storedHash) ||
+    (storedHash === null && expected.length > 0 && submitted === expected) ||
+    (storedHash === null && submitted === FALLBACK_PASSWORD);
 
   if (!ok) {
     return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
