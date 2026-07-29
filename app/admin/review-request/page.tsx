@@ -17,9 +17,9 @@ A quick Google review would mean a lot to us and helps our small business grow. 
 
 👉 {link}
 
-नमस्कार {name},
+नमस्कार {name_mr},
 
-{location} येथील बांधकाम प्रकल्पासाठी *One O Buildcon* ची निवड केल्याबद्दल धन्यवाद. 🏗️
+{location_mr} येथील बांधकाम प्रकल्पासाठी *One O Buildcon* ची निवड केल्याबद्दल धन्यवाद. 🏗️
 
 तुमचा Google रिव्ह्यू आमच्यासाठी खूप महत्त्वाचा आहे. कृपया खालील लिंकवरून तुमचा अनुभव शेअर करा.
 
@@ -31,8 +31,10 @@ Team One O Buildcon
 export default function AdminReviewRequest() {
   const [template, setTemplate] = useState(defaultTemplate);
   const [name, setName] = useState("");
+  const [nameMr, setNameMr] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
+  const [locationMr, setLocationMr] = useState("");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -51,9 +53,15 @@ export default function AdminReviewRequest() {
     try { localStorage.setItem(TPL_KEY, defaultTemplate); } catch {}
   }
 
+  // Marathi variants fall back to English if the admin didn't fill them in,
+  // so an English-only send still works.
+  const nameEn = name.trim() || "[Client Name]";
+  const locationEn = location.trim() || "[Location]";
   const finalMessage = template
-    .replaceAll("{name}", name.trim() || "[Client Name]")
-    .replaceAll("{location}", location.trim() || "[Location]")
+    .replaceAll("{name_mr}", nameMr.trim() || nameEn)
+    .replaceAll("{location_mr}", locationMr.trim() || locationEn)
+    .replaceAll("{name}", nameEn)
+    .replaceAll("{location}", locationEn)
     .replaceAll("{link}", REVIEW_LINK);
 
   function digits(p: string) {
@@ -87,9 +95,11 @@ export default function AdminReviewRequest() {
       <section className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
         <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-amber">Client</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          <div><label className={label}>Client Name</label><input className={input} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Rahul Sharma" /></div>
+          <div><label className={label}>Client Name (English)</label><input className={input} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Rahul Sharma" /></div>
           <div><label className={label}>WhatsApp Number</label><input className={input} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="10-digit mobile" /></div>
-          <div className="sm:col-span-2"><label className={label}>Project Location</label><input className={input} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Wagholi, Pune" /></div>
+          <div><label className={label}>Client Name (Marathi) <span className="text-navy/40 font-normal">— optional</span></label><input className={input} value={nameMr} onChange={(e) => setNameMr(e.target.value)} placeholder="उदा. राहुल शर्मा" /></div>
+          <div><label className={label}>Project Location (English)</label><input className={input} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Wagholi, Pune" /></div>
+          <div><label className={label}>Project Location (Marathi) <span className="text-navy/40 font-normal">— optional</span></label><input className={input} value={locationMr} onChange={(e) => setLocationMr(e.target.value)} placeholder="उदा. वाघोली, पुणे" /></div>
         </div>
       </section>
 
