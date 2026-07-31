@@ -623,9 +623,9 @@ export default function AdminQuotation() {
     numberedItems(notes);
 
     // ── Closing, stamp & signature, right after the special notes ──
-    const signW = marks.sign ? 40 : 0;
+    const signW = marks.sign ? 52 : 0;
     const signH = marks.sign ? signW / (marks.sign.ratio || 3) : 0;
-    const stampW = marks.stamp ? 24 : 0;
+    const stampW = marks.stamp ? 34 : 0;
     const stampH = marks.stamp ? stampW / (marks.stamp.ratio || 1) : 0;
     const markH = Math.max(signH, stampH);
     // Falls back to blank space for a wet signature if either image fails.
@@ -640,11 +640,9 @@ export default function AdminQuotation() {
 
     if (markH > 0) {
       const top = y + 3;
-      // Stamp sits under the left half of the signature, the way it lands on
-      // paper: stamped first, then signed across it.
+      // Stamp sits at the left margin, well clear of the signature on the right.
       if (marks.stamp) {
-        const stampX = R - signW - stampW + 10; // ~10mm of overlap
-        doc.addImage(marks.stamp.data, "PNG", stampX, top + (markH - stampH) / 2, stampW, stampH);
+        doc.addImage(marks.stamp.data, "PNG", L, top + (markH - stampH) / 2, stampW, stampH);
       }
       if (marks.sign) {
         doc.addImage(marks.sign.data, "PNG", R - signW, top + (markH - signH) / 2, signW, signH);
