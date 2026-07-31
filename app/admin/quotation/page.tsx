@@ -263,11 +263,6 @@ export default function AdminQuotation() {
     doc.setFontSize(15);
     doc.setFont("helvetica", "bold");
     doc.text("QUOTATION", W / 2, y, { align: "center" });
-    doc.setFontSize(8.5);
-    doc.setFont("helvetica", "normal");
-    doc.text(`No: ${quotationNo}`, R, y - 4, { align: "right" });
-    doc.text(`Date: ${date}`, R, y, { align: "right" });
-    doc.text(`Valid: ${validity}`, R, y + 4, { align: "right" });
     y += 8;
 
     // Client box — all client fields stacked on the left.
@@ -277,7 +272,8 @@ export default function AdminQuotation() {
       `Location: ${location || "—"}`,
       ...(address.trim() ? [`Address: ${address.trim()}`] : []),
     ];
-    const boxH = 12 + clientLines.length * 5 + 7;
+    const boxRows = Math.max(clientLines.length, 3); // meta column is 3 lines
+    const boxH = 12 + boxRows * 5 + 7;
     doc.setFillColor(249, 250, 251);
     doc.roundedRect(L, y, R - L, boxH, 2, 2, "F");
     doc.setTextColor(...navy);
@@ -287,11 +283,15 @@ export default function AdminQuotation() {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     clientLines.forEach((line, i) => doc.text(line, L + 5, y + 12 + i * 5));
+    // Quotation meta, right-aligned level with the client rows.
+    [`No: ${quotationNo}`, `Date: ${date}`, `Valid: ${validity}`].forEach((line, i) =>
+      doc.text(line, R - 5, y + 12 + i * 5, { align: "right" })
+    );
     doc.setFont("helvetica", "bold");
     doc.text(
       `Package: ${quotationPresets.find((p) => p.id === pkgId)?.label.split(" — ")[0] ?? ""} @ Rs.${rate}/sqft`,
       L + 5,
-      y + 12 + clientLines.length * 5 + 2
+      y + 12 + boxRows * 5 + 2
     );
     y += boxH + 6;
 
