@@ -203,6 +203,12 @@ export default function AdminQuotation() {
     function ensure(space: number) {
       if (y + space > 283) { footer(); doc.addPage(); y = 16; }
     }
+    // Start a fresh page so a group of sections stays together.
+    function newPage() {
+      footer();
+      doc.addPage();
+      y = 16;
+    }
     function sectionTitle(text: string) {
       ensure(14);
       doc.setFillColor(...navy);
@@ -313,8 +319,8 @@ export default function AdminQuotation() {
     y += 2;
     numberedItems(notes);
 
-    // ── Estimate ──
-    y += 2;
+    // ── Estimate + payment schedule: their own page ──
+    newPage();
     sectionTitle("TENTATIVE ESTIMATE");
     y += 2;
     ensure(12);
@@ -403,7 +409,8 @@ export default function AdminQuotation() {
     doc.text(`Rs. ${inr(Math.round((totalAmount * paySum) / 100))}`, R - 3, y + 4.8, { align: "right" });
     y += 11;
 
-    // ── Rates & brands ──
+    // ── Rates & brands: their own page ──
+    newPage();
     sectionTitle("RATE CONSIDERED & BRANDS USED");
     y += 2;
     function rateTable(headerLabel: string, groups: RateGroup[]) {
