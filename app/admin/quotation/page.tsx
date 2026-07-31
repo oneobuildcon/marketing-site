@@ -177,6 +177,8 @@ async function loadInkMark(src: string): Promise<Mark | null> {
 
 async function loadMarks(): Promise<{ stamp: Mark | null; sign: Mark | null }> {
   const [sign, stamp] = await Promise.all([loadInkMark(SIGN_SRC), loadInkMark(STAMP_SRC)]);
+  if (!sign) console.warn("Quotation: signature image could not be loaded", SIGN_SRC);
+  if (!stamp) console.warn("Quotation: stamp image could not be loaded", STAMP_SRC);
   return { stamp, sign };
 }
 
@@ -1108,7 +1110,28 @@ export default function AdminQuotation() {
           </div>
         </section>
 
-        <div className="flex flex-col gap-3 pb-10 sm:flex-row sm:items-center sm:justify-between">
+        {/* Quick check that the stamp and signature images are reachable — if
+            either box below is empty, the PDF will print blank signing space. */}
+        <section className="mt-5 rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
+          <h2 className="mb-3 text-sm font-bold uppercase tracking-widest text-amber">Stamp &amp; Signature</h2>
+          <div className="flex flex-wrap items-center gap-6">
+            {[
+              { label: "Signature", src: SIGN_SRC },
+              { label: "Stamp", src: STAMP_SRC },
+            ].map((m) => (
+              <div key={m.label}>
+                <div className="mb-1 text-xs font-semibold text-navy/60">{m.label}</div>
+                {/* Plain img on purpose: it loads straight from the bucket, so a
+                    broken box means the URL itself is wrong. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={m.src} alt={m.label} className="h-20 w-auto rounded border border-black/10 bg-white object-contain" />
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-navy/50">Both should appear above. If a box is blank or broken, the image URL is wrong and the PDF will leave empty space to sign by hand.</p>
+        </section>
+
+        <div className="mt-5 flex flex-col gap-3 pb-10 sm:flex-row sm:items-center sm:justify-between">
           <button onClick={saveTemplate} className="flex items-center gap-2 rounded-xl border border-navy/20 px-4 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5"><RotateCcw className="h-4 w-4" /> Save header &amp; bank</button>
           <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
             <button onClick={previewPDF} className="flex items-center justify-center gap-2 rounded-xl border border-navy/20 px-3 py-3 text-sm font-semibold text-navy hover:bg-navy/5 transition"><Eye className="h-4 w-4" /> Preview</button>
