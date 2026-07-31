@@ -261,7 +261,7 @@ export default function AdminQuotation() {
       doc.setFontSize(8.5);
     }
     function ensure(space: number) {
-      if (y + space > 283) { footer(); doc.addPage(); y = 16; resetStyle(); }
+      if (y + space > 286) { footer(); doc.addPage(); y = 16; resetStyle(); }
     }
     // Start a fresh page so a group of sections stays together.
     function newPage() {
@@ -284,20 +284,20 @@ export default function AdminQuotation() {
       doc.setTextColor(...navy);
       items.filter(Boolean).forEach((it, i) => {
         const lines = doc.splitTextToSize(it, R - L - 14) as string[];
-        ensure(lines.length * 4.4 + 3);
+        ensure(lines.length * 4.3 + 2);
         // Re-assert per row: ensure() may have broken the page mid-list.
         doc.setTextColor(...navy);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8.5);
         doc.text(String(i + 1), L + 4, y + 4, { align: "center" });
-        lines.forEach((ln, j) => doc.text(ln, L + 10, y + 4 + j * 4.4));
-        const h = lines.length * 4.4 + 2.2;
+        lines.forEach((ln, j) => doc.text(ln, L + 10, y + 3.9 + j * 4.3));
+        const h = lines.length * 4.3 + 1.8;
         doc.setDrawColor(225, 225, 225);
         doc.rect(L, y, R - L, h);
         doc.line(L + 8, y, L + 8, y + h);
         y += h;
       });
-      y += 3;
+      y += 2;
     }
 
     // ── Page 1: letterhead (logo + typeset company details) ──
@@ -350,21 +350,18 @@ export default function AdminQuotation() {
       ...(address.trim() ? [`Address: ${address.trim()}`] : []),
     ];
     const boxRows = Math.max(clientLines.length, 2); // meta column is No + Date
-    const boxH = 12 + boxRows * 5 + 3;
+    const boxH = boxRows * 5 + 6;
     doc.setFillColor(249, 250, 251);
     doc.roundedRect(L, y, R - L, boxH, 2, 2, "F");
     doc.setTextColor(...navy);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("Client Details", L + 5, y + 6);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
-    clientLines.forEach((line, i) => doc.text(line, L + 5, y + 12 + i * 5));
+    clientLines.forEach((line, i) => doc.text(line, L + 5, y + 7 + i * 5));
     // Quotation meta, right-aligned level with the client rows.
     [`No: ${quotationNo}`, `Date: ${date}`].forEach((line, i) =>
-      doc.text(line, R - 5, y + 12 + i * 5, { align: "right" })
+      doc.text(line, R - 5, y + 7 + i * 5, { align: "right" })
     );
-    y += boxH + 6;
+    y += boxH + 5;
 
     // ── Specifications ──
     sectionTitle(`SPECIFICATIONS  —  DETAILS OF WORK  @  Rs. ${rate} / SQ.FT`);
@@ -391,13 +388,13 @@ export default function AdminQuotation() {
     numberedItems(notes);
 
     // ── Closing & signature, right after the special notes ──
-    ensure(34);
-    y += 6;
+    ensure(30);
+    y += 5;
     doc.setTextColor(...navy);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.text("Thanking you,", R, y, { align: "right" });
-    y += 20; // blank space to sign by hand
+    y += 18; // blank space to sign by hand
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.text(header.company, R, y, { align: "right" });
