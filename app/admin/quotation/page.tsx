@@ -449,7 +449,7 @@ export default function AdminQuotation() {
     doc.text("Rate", L + 130, y + 4.8, { align: "right" });
     doc.text("Amount", R - 3, y + 4.8, { align: "right" });
     // column separators
-    [L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
+    [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
     y += 7;
     areaRows.filter((r) => r.label.trim() || r.area.trim()).forEach((r) => {
       ensure(7);
@@ -463,7 +463,7 @@ export default function AdminQuotation() {
       doc.text(inr(a), L + 95, y + 4.4, { align: "right" });
       doc.text(inr(rateNum), L + 130, y + 4.4, { align: "right" });
       doc.text(`Rs. ${inr(Math.round(a * rateNum))}`, R - 3, y + 4.4, { align: "right" });
-      [L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.2));
+      [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.2));
       y += 7.2;
     });
     ensure(10);
@@ -476,7 +476,7 @@ export default function AdminQuotation() {
     doc.text(`${inr(totalArea)} sqft`, L + 95, y + 5.2, { align: "right" });
     doc.text(`Rs. ${inr(totalAmount)}`, R - 3, y + 5.2, { align: "right" });
     doc.setDrawColor(255, 255, 255);
-    [L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.5));
+    [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.5));
     doc.setDrawColor(225, 225, 225);
     y += 9;
     ensure(6);
@@ -501,7 +501,7 @@ export default function AdminQuotation() {
     doc.text("Stage", L + 14, y + 4.8);
     doc.text("%", L + 130, y + 4.8, { align: "right" });
     doc.text("Amount", R - 3, y + 4.8, { align: "right" });
-    [L + 11, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
+    [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
     y += 7;
     let paySum = 0;
     payments.filter((p) => p.stage.trim()).forEach((p, i) => {
@@ -518,7 +518,7 @@ export default function AdminQuotation() {
       doc.text(p.stage, L + 14, y + 4.4);
       doc.text(`${p.percent}%`, L + 130, y + 4.4, { align: "right" });
       doc.text(`Rs. ${inr(amt)}`, R - 3, y + 4.4, { align: "right" });
-      [L + 11, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.2));
+      [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.2));
       y += 7.2;
     });
     ensure(9);
@@ -529,7 +529,7 @@ export default function AdminQuotation() {
     doc.setFont("helvetica", "bold");
     doc.text("TOTAL", L + 14, y + 4.8);
     doc.text(`${paySum}%`, L + 130, y + 4.8, { align: "right" });
-    [L + 11, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
+    [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
     doc.text(`Rs. ${inr(Math.round((totalAmount * paySum) / 100))}`, R - 3, y + 4.8, { align: "right" });
     y += 11;
 
