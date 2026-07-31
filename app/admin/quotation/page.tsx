@@ -52,6 +52,31 @@ async function loadLogo(): Promise<{ data: string; ratio: number } | null> {
             d8[i + 3] = lum > 110 ? 255 : 0;
           }
           ctx.putImageData(px, 0, 0);
+          // Trim the transparent padding so the mark starts flush with the
+          // left margin instead of floating inside its own whitespace.
+          let minX = c.width, minY = c.height, maxX = -1, maxY = -1;
+          for (let py = 0; py < c.height; py++) {
+            for (let pxx = 0; pxx < c.width; pxx++) {
+              if (d8[(py * c.width + pxx) * 4 + 3] > 0) {
+                if (pxx < minX) minX = pxx;
+                if (pxx > maxX) maxX = pxx;
+                if (py < minY) minY = py;
+                if (py > maxY) maxY = py;
+              }
+            }
+          }
+          if (maxX > minX && maxY > minY) {
+            const tw = maxX - minX + 1;
+            const th = maxY - minY + 1;
+            const t = document.createElement("canvas");
+            t.width = tw;
+            t.height = th;
+            const tctx = t.getContext("2d");
+            if (tctx) {
+              tctx.drawImage(c, minX, minY, tw, th, 0, 0, tw, th);
+              return resolve({ data: t.toDataURL("image/png"), ratio: tw / th });
+            }
+          }
           resolve({ data: c.toDataURL("image/png"), ratio: img.width / img.height || 1.5 });
         } catch {
           resolve({ data, ratio: img.width / img.height || 1.5 });
@@ -309,7 +334,7 @@ export default function AdminQuotation() {
         const logoH = 24;
         const logoW = logoH * logo.ratio;
         doc.addImage(logo.data, "PNG", L, 8, logoW, logoH);
-        textX = L + logoW + 8;
+        textX = L + logoW + 4;
       }
       doc.setTextColor(...gold);
       doc.setFont("helvetica", "bold");
