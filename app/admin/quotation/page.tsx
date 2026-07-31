@@ -705,24 +705,24 @@ export default function AdminQuotation() {
   }
 
   // ── UI helpers ──
-  const input = "w-full rounded-lg border border-black/15 px-3 py-2 text-sm text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20";
+  const input = "w-full min-w-0 rounded-lg border border-black/15 px-3 py-2 text-sm text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20";
   const label = "block text-xs font-semibold text-navy/60 mb-1";
   const payTotal = payments.reduce((s, p) => s + (parseFloat(p.percent) || 0), 0);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-navy">
+    <div className="mx-auto max-w-4xl px-3 py-6 sm:px-4 sm:py-8">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="flex items-center gap-2 text-xl font-bold text-navy sm:text-2xl">
           <FileText className="h-6 w-6 text-amber" /> Quotation Generator
         </h1>
-        <div className="flex flex-wrap items-center gap-2">
-          <button onClick={previewPDF} className="flex items-center gap-2 rounded-xl border border-navy/20 px-4 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5 transition">
+        <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
+          <button onClick={previewPDF} className="flex items-center justify-center gap-2 rounded-xl border border-navy/20 px-3 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5 transition">
             <Eye className="h-4 w-4" /> Preview
           </button>
-          <button onClick={downloadPDF} className="flex items-center gap-2 rounded-xl bg-amber px-4 py-2.5 text-sm font-semibold text-navy-dark hover:bg-amber-light transition">
+          <button onClick={downloadPDF} className="flex items-center justify-center gap-2 rounded-xl bg-amber px-3 py-2.5 text-sm font-semibold text-navy-dark hover:bg-amber-light transition">
             <Download className="h-4 w-4" /> Download
           </button>
-          <button onClick={sendWhatsApp} className="flex items-center gap-2 rounded-xl bg-green-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-600 transition">
+          <button onClick={sendWhatsApp} className="flex items-center justify-center gap-2 rounded-xl bg-green-500 px-3 py-2.5 text-sm font-semibold text-white hover:bg-green-600 transition">
             <Send className="h-4 w-4" /> WhatsApp
           </button>
         </div>
@@ -730,7 +730,7 @@ export default function AdminQuotation() {
 
       <div className="space-y-6">
         {/* Package selector */}
-        <section className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
           <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber"><Package className="h-4 w-4" /> Package</h2>
           <div className="flex flex-wrap gap-3">
             {quotationPresets.map((p) => (
@@ -749,7 +749,7 @@ export default function AdminQuotation() {
         </section>
 
         {/* Client & meta */}
-        <section className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
           <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-amber">Client &amp; Quotation</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div><label className={label}>Client Name</label><input className={input} value={clientName} onChange={(e) => setClientName(e.target.value)} /></div>
@@ -765,12 +765,12 @@ export default function AdminQuotation() {
         </section>
 
         {/* Estimate */}
-        <section className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
+        <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-sm font-bold uppercase tracking-widest text-amber">Tentative Estimate</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <label className="text-xs font-semibold text-navy/60">Rate (Rs./sqft)</label>
-              <input className={`${input} w-24`} type="number" value={rate} onChange={(e) => setRate(e.target.value)} />
+              <input className={`${input} max-w-[6rem]`} type="number" value={rate} onChange={(e) => setRate(e.target.value)} />
               <button onClick={() => setFloorRows([...floorRows, { label: `Floor ${floorRows.length}`, slab: "" }])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add Floor</button>
             </div>
           </div>
@@ -814,25 +814,25 @@ export default function AdminQuotation() {
           <div className="space-y-2">
             {groundUsage === "mixed" ? (
               <>
-                <div className="flex gap-2">
-                  <input className={input} value={floorRows[0]?.label ?? "Ground Floor"} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === 0 ? { ...x, label: e.target.value } : x))} />
-                  <input className={`${input} w-32`} type="number" placeholder="house sqft" value={groundHouseSqft} onChange={(e) => setGroundHouseSqft(e.target.value)} />
-                  <input className={`${input} w-32`} type="number" placeholder="parking sqft" value={groundParkingSqft} onChange={(e) => setGroundParkingSqft(e.target.value)} />
-                  <span className="w-10 shrink-0" />
+                <div className="flex flex-wrap gap-2">
+                  <input className={`${input} basis-full sm:basis-auto`} value={floorRows[0]?.label ?? "Ground Floor"} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === 0 ? { ...x, label: e.target.value } : x))} />
+                  <input className={`${input} max-w-[5.5rem] shrink-0 sm:max-w-[8rem]`} type="number" placeholder="house" value={groundHouseSqft} onChange={(e) => setGroundHouseSqft(e.target.value)} />
+                  <input className={`${input} max-w-[5.5rem] shrink-0 sm:max-w-[8rem]`} type="number" placeholder="parking" value={groundParkingSqft} onChange={(e) => setGroundParkingSqft(e.target.value)} />
+                  <span className="hidden w-10 shrink-0 sm:block" />
                 </div>
                 <p className="pl-1 text-xs text-navy/40">House area counts 100%, parking area counts 50%.</p>
               </>
             ) : (
               <div className="flex gap-2">
                 <input className={input} value={floorRows[0]?.label ?? "Ground Floor"} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === 0 ? { ...x, label: e.target.value } : x))} />
-                <input className={`${input} w-32`} type="number" placeholder="slab sqft" value={floorRows[0]?.slab ?? ""} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === 0 ? { ...x, slab: e.target.value } : x))} />
-                <span className="w-10 shrink-0" />
+                <input className={`${input} max-w-[5.5rem] shrink-0 sm:max-w-[8rem]`} type="number" placeholder="sqft" value={floorRows[0]?.slab ?? ""} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === 0 ? { ...x, slab: e.target.value } : x))} />
+                <span className="hidden w-10 shrink-0 sm:block" />
               </div>
             )}
             {floorRows.slice(1).map((r, i) => (
               <div key={i + 1} className="flex gap-2">
                 <input className={input} value={r.label} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === i + 1 ? { ...x, label: e.target.value } : x))} />
-                <input className={`${input} w-32`} type="number" placeholder="slab sqft" value={r.slab} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === i + 1 ? { ...x, slab: e.target.value } : x))} />
+                <input className={`${input} max-w-[5.5rem] shrink-0 sm:max-w-[8rem]`} type="number" placeholder="sqft" value={r.slab} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === i + 1 ? { ...x, slab: e.target.value } : x))} />
                 <button onClick={() => setFloorRows(floorRows.filter((_, j) => j !== i + 1))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
@@ -859,7 +859,7 @@ export default function AdminQuotation() {
         </section>
 
         {/* Specifications */}
-        <section className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-bold uppercase tracking-widest text-amber">Specifications — Details of Work</h2>
             <button onClick={() => setSections([...sections, { title: "NEW SECTION", items: [""] }])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add Section</button>
@@ -882,7 +882,7 @@ export default function AdminQuotation() {
                       <span className="flex w-6 shrink-0 items-center justify-center text-xs font-semibold text-navy/40">{ii + 1}</span>
                       <textarea
                         rows={Math.max(1, Math.ceil(it.length / 95))}
-                        className={`${input} resize-none`}
+                        className={`${input} min-w-0 resize-none`}
                         value={it}
                         onChange={(e) => setSections(sections.map((s, j) => j === si ? { ...s, items: s.items.map((x, k) => k === ii ? e.target.value : x) } : s))}
                       />
@@ -896,7 +896,7 @@ export default function AdminQuotation() {
         </section>
 
         {/* Special notes */}
-        <section className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-bold uppercase tracking-widest text-amber">Special Notes</h2>
             <button onClick={() => setNotes([...notes, ""])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add Note</button>
@@ -905,7 +905,7 @@ export default function AdminQuotation() {
             {notes.map((n, i) => (
               <div key={i} className="flex gap-2">
                 <span className="flex w-6 shrink-0 items-center justify-center text-xs font-semibold text-navy/40">{i + 1}</span>
-                <textarea rows={Math.max(1, Math.ceil(n.length / 95))} className={`${input} resize-none`} value={n} onChange={(e) => setNotes(notes.map((x, j) => j === i ? e.target.value : x))} />
+                <textarea rows={Math.max(1, Math.ceil(n.length / 95))} className={`${input} min-w-0 resize-none`} value={n} onChange={(e) => setNotes(notes.map((x, j) => j === i ? e.target.value : x))} />
                 <button onClick={() => setNotes(notes.filter((_, j) => j !== i))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
@@ -913,10 +913,10 @@ export default function AdminQuotation() {
         </section>
 
         {/* Payment schedule */}
-        <section className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-bold uppercase tracking-widest text-amber">Payment Schedule</h2>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               <span className={`text-xs font-bold ${payTotal === 100 ? "text-green-600" : "text-red-500"}`}>{payTotal}%</span>
               <button onClick={resetPaymentSchedule} className="flex items-center gap-1 rounded-lg border border-navy/20 px-3 py-1.5 text-xs font-semibold text-navy hover:bg-navy/5" title="Restore this package's payment schedule"><RotateCcw className="h-3 w-3" /> Reset</button>
               <button onClick={() => { setPaymentsEdited(true); setPayments([...payments, { stage: "", percent: "" }]); }} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add</button>
@@ -925,9 +925,9 @@ export default function AdminQuotation() {
           <div className="space-y-2">
             {payments.map((p, i) => (
               <div key={i} className="flex items-center gap-2">
-                <input className={input} placeholder="Stage" value={p.stage} onChange={(e) => { setPaymentsEdited(true); setPayments(payments.map((x, j) => j === i ? { ...x, stage: e.target.value } : x)); }} />
-                <input className={`${input} w-20`} type="number" placeholder="%" value={p.percent} onChange={(e) => { setPaymentsEdited(true); setPayments(payments.map((x, j) => j === i ? { ...x, percent: e.target.value } : x)); }} />
-                <span className="w-28 shrink-0 text-right text-xs text-navy/50">Rs. {inr(Math.round((totalAmount * (parseFloat(p.percent) || 0)) / 100))}</span>
+                <input className={`${input} min-w-0`} placeholder="Stage" value={p.stage} onChange={(e) => { setPaymentsEdited(true); setPayments(payments.map((x, j) => j === i ? { ...x, stage: e.target.value } : x)); }} />
+                <input className={`${input} max-w-[4.5rem] shrink-0`} type="number" placeholder="%" value={p.percent} onChange={(e) => { setPaymentsEdited(true); setPayments(payments.map((x, j) => j === i ? { ...x, percent: e.target.value } : x)); }} />
+                <span className="hidden w-28 shrink-0 text-right text-xs text-navy/50 sm:block">Rs. {inr(Math.round((totalAmount * (parseFloat(p.percent) || 0)) / 100))}</span>
                 <button onClick={() => { setPaymentsEdited(true); setPayments(payments.filter((_, j) => j !== i)); }} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
@@ -939,7 +939,7 @@ export default function AdminQuotation() {
         <GroupEditor title="Brands Used" groups={brands} setGroups={setBrands} input={input} />
 
         {/* Header (saved) */}
-        <section className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
           <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-amber">Company Header (saved)</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {([["company", "Company Name"], ["subtitle", "Subtitle"], ["phone", "Phone"], ["email", "Email"], ["website", "Website"], ["gstin", "GSTIN"], ["address", "Address"]] as const).map(([k, lbl]) => (
@@ -949,7 +949,7 @@ export default function AdminQuotation() {
         </section>
 
         {/* Bank (saved) */}
-        <section className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
           <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-amber">Bank Details (saved)</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {([["accountName", "Account Name"], ["accountNumber", "Account Number"], ["bankName", "Bank Name"], ["ifsc", "IFSC Code"], ["branch", "Branch"]] as const).map(([k, lbl]) => (
@@ -958,12 +958,12 @@ export default function AdminQuotation() {
           </div>
         </section>
 
-        <div className="flex items-center justify-between gap-3 pb-10">
+        <div className="flex flex-col gap-3 pb-10 sm:flex-row sm:items-center sm:justify-between">
           <button onClick={saveTemplate} className="flex items-center gap-2 rounded-xl border border-navy/20 px-4 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5"><RotateCcw className="h-4 w-4" /> Save header &amp; bank</button>
-          <div className="flex flex-wrap items-center gap-2">
-            <button onClick={previewPDF} className="flex items-center gap-2 rounded-xl border border-navy/20 px-4 py-3 text-sm font-semibold text-navy hover:bg-navy/5 transition"><Eye className="h-4 w-4" /> Preview</button>
-            <button onClick={downloadPDF} className="flex items-center gap-2 rounded-xl bg-amber px-5 py-3 text-sm font-semibold text-navy-dark hover:bg-amber-light transition"><Download className="h-4 w-4" /> Download</button>
-            <button onClick={sendWhatsApp} className="flex items-center gap-2 rounded-xl bg-green-500 px-5 py-3 text-sm font-semibold text-white hover:bg-green-600 transition"><Send className="h-4 w-4" /> WhatsApp</button>
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
+            <button onClick={previewPDF} className="flex items-center justify-center gap-2 rounded-xl border border-navy/20 px-3 py-3 text-sm font-semibold text-navy hover:bg-navy/5 transition"><Eye className="h-4 w-4" /> Preview</button>
+            <button onClick={downloadPDF} className="flex items-center justify-center gap-2 rounded-xl bg-amber px-3 py-3 text-sm font-semibold text-navy-dark hover:bg-amber-light transition"><Download className="h-4 w-4" /> Download</button>
+            <button onClick={sendWhatsApp} className="flex items-center justify-center gap-2 rounded-xl bg-green-500 px-3 py-3 text-sm font-semibold text-white hover:bg-green-600 transition"><Send className="h-4 w-4" /> WhatsApp</button>
           </div>
         </div>
       </div>
@@ -973,7 +973,7 @@ export default function AdminQuotation() {
 
 function GroupEditor({ title, groups, setGroups, input }: { title: string; groups: RateGroup[]; setGroups: (v: RateGroup[]) => void; input: string }) {
   return (
-    <section className="rounded-2xl border border-black/8 bg-white p-5 shadow-sm">
+    <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-bold uppercase tracking-widest text-amber">{title}</h2>
         <button onClick={() => setGroups([...groups, { work: "", items: [""] }])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add</button>
@@ -982,13 +982,13 @@ function GroupEditor({ title, groups, setGroups, input }: { title: string; group
         {groups.map((g, gi) => (
           <div key={gi} className="rounded-xl border border-black/8 p-3">
             <div className="mb-2 flex items-center gap-2">
-              <input className={`${input} font-semibold`} placeholder="Work (e.g. Tile)" value={g.work} onChange={(e) => setGroups(groups.map((x, j) => j === gi ? { ...x, work: e.target.value } : x))} />
+              <input className={`${input} min-w-0 font-semibold`} placeholder="Work (e.g. Tile)" value={g.work} onChange={(e) => setGroups(groups.map((x, j) => j === gi ? { ...x, work: e.target.value } : x))} />
               <button onClick={() => confirm(`Delete "${g.work || "this group"}"?`) && setGroups(groups.filter((_, j) => j !== gi))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600" title="Delete group"><Trash2 className="h-4 w-4" /></button>
             </div>
             <div className="space-y-2 pl-3">
               {g.items.map((it, ii) => (
                 <div key={ii} className="flex items-center gap-2">
-                  <input className={input} placeholder="Rate / brand line" value={it} onChange={(e) => setGroups(groups.map((x, j) => j === gi ? { ...x, items: x.items.map((y, k) => k === ii ? e.target.value : y) } : x))} />
+                  <input className={`${input} min-w-0`} placeholder="Rate / brand line" value={it} onChange={(e) => setGroups(groups.map((x, j) => j === gi ? { ...x, items: x.items.map((y, k) => k === ii ? e.target.value : y) } : x))} />
                   <button onClick={() => setGroups(groups.map((x, j) => j === gi ? { ...x, items: x.items.filter((_, k) => k !== ii) } : x))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
                 </div>
               ))}
