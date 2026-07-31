@@ -286,6 +286,19 @@ export default function AdminQuotation() {
     setPayments(buildPaymentSchedule(slabCount));
   }, [slabCount, paymentsEdited]);
 
+  // Restore whatever schedule the selected package defines: a fixed list if it
+  // has one (e.g. RCC & brick work), otherwise one derived from the floors.
+  function resetPaymentSchedule() {
+    const preset = quotationPresets.find((p) => p.id === pkgId);
+    if (preset?.payments) {
+      setPayments(clone(preset.payments));
+      setPaymentsEdited(true);
+    } else {
+      setPaymentsEdited(false);
+      setPayments(buildPaymentSchedule(slabCount));
+    }
+  }
+
   async function buildPDF() {
     saveTemplate();
     const [{ jsPDF }, logo] = await Promise.all([import("jspdf"), loadLogo()]);
@@ -885,9 +898,7 @@ export default function AdminQuotation() {
             <h2 className="text-sm font-bold uppercase tracking-widest text-amber">Payment Schedule</h2>
             <div className="flex items-center gap-3">
               <span className={`text-xs font-bold ${payTotal === 100 ? "text-green-600" : "text-red-500"}`}>{payTotal}%</span>
-              {paymentsEdited && (
-                <button onClick={() => { setPaymentsEdited(false); setPayments(buildPaymentSchedule(slabCount)); }} className="flex items-center gap-1 rounded-lg border border-navy/20 px-3 py-1.5 text-xs font-semibold text-navy hover:bg-navy/5" title="Recalculate from the number of floors"><RotateCcw className="h-3 w-3" /> Auto</button>
-              )}
+              <button onClick={resetPaymentSchedule} className="flex items-center gap-1 rounded-lg border border-navy/20 px-3 py-1.5 text-xs font-semibold text-navy hover:bg-navy/5" title="Restore this package's payment schedule"><RotateCcw className="h-3 w-3" /> Reset</button>
               <button onClick={() => { setPaymentsEdited(true); setPayments([...payments, { stage: "", percent: "" }]); }} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add</button>
             </div>
           </div>
