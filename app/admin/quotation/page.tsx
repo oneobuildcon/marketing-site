@@ -91,6 +91,95 @@ async function loadLogo(): Promise<{ data: string; ratio: number } | null> {
   }
 }
 
+// Photographs of the hand signature and the rubber stamp, taken on paper.
+const SIGN_SRC = "https://fznldowoujwhcgjmsyhu.supabase.co/storage/v1/object/public/projects/WhatsApp%20Image%202026-07-31%20at%205.16.36%20PM.png";
+const STAMP_SRC = "https://fznldowoujwhcgjmsyhu.supabase.co/storage/v1/object/public/projects/WhatsApp%20Image%202026-07-31%20at%205.16.37%20PM.png";
+
+type Mark = { data: string; ratio: number };
+
+// Lift dark ink off the paper: anything darker than the paper becomes opaque
+// navy, everything lighter becomes transparent, then the transparent margin is
+// cropped away. Show-through from the reverse of the sheet is far lighter than
+// the ink, so it falls below the threshold and disappears.
+async function loadInkMark(src: string): Promise<Mark | null> {
+  try {
+    const res = await fetch(src);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    const data = await new Promise<string | null>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(typeof reader.result === "string" ? reader.result : null);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+    if (!data) return null;
+    return await new Promise((resolve) => {
+      const img = new window.Image();
+      img.onload = () => {
+        try {
+          const c = document.createElement("canvas");
+          c.width = img.width;
+          c.height = img.height;
+          const ctx = c.getContext("2d");
+          if (!ctx) return resolve(null);
+          ctx.drawImage(img, 0, 0);
+          const px = ctx.getImageData(0, 0, c.width, c.height);
+          const d8 = px.data;
+          // Ramp rather than a hard cut, so pen edges stay smooth in print.
+          const INK = 110;   // fully opaque at or below this luminance
+          const PAPER = 175; // fully transparent at or above
+          for (let i = 0; i < d8.length; i += 4) {
+            const lum = (d8[i] + d8[i + 1] + d8[i + 2]) / 3;
+            let a = 0;
+            if (lum <= INK) a = 255;
+            else if (lum < PAPER) a = Math.round(255 * ((PAPER - lum) / (PAPER - INK)));
+            d8[i] = 20;
+            d8[i + 1] = 30;
+            d8[i + 2] = 61; // navy, so it stays dark in black-and-white printing
+            d8[i + 3] = a;
+          }
+          ctx.putImageData(px, 0, 0);
+          // Crop to the ink. Ignore near-transparent stragglers so a stray
+          // speck of paper grain doesn't widen the box.
+          let minX = c.width, minY = c.height, maxX = -1, maxY = -1;
+          for (let py = 0; py < c.height; py++) {
+            for (let pxx = 0; pxx < c.width; pxx++) {
+              if (d8[(py * c.width + pxx) * 4 + 3] > 60) {
+                if (pxx < minX) minX = pxx;
+                if (pxx > maxX) maxX = pxx;
+                if (py < minY) minY = py;
+                if (py > maxY) maxY = py;
+              }
+            }
+          }
+          if (maxX <= minX || maxY <= minY) return resolve(null);
+          const tw = maxX - minX + 1;
+          const th = maxY - minY + 1;
+          const t = document.createElement("canvas");
+          t.width = tw;
+          t.height = th;
+          const tctx = t.getContext("2d");
+          if (!tctx) return resolve(null);
+          tctx.drawImage(c, minX, minY, tw, th, 0, 0, tw, th);
+          resolve({ data: t.toDataURL("image/png"), ratio: tw / th });
+        } catch {
+          resolve(null);
+        }
+      };
+      img.onerror = () => resolve(null);
+      img.crossOrigin = "anonymous";
+      img.src = data;
+    });
+  } catch {
+    return null;
+  }
+}
+
+async function loadMarks(): Promise<{ stamp: Mark | null; sign: Mark | null }> {
+  const [sign, stamp] = await Promise.all([loadInkMark(SIGN_SRC), loadInkMark(STAMP_SRC)]);
+  return { stamp, sign };
+}
+
 type AreaRow = { label: string; area: string };
 type PayRow = { stage: string; percent: string };
 type FloorRow = { label: string; slab: string };
@@ -302,7 +391,7 @@ export default function AdminQuotation() {
 
   async function buildPDF() {
     saveTemplate();
-    const [{ jsPDF }, logo] = await Promise.all([import("jspdf"), loadLogo()]);
+    const [{ jsPDF }, logo, marks] = await Promise.all([import("jspdf"), loadLogo(), loadMarks()]);
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const navy = [13, 27, 62] as const;
     const W = 210;
@@ -470,14 +559,36 @@ export default function AdminQuotation() {
     y += 2;
     numberedItems(notes);
 
-    // ── Closing & signature, right after the special notes ──
-    ensure(34);
+    // ── Closing, stamp & signature, right after the special notes ──
+    const signW = marks.sign ? 40 : 0;
+    const signH = marks.sign ? signW / (marks.sign.ratio || 3) : 0;
+    const stampW = marks.stamp ? 24 : 0;
+    const stampH = marks.stamp ? stampW / (marks.stamp.ratio || 1) : 0;
+    const markH = Math.max(signH, stampH);
+    // Falls back to blank space for a wet signature if either image fails.
+    const gap = markH > 0 ? markH + 6 : 20;
+
+    ensure(20 + gap);
     y += 8;
     doc.setTextColor(...navy);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.text("Thanking you,", R, y, { align: "right" });
-    y += 20; // room to sign by hand
+
+    if (markH > 0) {
+      const top = y + 3;
+      // Stamp sits under the left half of the signature, the way it lands on
+      // paper: stamped first, then signed across it.
+      if (marks.stamp) {
+        const stampX = R - signW - stampW + 10; // ~10mm of overlap
+        doc.addImage(marks.stamp.data, "PNG", stampX, top + (markH - stampH) / 2, stampW, stampH);
+      }
+      if (marks.sign) {
+        doc.addImage(marks.sign.data, "PNG", R - signW, top + (markH - signH) / 2, signW, signH);
+      }
+    }
+
+    y += gap;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.text(header.company, R, y, { align: "right" });
