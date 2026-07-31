@@ -14,21 +14,29 @@ import {
 // editable per quotation.
 const TPL_KEY = "oneo_quotation_template_v2";
 
-// Letterhead banner used at the top of the quotation PDF.
-const LETTERHEAD_SRC = "/letterhead.png";
-const LETTERHEAD_RATIO = 1900 / 250; // keeps the banner's aspect ratio
+// The ONE wordmark, stored in Supabase. Loaded in the browser and drawn into
+// the PDF beside typeset company details, so the letterhead stays crisp.
+const LOGO_SRC = "https://fznldowoujwhcgjmsyhu.supabase.co/storage/v1/object/public/projects/image-1785485863964.png";
 
-async function loadLetterhead(): Promise<string | null> {
+async function loadLogo(): Promise<{ data: string; ratio: number } | null> {
   try {
-    const res = await fetch(LETTERHEAD_SRC);
+    const res = await fetch(LOGO_SRC);
     if (!res.ok) return null;
     const blob = await res.blob();
-    return await new Promise((resolve) => {
+    const data = await new Promise<string | null>((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(typeof reader.result === "string" ? reader.result : null);
       reader.onerror = () => resolve(null);
       reader.readAsDataURL(blob);
     });
+    if (!data) return null;
+    const ratio = await new Promise<number>((resolve) => {
+      const img = new window.Image();
+      img.onload = () => resolve(img.width / img.height || 1.5);
+      img.onerror = () => resolve(1.5);
+      img.src = data;
+    });
+    return { data, ratio };
   } catch {
     return null;
   }
@@ -204,7 +212,7 @@ export default function AdminQuotation() {
 
   async function buildPDF() {
     saveTemplate();
-    const [{ jsPDF }, letterhead] = await Promise.all([import("jspdf"), loadLetterhead()]);
+    const [{ jsPDF }, logo] = await Promise.all([import("jspdf"), loadLogo()]);
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const navy = [13, 27, 62] as const;
     const amber = [245, 158, 11] as const;
@@ -268,34 +276,41 @@ export default function AdminQuotation() {
       y += 3;
     }
 
-    // ── Page 1: letterhead ──
-    // Falls back to the typeset header if the image can't be loaded.
-    if (letterhead) {
-      const imgW = R - L;
-      const imgH = imgW / LETTERHEAD_RATIO;
-      doc.addImage(letterhead, "PNG", L, 8, imgW, imgH);
-      y = 8 + imgH + 8;
-    } else {
-      doc.setFillColor(...navy);
-      doc.rect(0, 0, W, 34, "F");
-      doc.setTextColor(...amber);
-      doc.setFontSize(19);
+    // ── Page 1: letterhead (logo + typeset company details) ──
+    const gold = [198, 150, 48] as const;
+    {
+      let textX = L;
+      if (logo) {
+        const logoH = 16;
+        const logoW = logoH * logo.ratio;
+        doc.addImage(logo.data, "PNG", L, 10, logoW, logoH);
+        textX = L + logoW + 7;
+      }
+      doc.setTextColor(...gold);
       doc.setFont("helvetica", "bold");
-      doc.text(header.company, L, 15);
-      doc.setFontSize(7.5);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(210, 210, 210);
-      doc.text(header.subtitle, L, 21);
-      doc.text(header.address, L, 27);
-      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(21);
+      doc.text(header.company, textX, 20);
+      doc.setTextColor(40, 45, 60);
       doc.setFontSize(8);
-      doc.text(header.phone, R, 11, { align: "right" });
-      doc.text(header.email, R, 16, { align: "right" });
-      doc.text(header.website, R, 21, { align: "right" });
-      doc.setTextColor(...amber);
+      doc.text(header.subtitle, textX + 1, 26);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.text(header.address, textX + 1, 33);
+      // right column
+      doc.setTextColor(20, 20, 20);
+      doc.setFontSize(8.5);
+      doc.text(header.phone, R, 13, { align: "right" });
+      doc.text(header.email, R, 19, { align: "right" });
+      doc.text(header.website, R, 25, { align: "right" });
+      doc.setTextColor(...gold);
       doc.setFont("helvetica", "bold");
-      doc.text(`GSTIN  ${header.gstin}`, R, 27, { align: "right" });
-      y = 42;
+      doc.text(`GSTIN  ${header.gstin}`, R, 32, { align: "right" });
+      // navy / gold rule
+      doc.setFillColor(23, 30, 48);
+      doc.rect(L, 37, (R - L) / 2, 1.4, "F");
+      doc.setFillColor(...gold);
+      doc.rect(L + (R - L) / 2, 37, (R - L) / 2, 1.4, "F");
+      y = 47;
     }
     doc.setTextColor(...navy);
     doc.setFontSize(15);
