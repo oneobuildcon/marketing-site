@@ -686,24 +686,46 @@ export default function AdminQuotation() {
 
   // WhatsApp can't accept a file through a link, so download the PDF and open
   // the chat with a ready message — the admin just attaches the saved file.
-  function sendWhatsApp() {
-    const d = clientPhone.replace(/\D/g, "");
-    const to = d.length === 10 ? `91${d}` : d;
-    if (to.length < 10) { alert("Enter the client's phone number first."); return; }
-    const msg =
+  function whatsAppMessage() {
+    return (
       `Hello ${clientName.trim() || "Sir/Madam"},\n\n` +
       `Thank you for your interest in *One O Buildcon*. Please find attached our quotation for your construction project${location.trim() ? ` at ${location.trim()}` : ""}.\n\n` +
       `*Quotation No:* ${quotationNo}  |  *Valid for:* ${validity}\n\n` +
       `Please feel free to call us if you would like any clarification. We would be glad to arrange a site visit at your convenience.\n\n` +
-      `Warm regards,\nTeam One O Buildcon\n${header.phone}`;
-    // Open WhatsApp straight away, while we're still inside the click handler —
-    // building the PDF first loses the user gesture and the tab gets blocked,
-    // leaving only the downloaded file open. The PDF then saves in the
-    // background, ready to attach.
-    window.open(`https://wa.me/${to}?text=${encodeURIComponent(msg)}`, "_blank");
-    buildPDF()
-      .then((doc) => doc.save(fileName()))
-      .catch(() => alert("Could not generate the PDF. Please use Download."));
+      `Warm regards,\nTeam One O Buildcon\n${header.phone}`
+    );
+  }
+
+  async function sendWhatsApp() {
+    const d = clientPhone.replace(/\D/g, "");
+    const to = d.length === 10 ? `91${d}` : d;
+    if (to.length < 10) { alert("Enter the client's phone number first."); return; }
+    const msg = whatsAppMessage();
+
+    // Decide up front, while still inside the click, whether this device can
+    // share a file — building the PDF first would cost us the user gesture and
+    // the fallback tab would be blocked.
+    const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+    const canShareFile =
+      typeof nav.share === "function" &&
+      !!nav.canShare?.({ files: [new File([new Blob()], "q.pdf", { type: "application/pdf" })] });
+    // Fallback path opens the chat now; the share path needs no window.
+    const chat = canShareFile ? null : window.open(`https://wa.me/${to}?text=${encodeURIComponent(msg)}`, "_blank");
+
+    try {
+      const doc = await buildPDF();
+      if (canShareFile) {
+        // Phone: hand the PDF straight to the share sheet — pick WhatsApp, pick
+        // the contact, send. Nothing is written to storage.
+        const file = new File([doc.output("blob")], fileName(), { type: "application/pdf" });
+        await nav.share!({ files: [file], text: msg, title: fileName() });
+        return;
+      }
+      doc.save(fileName());
+    } catch (e: any) {
+      if (e?.name === "AbortError") return; // share sheet dismissed
+      if (!chat) alert("Could not generate the PDF. Please use Download.");
+    }
   }
 
   // ── UI helpers ──
