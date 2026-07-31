@@ -305,10 +305,11 @@ export default function AdminQuotation() {
     {
       let textX = L;
       if (logo) {
-        const logoH = 16;
+        // Sized and centred against the company name + tagline block.
+        const logoH = 24;
         const logoW = logoH * logo.ratio;
-        doc.addImage(logo.data, "PNG", L, 10, logoW, logoH);
-        textX = L + logoW + 7;
+        doc.addImage(logo.data, "PNG", L, 8, logoW, logoH);
+        textX = L + logoW + 8;
       }
       doc.setTextColor(...gold);
       doc.setFont("helvetica", "bold");
