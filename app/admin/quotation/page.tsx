@@ -338,8 +338,8 @@ export default function AdminQuotation() {
       }
       doc.setTextColor(...gold);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(21);
-      doc.text(header.company, textX, 20);
+      doc.setFontSize(24);
+      doc.text(header.company, textX, 20.5);
       doc.setTextColor(40, 45, 60);
       doc.setFontSize(8);
       doc.text(header.subtitle, textX + 1, 26);
