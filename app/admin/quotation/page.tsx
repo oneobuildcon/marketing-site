@@ -440,6 +440,15 @@ export default function AdminQuotation() {
 
     // ── Special notes ──
     y += 3;
+    {
+      // Don't leave the heading stranded at the foot of a page.
+      doc.setFontSize(9.5);
+      const firstH = notes
+        .filter(Boolean)
+        .slice(0, 2)
+        .reduce((h, it) => h + (doc.splitTextToSize(it, R - L - 14) as string[]).length * 4.9 + 2, 0);
+      if (y + 9 + firstH > 286) { footer(); doc.addPage(); y = 16; resetStyle(); }
+    }
     sectionTitle("SPECIAL NOTES");
     y += 2;
     numberedItems(notes);
@@ -557,8 +566,8 @@ export default function AdminQuotation() {
     doc.text(`Rs. ${inr(Math.round((totalAmount * paySum) / 100))}`, R - 3, y + 4.8, { align: "right" });
     y += 11;
 
-    // ── Rates & brands: their own page ──
-    newPage();
+    // ── Rates & brands ──
+    y += 10;
     sectionTitle("RATE CONSIDERED & BRANDS USED");
     y += 2;
     function rateTable(headerLabel: string, groups: RateGroup[]) {
