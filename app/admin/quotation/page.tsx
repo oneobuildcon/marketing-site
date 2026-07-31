@@ -284,14 +284,14 @@ export default function AdminQuotation() {
       doc.setTextColor(...navy);
       items.filter(Boolean).forEach((it, i) => {
         const lines = doc.splitTextToSize(it, R - L - 14) as string[];
-        ensure(lines.length * 4.3 + 2);
+        ensure(lines.length * 4.9 + 2);
         // Re-assert per row: ensure() may have broken the page mid-list.
         doc.setTextColor(...navy);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(8.5);
-        doc.text(String(i + 1), L + 4, y + 4, { align: "center" });
-        lines.forEach((ln, j) => doc.text(ln, L + 10, y + 3.9 + j * 4.3));
-        const h = lines.length * 4.3 + 1.8;
+        doc.setFontSize(9.5);
+        doc.text(String(i + 1), L + 4, y + 4.4, { align: "center" });
+        lines.forEach((ln, j) => doc.text(ln, L + 10, y + 4.3 + j * 4.9));
+        const h = lines.length * 4.9 + 2;
         doc.setDrawColor(225, 225, 225);
         doc.rect(L, y, R - L, h);
         doc.line(L + 8, y, L + 8, y + h);
@@ -371,24 +371,24 @@ export default function AdminQuotation() {
       if (!sec.title.trim() && sec.items.every((i) => !i.trim())) return;
       // Keep a whole section on one page where it fits, so a heading is never
       // stranded from its items.
-      doc.setFontSize(8.5);
+      doc.setFontSize(9.5);
       const secH =
-        6.5 +
+        7 +
         sec.items
           .filter(Boolean)
-          .reduce((h, it) => h + (doc.splitTextToSize(it, R - L - 14) as string[]).length * 4.3 + 1.8, 0) +
+          .reduce((h, it) => h + (doc.splitTextToSize(it, R - L - 14) as string[]).length * 4.9 + 2, 0) +
         2;
       if (y + secH > 286 && secH <= 270) { footer(); doc.addPage(); y = 16; resetStyle(); }
       ensure(16);
       doc.setFillColor(238, 240, 244);
-      doc.rect(L, y, R - L, 6.5, "F");
+      doc.rect(L, y, R - L, 7, "F");
       doc.setDrawColor(225, 225, 225);
-      doc.rect(L, y, R - L, 6.5);
+      doc.rect(L, y, R - L, 7);
       doc.setTextColor(...navy);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(9);
-      doc.text(sec.title, W / 2, y + 4.5, { align: "center" });
-      y += 6.5;
+      doc.setFontSize(10);
+      doc.text(sec.title, W / 2, y + 4.8, { align: "center" });
+      y += 7;
       numberedItems(sec.items);
     });
 
@@ -421,7 +421,7 @@ export default function AdminQuotation() {
     doc.rect(L, y, R - L, 7);
     doc.setTextColor(...navy);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8.5);
+    doc.setFontSize(9.5);
     doc.text("Floor", L + 3, y + 4.8);
     doc.text("Approx Area (sqft)", L + 95, y + 4.8, { align: "right" });
     doc.text("Rate", L + 130, y + 4.8, { align: "right" });
@@ -432,14 +432,14 @@ export default function AdminQuotation() {
       const a = parseFloat(r.area) || 0;
       doc.setTextColor(...navy);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8.5);
+      doc.setFontSize(9.5);
       doc.setDrawColor(225, 225, 225);
-      doc.rect(L, y, R - L, 6.5);
+      doc.rect(L, y, R - L, 7.2);
       doc.text(r.label || "—", L + 3, y + 4.4);
       doc.text(inr(a), L + 95, y + 4.4, { align: "right" });
       doc.text(inr(rateNum), L + 130, y + 4.4, { align: "right" });
       doc.text(`Rs. ${inr(Math.round(a * rateNum))}`, R - 3, y + 4.4, { align: "right" });
-      y += 6.5;
+      y += 7.2;
     });
     ensure(10);
     doc.setFillColor(...amber);
@@ -468,7 +468,7 @@ export default function AdminQuotation() {
     doc.rect(L, y, R - L, 7);
     doc.setTextColor(...navy);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8.5);
+    doc.setFontSize(9.5);
     doc.text("SR", L + 3, y + 4.8);
     doc.text("Stage", L + 14, y + 4.8);
     doc.text("%", L + 130, y + 4.8, { align: "right" });
@@ -482,14 +482,14 @@ export default function AdminQuotation() {
       paySum += pct;
       doc.setTextColor(...navy);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8.5);
+      doc.setFontSize(9.5);
       doc.setDrawColor(225, 225, 225);
-      doc.rect(L, y, R - L, 6.5);
+      doc.rect(L, y, R - L, 7.2);
       doc.text(String(i + 1), L + 3, y + 4.4);
       doc.text(p.stage, L + 14, y + 4.4);
       doc.text(`${p.percent}%`, L + 130, y + 4.4, { align: "right" });
       doc.text(`Rs. ${inr(amt)}`, R - 3, y + 4.4, { align: "right" });
-      y += 6.5;
+      y += 7.2;
     });
     ensure(9);
     doc.setFillColor(238, 240, 244);
@@ -514,31 +514,31 @@ export default function AdminQuotation() {
       doc.rect(L, y, R - L, 7);
       doc.setTextColor(...navy);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(8.5);
+      doc.setFontSize(9.5);
       doc.text("WORK", L + 3, y + 4.8);
       doc.text(headerLabel, L + 62, y + 4.8);
       y += 7;
       groups.forEach((g) => {
         const items = g.items.filter(Boolean);
         if (!g.work.trim() && !items.length) return;
-        ensure(items.length * 6 + 2);
+        ensure(items.length * 6.8 + 2);
         const startY = y;
         items.forEach((it, j) => {
           doc.setFont("helvetica", "normal");
-          doc.setFontSize(8.5);
+          doc.setFontSize(9.5);
           doc.setDrawColor(225, 225, 225);
-          doc.rect(L + 60, y, R - L - 60, 6);
-          doc.text(it, L + 62, y + 4.2);
+          doc.rect(L + 60, y, R - L - 60, 6.8);
+          doc.text(it, L + 62, y + 4.6);
           if (j === 0) {
             doc.setFont("helvetica", "bold");
           }
-          y += 6;
+          y += 6.8;
         });
         doc.setDrawColor(225, 225, 225);
         doc.rect(L, startY, 60, y - startY);
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(8.5);
-        doc.text(g.work, L + 3, startY + 4.2);
+        doc.setFontSize(9.5);
+        doc.text(g.work, L + 3, startY + 4.6);
       });
       y += 12;
     }
