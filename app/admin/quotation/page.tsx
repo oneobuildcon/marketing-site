@@ -369,6 +369,16 @@ export default function AdminQuotation() {
     y += 2;
     sections.forEach((sec) => {
       if (!sec.title.trim() && sec.items.every((i) => !i.trim())) return;
+      // Keep a whole section on one page where it fits, so a heading is never
+      // stranded from its items.
+      doc.setFontSize(8.5);
+      const secH =
+        6.5 +
+        sec.items
+          .filter(Boolean)
+          .reduce((h, it) => h + (doc.splitTextToSize(it, R - L - 14) as string[]).length * 4.3 + 1.8, 0) +
+        2;
+      if (y + secH > 286 && secH <= 270) { footer(); doc.addPage(); y = 16; resetStyle(); }
       ensure(16);
       doc.setFillColor(238, 240, 244);
       doc.rect(L, y, R - L, 6.5, "F");
