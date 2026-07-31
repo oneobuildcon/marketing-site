@@ -369,16 +369,14 @@ export default function AdminQuotation() {
     y += 2;
     sections.forEach((sec) => {
       if (!sec.title.trim() && sec.items.every((i) => !i.trim())) return;
-      // Keep a whole section on one page where it fits, so a heading is never
-      // stranded from its items.
+      // Orphan control: keep the heading with its first two items. Sections
+      // longer than that flow onto the next page rather than leaving a large
+      // gap behind.
       doc.setFontSize(9.5);
-      const secH =
-        7 +
-        sec.items
-          .filter(Boolean)
-          .reduce((h, it) => h + (doc.splitTextToSize(it, R - L - 14) as string[]).length * 4.9 + 2, 0) +
-        2;
-      if (y + secH > 286 && secH <= 270) { footer(); doc.addPage(); y = 16; resetStyle(); }
+      const itemH = (it: string) => (doc.splitTextToSize(it, R - L - 14) as string[]).length * 4.9 + 2;
+      const live = sec.items.filter(Boolean);
+      const keepH = 7 + live.slice(0, 2).reduce((h, it) => h + itemH(it), 0);
+      if (y + keepH > 286) { footer(); doc.addPage(); y = 16; resetStyle(); }
       ensure(16);
       doc.setFillColor(238, 240, 244);
       doc.rect(L, y, R - L, 7, "F");
@@ -392,8 +390,8 @@ export default function AdminQuotation() {
       numberedItems(sec.items);
     });
 
-    // ── Special notes ──
-    y += 2;
+    // ── Special notes: their own page ──
+    newPage();
     sectionTitle("SPECIAL NOTES");
     y += 2;
     numberedItems(notes);
