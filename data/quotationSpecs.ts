@@ -17,7 +17,7 @@ export type QuotationPreset = {
   // Optional overrides — packages that measure or bill differently.
   notes?: string[];
   payments?: PayRow[];
-  areaPercents?: { plinth: number; ground: number; upper: number; terrace: number };
+  areaPercents?: { plinth: number; ground: number; parking: number; upper: number; terrace: number };
 };
 
 // Special notes are identical for both packages.
@@ -193,7 +193,7 @@ export const quotationPresets: QuotationPreset[] = [
     id: "rcc",
     label: "RCC & Brick Work — ₹870/sqft",
     rate: 870,
-    areaPercents: { plinth: 1, ground: 0.75, upper: 1, terrace: 0.5 },
+    areaPercents: { plinth: 1, ground: 0.75, parking: 0.75, upper: 1, terrace: 0.5 },
     sections: [
       { title: "RATE", items: [
         "As per the below mode of measuring and scope of works, the rate for R.C.C. and brick work plaster work (for built-up area) will be:",

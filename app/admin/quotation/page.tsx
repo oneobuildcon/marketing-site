@@ -186,6 +186,9 @@ export default function AdminQuotation() {
   const [groundUsage, setGroundUsage] = useState<GroundUsage>("house");
   const [groundHouseSqft, setGroundHouseSqft] = useState("");
   const [groundParkingSqft, setGroundParkingSqft] = useState("");
+  // Area percentages, seeded from the package and editable per quotation.
+  const DEFAULT_PCT = { plinth: 50, ground: 100, parking: 50, upper: 100, terrace: 35 };
+  const [pcts, setPcts] = useState(DEFAULT_PCT);
 
   useEffect(() => {
     try {
@@ -215,6 +218,10 @@ export default function AdminQuotation() {
     setRates(clone(preset.rates));
     setBrands(clone(preset.brands));
     setNotes(clone(preset.notes ?? defaultSpecialNotes));
+    const ap = preset.areaPercents;
+    setPcts(ap
+      ? { plinth: ap.plinth * 100, ground: ap.ground * 100, parking: ap.parking * 100, upper: ap.upper * 100, terrace: ap.terrace * 100 }
+      : DEFAULT_PCT);
     if (preset.payments) {
       setPayments(clone(preset.payments));
       setPaymentsEdited(true); // fixed schedule — don't regenerate from floors
@@ -235,11 +242,12 @@ export default function AdminQuotation() {
   const groundParking = groundUsage === "mixed" ? parseFloat(groundParkingSqft) || 0 : 0;
   const groundSlab = groundUsage === "mixed" ? groundHouse + groundParking : slabs[0] || 0;
   const maxSlab = Math.max(groundSlab, ...slabs.slice(1), 0);
-  const pct = quotationPresets.find((p) => p.id === pkgId)?.areaPercents ?? {
-    plinth: 0.5,
-    ground: 1,
-    upper: 1,
-    terrace: 0.35,
+  const pct = {
+    plinth: (parseFloat(String(pcts.plinth)) || 0) / 100,
+    ground: (parseFloat(String(pcts.ground)) || 0) / 100,
+    parking: (parseFloat(String(pcts.parking)) || 0) / 100,
+    upper: (parseFloat(String(pcts.upper)) || 0) / 100,
+    terrace: (parseFloat(String(pcts.terrace)) || 0) / 100,
   };
   const plinthArea = Math.round(groundSlab * pct.plinth);
   const terraceArea = Math.round(maxSlab * pct.terrace);
@@ -248,10 +256,10 @@ export default function AdminQuotation() {
   const pctLabel = (v: number) => `${Math.round(v * 100)}%`;
   areaRows.push({ label: `Plinth (${pctLabel(pct.plinth)} of ${inr(groundSlab)} sqft ground slab)`, area: String(plinthArea) });
   if (groundUsage === "mixed") {
-    areaRows.push({ label: "Ground Floor — House (100%)", area: String(Math.round(groundHouse)) });
-    areaRows.push({ label: "Ground Floor — Parking (50%)", area: String(Math.round(groundParking * 0.5)) });
+    areaRows.push({ label: `Ground Floor — House (${pctLabel(pct.ground)})`, area: String(Math.round(groundHouse * pct.ground)) });
+    areaRows.push({ label: `Ground Floor — Parking (${pctLabel(pct.parking)})`, area: String(Math.round(groundParking * pct.parking)) });
   } else {
-    const gPct = groundUsage === "parking" ? 0.5 : pct.ground;
+    const gPct = groundUsage === "parking" ? pct.parking : pct.ground;
     areaRows.push({
       label: `${floorRows[0]?.label || "Ground Floor"}${gPct === 1 ? "" : ` (${pctLabel(gPct)})`}`,
       area: String(Math.round((slabs[0] || 0) * gPct)),
@@ -735,6 +743,24 @@ export default function AdminQuotation() {
                 >
                   {lbl}
                 </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Area percentages */}
+          <div className="mb-4 rounded-xl border border-black/8 bg-gray-50 p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-navy/40">Area Percentages</p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+              {([["plinth", "Plinth"], ["ground", "Ground"], ["parking", "Parking"], ["upper", "Upper floors"], ["terrace", "Terrace"]] as const).map(([k, lbl]) => (
+                <div key={k}>
+                  <label className={label}>{lbl} %</label>
+                  <input
+                    className={input}
+                    type="number"
+                    value={(pcts as any)[k]}
+                    onChange={(e) => setPcts({ ...pcts, [k]: e.target.value === "" ? 0 : Number(e.target.value) })}
+                  />
+                </div>
               ))}
             </div>
           </div>
