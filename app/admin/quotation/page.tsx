@@ -341,8 +341,8 @@ export default function AdminQuotation() {
       doc.setFontSize(24);
       doc.text(header.company, textX, 20.5);
       doc.setTextColor(40, 45, 60);
-      doc.setFontSize(8);
-      doc.text(header.subtitle, textX + 1, 26);
+      doc.setFontSize(9);
+      doc.text(header.subtitle, textX + 1, 26.5);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7.5);
       doc.text(header.address, textX + 1, 33);
