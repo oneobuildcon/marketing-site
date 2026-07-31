@@ -415,20 +415,20 @@ export default function AdminQuotation() {
       numberedItems(sec.items);
     });
 
-    // ── Special notes: their own page ──
-    newPage();
+    // ── Special notes ──
+    y += 3;
     sectionTitle("SPECIAL NOTES");
     y += 2;
     numberedItems(notes);
 
     // ── Closing & signature, right after the special notes ──
-    ensure(20);
-    y += 6;
+    ensure(34);
+    y += 8;
     doc.setTextColor(...navy);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.text("Thanking you,", R, y, { align: "right" });
-    y += 7;
+    y += 20; // room to sign by hand
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.text(header.company, R, y, { align: "right" });
