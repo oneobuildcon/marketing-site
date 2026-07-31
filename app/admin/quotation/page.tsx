@@ -31,31 +31,21 @@ const defaultHeader = {
 
 const ORDINALS = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"];
 
-// Advance (15%) and plinth (10%) are fixed; the remaining 75% is split across
-// the actual number of RCC slabs plus the finishing stages, so a G+1 and a
-// G+4 project each get a sensible schedule that still totals 100%.
+// Four stages have fixed percentages: advance 15%, after plinth 10%,
+// before painting 5% and on handover 5%. The remaining 65% is split across
+// the actual RCC slabs and the middle finishing stages, so a G+1 and a G+4
+// project each get a sensible schedule that still totals exactly 100%.
 function buildPaymentSchedule(slabCount: number): PayRow[] {
   const slabs = Math.max(1, slabCount);
-  const FINISHING = [
+  const MIDDLE = [
     "After Brickwork (all floors)",
     "After Plaster (all floors)",
     "After Tile & Plumbing Work",
     "After Electrical & POP Work",
-    "After Painting",
-    "On Handover / Possession",
   ];
-  const rows: PayRow[] = [
-    { stage: "Advance / Booking", percent: "15" },
-    { stage: "After Plinth", percent: "10" },
-  ];
-  // Split the remaining 75% between slab stages and finishing stages,
-  // weighted so slabs take roughly half when there are several floors.
-  const remaining = 75;
-  const slabShare = Math.round((remaining * slabs) / (slabs + FINISHING.length));
-  const finishShare = remaining - slabShare;
 
-  // Distribute in whole percent, pushing any rounding remainder onto the
-  // last row of each group so the schedule always sums to exactly 100.
+  // Distribute a whole-percent total across labels, pushing the rounding
+  // remainder onto the last rows so the group sums exactly.
   function spread(total: number, labels: string[]): PayRow[] {
     const base = Math.floor(total / labels.length);
     const extra = total - base * labels.length;
@@ -65,10 +55,19 @@ function buildPaymentSchedule(slabCount: number): PayRow[] {
     }));
   }
 
+  const remaining = 100 - 15 - 10 - 5 - 5; // 65% to distribute
+  const slabShare = Math.round((remaining * slabs) / (slabs + MIDDLE.length));
+  const middleShare = remaining - slabShare;
   const slabLabels = Array.from({ length: slabs }, (_, i) => `After ${ORDINALS[i] ?? `${i + 1}th`} RCC Slab`);
-  rows.push(...spread(slabShare, slabLabels));
-  rows.push(...spread(finishShare, FINISHING));
-  return rows;
+
+  return [
+    { stage: "Advance / Booking", percent: "15" },
+    { stage: "After Plinth", percent: "10" },
+    ...spread(slabShare, slabLabels),
+    ...spread(middleShare, MIDDLE),
+    { stage: "Before Painting", percent: "5" },
+    { stage: "On Handover / Possession", percent: "5" },
+  ];
 }
 
 const defaultBank = { accountName: "", accountNumber: "", bankName: "", ifsc: "", branch: "" };
