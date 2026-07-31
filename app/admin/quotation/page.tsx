@@ -357,6 +357,18 @@ export default function AdminQuotation() {
     y += 2;
     numberedItems(notes);
 
+    // ── Closing & signature, right after the special notes ──
+    ensure(34);
+    y += 6;
+    doc.setTextColor(...navy);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text("Thanking you,", R, y, { align: "right" });
+    y += 20; // blank space to sign by hand
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text(header.company, R, y, { align: "right" });
+
     // ── Estimate + payment schedule: their own page ──
     newPage();
     sectionTitle("TENTATIVE ESTIMATE");
@@ -510,18 +522,6 @@ export default function AdminQuotation() {
       doc.text(`Branch: ${bank.branch}`, R - 70, y + 17);
       y += 30;
     }
-
-    // ── Closing & signature, right-aligned at the end of the document ──
-    ensure(34);
-    y += 6;
-    doc.setTextColor(...navy);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.text("Thanking you,", R, y, { align: "right" });
-    y += 20; // blank space to sign by hand
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.text(header.company, R, y, { align: "right" });
 
     footer();
     return doc;
