@@ -200,14 +200,23 @@ export default function AdminQuotation() {
       doc.setTextColor(150, 150, 150);
       doc.text(`${header.company}  |  ${header.phone}  |  ${header.email}  |  GSTIN ${header.gstin}`, W / 2, 293, { align: "center" });
     }
+    // The footer leaves the draw state grey/small, so reset it after every
+    // page break or the first rows on the new page render faint.
+    function resetStyle() {
+      doc.setTextColor(...navy);
+      doc.setDrawColor(225, 225, 225);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+    }
     function ensure(space: number) {
-      if (y + space > 283) { footer(); doc.addPage(); y = 16; }
+      if (y + space > 283) { footer(); doc.addPage(); y = 16; resetStyle(); }
     }
     // Start a fresh page so a group of sections stays together.
     function newPage() {
       footer();
       doc.addPage();
       y = 16;
+      resetStyle();
     }
     function sectionTitle(text: string) {
       ensure(14);
@@ -224,6 +233,8 @@ export default function AdminQuotation() {
       items.filter(Boolean).forEach((it, i) => {
         const lines = doc.splitTextToSize(it, R - L - 14) as string[];
         ensure(lines.length * 4.4 + 3);
+        // Re-assert per row: ensure() may have broken the page mid-list.
+        doc.setTextColor(...navy);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8.5);
         doc.text(String(i + 1), L + 4, y + 4, { align: "center" });
@@ -339,6 +350,7 @@ export default function AdminQuotation() {
     areaRows.filter((r) => r.label.trim() || r.area.trim()).forEach((r) => {
       ensure(7);
       const a = parseFloat(r.area) || 0;
+      doc.setTextColor(...navy);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8.5);
       doc.setDrawColor(225, 225, 225);
@@ -388,6 +400,7 @@ export default function AdminQuotation() {
       const pct = parseFloat(p.percent) || 0;
       const amt = Math.round((totalAmount * pct) / 100);
       paySum += pct;
+      doc.setTextColor(...navy);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8.5);
       doc.setDrawColor(225, 225, 225);
