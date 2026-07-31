@@ -486,12 +486,12 @@ export default function AdminQuotation() {
     doc.save(fileName());
     const msg =
       `Hello ${clientName.trim() || "Sir/Madam"},\n\n` +
-      `Please find attached the quotation for your construction project${location.trim() ? ` at ${location.trim()}` : ""}.\n\n` +
-      `Package: ${quotationPresets.find((p) => p.id === pkgId)?.label ?? ""}\n` +
-      `Total built-up area: ${inr(totalArea)} sqft\n` +
-      `Estimated amount: Rs. ${inr(totalAmount)} (GST 18% extra)\n\n` +
-      `Quotation No: ${quotationNo}  |  Valid: ${validity}\n\n` +
-      `Please feel free to call us for any clarification.\n\n` +
+      `Thank you for your interest in *One O Buildcon*. Please find attached our quotation for your construction project${location.trim() ? ` at ${location.trim()}` : ""}.\n\n` +
+      `*Package:* ${quotationPresets.find((p) => p.id === pkgId)?.label ?? ""}\n` +
+      `*Total built-up area:* ${inr(totalArea)} sq.ft\n` +
+      `*Estimated amount:* Rs. ${inr(totalAmount)} (GST 18% extra)\n\n` +
+      `*Quotation No:* ${quotationNo}  |  *Valid for:* ${validity}\n\n` +
+      `Please feel free to call us if you would like any clarification. We would be glad to arrange a site visit at your convenience.\n\n` +
       `Warm regards,\nTeam One O Buildcon\n${header.phone}`;
     window.open(`https://wa.me/${to}?text=${encodeURIComponent(msg)}`, "_blank");
   }
