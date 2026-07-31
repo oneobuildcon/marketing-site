@@ -29,20 +29,47 @@ const defaultHeader = {
   address: "Patharemala, Charholi Budruk, Pimpri Chinchwad, Pune, Maharashtra – 412105",
 };
 
-const defaultPayments: PayRow[] = [
-  { stage: "Advance / Booking", percent: "5" },
-  { stage: "After Plinth", percent: "10" },
-  { stage: "After 1st RCC Slab", percent: "8" },
-  { stage: "After 2nd RCC Slab", percent: "8" },
-  { stage: "After 3rd RCC Slab", percent: "8" },
-  { stage: "After 4th RCC Slab", percent: "8" },
-  { stage: "After Brickwork (all floors)", percent: "10" },
-  { stage: "After Plaster (all floors)", percent: "10" },
-  { stage: "After Tile & Plumbing Work", percent: "10" },
-  { stage: "After Electrical & POP Work", percent: "8" },
-  { stage: "After Painting", percent: "10" },
-  { stage: "On Handover / Possession", percent: "5" },
-];
+const ORDINALS = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"];
+
+// Advance (15%) and plinth (10%) are fixed; the remaining 75% is split across
+// the actual number of RCC slabs plus the finishing stages, so a G+1 and a
+// G+4 project each get a sensible schedule that still totals 100%.
+function buildPaymentSchedule(slabCount: number): PayRow[] {
+  const slabs = Math.max(1, slabCount);
+  const FINISHING = [
+    "After Brickwork (all floors)",
+    "After Plaster (all floors)",
+    "After Tile & Plumbing Work",
+    "After Electrical & POP Work",
+    "After Painting",
+    "On Handover / Possession",
+  ];
+  const rows: PayRow[] = [
+    { stage: "Advance / Booking", percent: "15" },
+    { stage: "After Plinth", percent: "10" },
+  ];
+  // Split the remaining 75% between slab stages and finishing stages,
+  // weighted so slabs take roughly half when there are several floors.
+  const remaining = 75;
+  const slabShare = Math.round((remaining * slabs) / (slabs + FINISHING.length));
+  const finishShare = remaining - slabShare;
+
+  // Distribute in whole percent, pushing any rounding remainder onto the
+  // last row of each group so the schedule always sums to exactly 100.
+  function spread(total: number, labels: string[]): PayRow[] {
+    const base = Math.floor(total / labels.length);
+    const extra = total - base * labels.length;
+    return labels.map((stage, i) => ({
+      stage,
+      percent: String(base + (i >= labels.length - extra ? 1 : 0)),
+    }));
+  }
+
+  const slabLabels = Array.from({ length: slabs }, (_, i) => `After ${ORDINALS[i] ?? `${i + 1}th`} RCC Slab`);
+  rows.push(...spread(slabShare, slabLabels));
+  rows.push(...spread(finishShare, FINISHING));
+  return rows;
+}
 
 const defaultBank = { accountName: "", accountNumber: "", bankName: "", ifsc: "", branch: "" };
 
@@ -67,7 +94,9 @@ export default function AdminQuotation() {
   const [notes, setNotes] = useState<string[]>(clone(defaultSpecialNotes));
   const [rates, setRates] = useState<RateGroup[]>(clone(quotationPresets[0].rates));
   const [brands, setBrands] = useState<RateGroup[]>(clone(quotationPresets[0].brands));
-  const [payments, setPayments] = useState<PayRow[]>(clone(defaultPayments));
+  const [payments, setPayments] = useState<PayRow[]>(buildPaymentSchedule(2));
+  // Once the admin edits the schedule by hand we stop regenerating it.
+  const [paymentsEdited, setPaymentsEdited] = useState(false);
 
   // Client / quotation meta
   const [quotationNo, setQuotationNo] = useState("");
@@ -146,6 +175,13 @@ export default function AdminQuotation() {
 
   const totalArea = areaRows.reduce((s, r) => s + (parseFloat(r.area) || 0), 0);
   const totalAmount = Math.round(totalArea * rateNum);
+
+  // One RCC slab per floor (ground + upper floors).
+  const slabCount = floorRows.length;
+  useEffect(() => {
+    if (paymentsEdited) return;
+    setPayments(buildPaymentSchedule(slabCount));
+  }, [slabCount, paymentsEdited]);
 
   async function buildPDF() {
     saveTemplate();
@@ -656,16 +692,19 @@ export default function AdminQuotation() {
             <h2 className="text-sm font-bold uppercase tracking-widest text-amber">Payment Schedule</h2>
             <div className="flex items-center gap-3">
               <span className={`text-xs font-bold ${payTotal === 100 ? "text-green-600" : "text-red-500"}`}>{payTotal}%</span>
-              <button onClick={() => setPayments([...payments, { stage: "", percent: "" }])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add</button>
+              {paymentsEdited && (
+                <button onClick={() => { setPaymentsEdited(false); setPayments(buildPaymentSchedule(slabCount)); }} className="flex items-center gap-1 rounded-lg border border-navy/20 px-3 py-1.5 text-xs font-semibold text-navy hover:bg-navy/5" title="Recalculate from the number of floors"><RotateCcw className="h-3 w-3" /> Auto</button>
+              )}
+              <button onClick={() => { setPaymentsEdited(true); setPayments([...payments, { stage: "", percent: "" }]); }} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add</button>
             </div>
           </div>
           <div className="space-y-2">
             {payments.map((p, i) => (
               <div key={i} className="flex items-center gap-2">
-                <input className={input} placeholder="Stage" value={p.stage} onChange={(e) => setPayments(payments.map((x, j) => j === i ? { ...x, stage: e.target.value } : x))} />
-                <input className={`${input} w-20`} type="number" placeholder="%" value={p.percent} onChange={(e) => setPayments(payments.map((x, j) => j === i ? { ...x, percent: e.target.value } : x))} />
+                <input className={input} placeholder="Stage" value={p.stage} onChange={(e) => { setPaymentsEdited(true); setPayments(payments.map((x, j) => j === i ? { ...x, stage: e.target.value } : x)); }} />
+                <input className={`${input} w-20`} type="number" placeholder="%" value={p.percent} onChange={(e) => { setPaymentsEdited(true); setPayments(payments.map((x, j) => j === i ? { ...x, percent: e.target.value } : x)); }} />
                 <span className="w-28 shrink-0 text-right text-xs text-navy/50">Rs. {inr(Math.round((totalAmount * (parseFloat(p.percent) || 0)) / 100))}</span>
-                <button onClick={() => setPayments(payments.filter((_, j) => j !== i))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
+                <button onClick={() => { setPaymentsEdited(true); setPayments(payments.filter((_, j) => j !== i)); }} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
           </div>
