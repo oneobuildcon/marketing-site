@@ -481,150 +481,170 @@ export default function AdminQuotation() {
     doc.setFontSize(11);
     doc.text(header.company, R, y, { align: "right" });
 
-    // ── Estimate + payment schedule: their own page ──
+    // ── Estimate + payment schedule: always together on one page ──
+    // Row height and type size shrink to fit however many slabs there are, so
+    // this pair never spills onto a second page.
     newPage();
-    sectionTitle("TENTATIVE ESTIMATE");
-    y += 2;
-    ensure(12);
-    doc.setFillColor(238, 240, 244);
-    doc.rect(L, y, R - L, 7, "F");
-    doc.setDrawColor(225, 225, 225);
-    doc.rect(L, y, R - L, 7);
-    doc.setTextColor(...navy);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9.5);
-    doc.text("Floor", L + 3, y + 4.8);
-    doc.text("Approx Area (sqft)", L + 95, y + 4.8, { align: "right" });
-    doc.text("Rate", L + 130, y + 4.8, { align: "right" });
-    doc.text("Amount", R - 3, y + 4.8, { align: "right" });
-    // column separators
-    [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
-    y += 7;
-    areaRows.filter((r) => r.label.trim() || r.area.trim()).forEach((r) => {
-      ensure(7);
-      const a = parseFloat(r.area) || 0;
-      doc.setTextColor(...navy);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9.5);
-      doc.setDrawColor(225, 225, 225);
-      doc.rect(L, y, R - L, 7.2);
-      doc.text(r.label || "—", L + 3, y + 4.4);
-      doc.text(inr(a), L + 95, y + 4.4, { align: "right" });
-      doc.text(inr(rateNum), L + 130, y + 4.4, { align: "right" });
-      doc.text(`Rs. ${inr(Math.round(a * rateNum))}`, R - 3, y + 4.4, { align: "right" });
-      [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.2));
-      y += 7.2;
-    });
-    ensure(10);
-    doc.setFillColor(...navy);
-    doc.rect(L, y, R - L, 7.5, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9.5);
-    doc.text("TOTAL", L + 3, y + 5.2);
-    doc.text(`${inr(totalArea)} sqft`, L + 95, y + 5.2, { align: "right" });
-    doc.text(`Rs. ${inr(totalAmount)}`, R - 3, y + 5.2, { align: "right" });
-    doc.setDrawColor(255, 255, 255);
-    [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.5));
-    doc.setDrawColor(225, 225, 225);
-    y += 9;
-    ensure(6);
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(7.5);
-    doc.setTextColor(70, 70, 70);
-    doc.text("GST 18% extra on the base amount, as per Special Notes.", L, y + 3);
-    y += 18;
+    {
+      const eRows = areaRows.filter((r) => r.label.trim() || r.area.trim());
+      const pRows = payments.filter((p) => p.stage.trim());
+      const fixed = 9 + 2 + 7 + 7.5 + 9 + 6 + 14 + 9 + 2 + 7 + 7 + 4; // titles, headers, totals, note, gaps
+      const available = 284 - y;
+      const rowCount = eRows.length + pRows.length;
+      let rowH = 7.2;
+      if (rowCount > 0) rowH = Math.min(7.2, Math.max(4.6, (available - fixed) / rowCount));
+      const fs = rowH >= 6.6 ? 9.5 : rowH >= 5.8 ? 8.5 : rowH >= 5.2 ? 8 : 7.5;
+      const tx = rowH / 2 + 1.3; // baseline inside a row
 
-    // ── Payment schedule ──
-    sectionTitle("TENTATIVE PAYMENT SCHEDULE");
-    y += 2;
-    ensure(12);
-    doc.setFillColor(238, 240, 244);
-    doc.rect(L, y, R - L, 7, "F");
-    doc.setDrawColor(225, 225, 225);
-    doc.rect(L, y, R - L, 7);
-    doc.setTextColor(...navy);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9.5);
-    doc.text("SR", L + 3, y + 4.8);
-    doc.text("Stage", L + 14, y + 4.8);
-    doc.text("%", L + 130, y + 4.8, { align: "right" });
-    doc.text("Amount", R - 3, y + 4.8, { align: "right" });
-    [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
-    y += 7;
-    let paySum = 0;
-    payments.filter((p) => p.stage.trim()).forEach((p, i) => {
-      ensure(7);
-      const pct = parseFloat(p.percent) || 0;
-      const amt = Math.round((totalAmount * pct) / 100);
-      paySum += pct;
-      doc.setTextColor(...navy);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9.5);
-      doc.setDrawColor(225, 225, 225);
-      doc.rect(L, y, R - L, 7.2);
-      doc.text(String(i + 1), L + 3, y + 4.4);
-      doc.text(p.stage, L + 14, y + 4.4);
-      doc.text(`${p.percent}%`, L + 130, y + 4.4, { align: "right" });
-      doc.text(`Rs. ${inr(amt)}`, R - 3, y + 4.4, { align: "right" });
-      [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.2));
-      y += 7.2;
-    });
-    ensure(9);
-    doc.setFillColor(238, 240, 244);
-    doc.rect(L, y, R - L, 7, "F");
-    doc.setDrawColor(225, 225, 225);
-    doc.rect(L, y, R - L, 7);
-    doc.setFont("helvetica", "bold");
-    doc.text("TOTAL", L + 14, y + 4.8);
-    doc.text(`${paySum}%`, L + 130, y + 4.8, { align: "right" });
-    [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
-    doc.text(`Rs. ${inr(Math.round((totalAmount * paySum) / 100))}`, R - 3, y + 4.8, { align: "right" });
-    y += 11;
-
-    // ── Rates & brands ──
-    y += 10;
-    sectionTitle("RATE CONSIDERED & BRANDS USED");
-    y += 2;
-    function rateTable(headerLabel: string, groups: RateGroup[]) {
-      ensure(12);
+      sectionTitle("TENTATIVE ESTIMATE");
+      y += 2;
       doc.setFillColor(238, 240, 244);
       doc.rect(L, y, R - L, 7, "F");
       doc.setDrawColor(225, 225, 225);
       doc.rect(L, y, R - L, 7);
       doc.setTextColor(...navy);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(9.5);
-      doc.text("WORK", L + 3, y + 4.8);
-      doc.text(headerLabel, L + 62, y + 4.8);
+      doc.setFontSize(fs);
+      doc.text("Floor", L + 3, y + 4.8);
+      doc.text("Approx Area (sqft)", L + 95, y + 4.8, { align: "right" });
+      doc.text("Rate", L + 130, y + 4.8, { align: "right" });
+      doc.text("Amount", R - 3, y + 4.8, { align: "right" });
+      [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
       y += 7;
-      groups.forEach((g) => {
-        const items = g.items.filter(Boolean);
-        if (!g.work.trim() && !items.length) return;
-        const rows = items.length || 1; // a work with no lines still gets a row
-        ensure(rows * 6.8 + 2);
-        const startY = y;
-        (items.length ? items : [""]).forEach((it) => {
-          doc.setTextColor(...navy);
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(9.5);
-          doc.setDrawColor(225, 225, 225);
-          doc.rect(L + 60, y, R - L - 60, 6.8);
-          if (it) doc.text(it, L + 62, y + 4.6);
-          y += 6.8;
-        });
-        doc.setDrawColor(225, 225, 225);
-        doc.rect(L, startY, 60, y - startY);
+      eRows.forEach((r) => {
+        const a = parseFloat(r.area) || 0;
         doc.setTextColor(...navy);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(9.5);
-        doc.text(g.work, L + 3, startY + 4.6);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(fs);
+        doc.setDrawColor(225, 225, 225);
+        doc.rect(L, y, R - L, rowH);
+        doc.text(r.label || "—", L + 3, y + tx);
+        doc.text(inr(a), L + 95, y + tx, { align: "right" });
+        doc.text(inr(rateNum), L + 130, y + tx, { align: "right" });
+        doc.text(`Rs. ${inr(Math.round(a * rateNum))}`, R - 3, y + tx, { align: "right" });
+        [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + rowH));
+        y += rowH;
       });
-      y += 12;
+      doc.setFillColor(...navy);
+      doc.rect(L, y, R - L, 7.5, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(fs);
+      doc.text("TOTAL", L + 3, y + 5.2);
+      doc.text(`${inr(totalArea)} sqft`, L + 95, y + 5.2, { align: "right" });
+      doc.text(`Rs. ${inr(totalAmount)}`, R - 3, y + 5.2, { align: "right" });
+      doc.setDrawColor(255, 255, 255);
+      [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.5));
+      doc.setDrawColor(225, 225, 225);
+      y += 9;
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(7.5);
+      doc.setTextColor(70, 70, 70);
+      doc.text("GST 18% extra on the base amount, as per Special Notes.", L, y + 3);
+      y += 14;
+
+      sectionTitle("TENTATIVE PAYMENT SCHEDULE");
+      y += 2;
+      doc.setFillColor(238, 240, 244);
+      doc.rect(L, y, R - L, 7, "F");
+      doc.setDrawColor(225, 225, 225);
+      doc.rect(L, y, R - L, 7);
+      doc.setTextColor(...navy);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(fs);
+      doc.text("SR", L + 3, y + 4.8);
+      doc.text("Stage", L + 14, y + 4.8);
+      doc.text("%", L + 130, y + 4.8, { align: "right" });
+      doc.text("Amount", R - 3, y + 4.8, { align: "right" });
+      [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
+      y += 7;
+      let paySum = 0;
+      pRows.forEach((p, i2) => {
+        const pctv = parseFloat(p.percent) || 0;
+        paySum += pctv;
+        doc.setTextColor(...navy);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(fs);
+        doc.setDrawColor(225, 225, 225);
+        doc.rect(L, y, R - L, rowH);
+        doc.text(String(i2 + 1), L + 3, y + tx);
+        doc.text(p.stage, L + 14, y + tx);
+        doc.text(`${p.percent}%`, L + 130, y + tx, { align: "right" });
+        doc.text(`Rs. ${inr(Math.round((totalAmount * pctv) / 100))}`, R - 3, y + tx, { align: "right" });
+        [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + rowH));
+        y += rowH;
+      });
+      doc.setFillColor(238, 240, 244);
+      doc.rect(L, y, R - L, 7, "F");
+      doc.setDrawColor(225, 225, 225);
+      doc.rect(L, y, R - L, 7);
+      doc.setTextColor(...navy);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(fs);
+      doc.text("TOTAL", L + 14, y + 4.8);
+      doc.text(`${paySum}%`, L + 130, y + 4.8, { align: "right" });
+      doc.text(`Rs. ${inr(Math.round((totalAmount * paySum) / 100))}`, R - 3, y + 4.8, { align: "right" });
+      [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
+      y += 11;
     }
-    // A package may not quote item rates (e.g. RCC & brick work) — skip empty tables.
-    if (rates.some((g) => g.work.trim() || g.items.some(Boolean))) rateTable("RATE CONSIDERED", rates);
-    if (brands.some((g) => g.work.trim() || g.items.some(Boolean))) rateTable("BRAND USED", brands);
+
+    // ── Rates & brands: always together on one page ──
+    {
+      const live = (gs: RateGroup[]) => gs.filter((g) => g.work.trim() || g.items.some(Boolean));
+      const liveRates = live(rates);
+      const liveBrands = live(brands);
+      const countRows = (gs: RateGroup[]) => gs.reduce((n, g) => n + Math.max(1, g.items.filter(Boolean).length), 0);
+      const tables = [
+        ["RATE CONSIDERED", liveRates] as const,
+        ["BRAND USED", liveBrands] as const,
+      ].filter(([, gs]) => gs.length);
+
+      if (tables.length) {
+        newPage();
+        const fixed = 9 + 2 + tables.length * (7 + 12) + 6;
+        const totalRows = tables.reduce((n, [, gs]) => n + countRows(gs), 0);
+        const available = 284 - y;
+        let rowH = 6.8;
+        if (totalRows > 0) rowH = Math.min(6.8, Math.max(4.4, (available - fixed) / totalRows));
+        const fs = rowH >= 6.2 ? 9.5 : rowH >= 5.5 ? 8.5 : rowH >= 5 ? 8 : 7.5;
+        const tx = rowH / 2 + 1.2;
+
+        sectionTitle("RATE CONSIDERED & BRANDS USED");
+        y += 2;
+        tables.forEach(([headerLabel, groups]) => {
+          doc.setFillColor(238, 240, 244);
+          doc.rect(L, y, R - L, 7, "F");
+          doc.setDrawColor(225, 225, 225);
+          doc.rect(L, y, R - L, 7);
+          doc.setTextColor(...navy);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(fs);
+          doc.text("WORK", L + 3, y + 4.8);
+          doc.text(headerLabel, L + 62, y + 4.8);
+          y += 7;
+          groups.forEach((g) => {
+            const items = g.items.filter(Boolean);
+            const startY = y;
+            (items.length ? items : [""]).forEach((it) => {
+              doc.setTextColor(...navy);
+              doc.setFont("helvetica", "normal");
+              doc.setFontSize(fs);
+              doc.setDrawColor(225, 225, 225);
+              doc.rect(L + 60, y, R - L - 60, rowH);
+              if (it) doc.text(it, L + 62, y + tx);
+              y += rowH;
+            });
+            doc.setDrawColor(225, 225, 225);
+            doc.rect(L, startY, 60, y - startY);
+            doc.setTextColor(...navy);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(fs);
+            doc.text(g.work, L + 3, startY + tx);
+          });
+          y += 12;
+        });
+      }
+    }
 
     // ── Bank details ──
     if (bank.accountName || bank.accountNumber || bank.bankName) {
