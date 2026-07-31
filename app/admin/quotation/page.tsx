@@ -188,27 +188,89 @@ async function loadInkMark(src: string): Promise<Mark | null> {
     // Two passes: tight first (clean edges, drops show-through), then looser if
     // the tight pass found no ink at all.
     const passes: Array<[number, number]> = [
-      [paperTone * 0.60, paperTone * 0.88],
+      [paperTone * 0.58, paperTone * 0.82],
       [paperTone * 0.75, paperTone * 0.97],
     ];
 
     for (const [INK, PAPER] of passes) {
       const alpha = new Uint8Array(w * h);
-      let minX = w, minY = h, maxX = -1, maxY = -1;
       for (let p = 0; p < lums.length; p++) {
         const lum = lums[p];
         let a = 0;
         if (lum <= INK) a = 255;
         else if (lum < PAPER) a = Math.round(255 * ((PAPER - lum) / (PAPER - INK)));
         alpha[p] = a;
-        if (a > 60) {
-          const pxx = p % w;
-          const py = (p - pxx) / w;
-          if (pxx < minX) minX = pxx;
-          if (pxx > maxX) maxX = pxx;
-          if (py < minY) minY = py;
-          if (py > maxY) maxY = py;
+      }
+
+      // Drop specks. Paper texture and shadow survive the threshold as small
+      // islands scattered around the mark; the real ink is one big connected
+      // shape (plus a few genuine pieces, like the letters inside the stamp).
+      // So label every island and keep only those a meaningful fraction of the
+      // largest — that clears the smudges without thinning any pen stroke.
+      const label = new Int32Array(w * h).fill(-1);
+      const areas: number[] = [];
+      const stack = new Int32Array(w * h);
+      for (let start = 0; start < alpha.length; start++) {
+        if (alpha[start] <= 60 || label[start] !== -1) continue;
+        const id = areas.length;
+        let area = 0;
+        let sp = 0;
+        stack[sp++] = start;
+        label[start] = id;
+        while (sp > 0) {
+          const p = stack[--sp];
+          area++;
+          const x = p % w;
+          const y = (p - x) / w;
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              if (!dx && !dy) continue;
+              const nx = x + dx, ny = y + dy;
+              if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+              const np = ny * w + nx;
+              if (alpha[np] > 60 && label[np] === -1) {
+                label[np] = id;
+                stack[sp++] = np;
+              }
+            }
+          }
         }
+        areas.push(area);
+      }
+      let largest = 0;
+      for (const a of areas) if (a > largest) largest = a;
+      const minArea = Math.max(12, largest * 0.01);
+      const keep = areas.map((a) => a >= minArea);
+      const kept = (p: number) => label[p] !== -1 && keep[label[p]];
+      for (let p = 0; p < alpha.length; p++) {
+        if (kept(p)) continue;
+        // Soft edge pixels sit below the labelling threshold, so keep the ones
+        // touching real ink — that's what stops strokes looking ragged.
+        if (alpha[p] > 0 && label[p] === -1) {
+          const x = p % w;
+          const y = (p - x) / w;
+          let touches = false;
+          for (let dy = -1; dy <= 1 && !touches; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              const nx = x + dx, ny = y + dy;
+              if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+              if (kept(ny * w + nx)) { touches = true; break; }
+            }
+          }
+          if (touches) continue;
+        }
+        alpha[p] = 0;
+      }
+
+      let minX = w, minY = h, maxX = -1, maxY = -1;
+      for (let p = 0; p < alpha.length; p++) {
+        if (alpha[p] <= 60) continue;
+        const pxx = p % w;
+        const py = (p - pxx) / w;
+        if (pxx < minX) minX = pxx;
+        if (pxx > maxX) maxX = pxx;
+        if (py < minY) minY = py;
+        if (py > maxY) maxY = py;
       }
       if (maxX <= minX || maxY <= minY) continue;
 
