@@ -446,7 +446,7 @@ export default function AdminQuotation() {
     doc.setFontSize(7.5);
     doc.setTextColor(120, 120, 120);
     doc.text("GST 18% extra on the base amount, as per Special Notes.", L, y + 3);
-    y += 8;
+    y += 18;
 
     // ── Payment schedule ──
     sectionTitle("TENTATIVE PAYMENT SCHEDULE");
@@ -530,7 +530,7 @@ export default function AdminQuotation() {
         doc.setFontSize(8.5);
         doc.text(g.work, L + 3, startY + 4.2);
       });
-      y += 4;
+      y += 12;
     }
     rateTable("RATE CONSIDERED", rates);
     rateTable("BRAND USED", brands);
