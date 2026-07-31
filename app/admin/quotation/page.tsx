@@ -97,79 +97,140 @@ const STAMP_SRC = "https://fznldowoujwhcgjmsyhu.supabase.co/storage/v1/object/pu
 
 type Mark = { data: string; ratio: number };
 
+// Decode an image to a canvas. Tries fetch → data URL first (immune to CORS
+// on the canvas), and falls back to loading the URL straight into an <img>
+// with crossOrigin set, in case the fetch itself is blocked.
+async function decodeToImage(src: string): Promise<HTMLImageElement | null> {
+  const fromDataUrl = await (async () => {
+    try {
+      const res = await fetch(src);
+      if (!res.ok) return null;
+      const blob = await res.blob();
+      return await new Promise<string | null>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(typeof reader.result === "string" ? reader.result : null);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      });
+    } catch {
+      return null;
+    }
+  })();
+
+  const attempt = (url: string, cors: boolean) =>
+    new Promise<HTMLImageElement | null>((resolve) => {
+      const img = new window.Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      if (cors) img.crossOrigin = "anonymous";
+      img.src = url;
+    });
+
+  if (fromDataUrl) {
+    const img = await attempt(fromDataUrl, false);
+    if (img) return img;
+  }
+  return attempt(src, true);
+}
+
 // Lift dark ink off the paper: anything darker than the paper becomes opaque
 // navy, everything lighter becomes transparent, then the transparent margin is
 // cropped away. Show-through from the reverse of the sheet is far lighter than
 // the ink, so it falls below the threshold and disappears.
+//
+// The thresholds are derived from each photo rather than fixed, because the
+// two images were shot in different light — a fixed cut-off that suits one can
+// erase the other completely.
 async function loadInkMark(src: string): Promise<Mark | null> {
   try {
-    const res = await fetch(src);
-    if (!res.ok) return null;
-    const blob = await res.blob();
-    const data = await new Promise<string | null>((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(typeof reader.result === "string" ? reader.result : null);
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(blob);
-    });
-    if (!data) return null;
-    return await new Promise((resolve) => {
-      const img = new window.Image();
-      img.onload = () => {
-        try {
-          const c = document.createElement("canvas");
-          c.width = img.width;
-          c.height = img.height;
-          const ctx = c.getContext("2d");
-          if (!ctx) return resolve(null);
-          ctx.drawImage(img, 0, 0);
-          const px = ctx.getImageData(0, 0, c.width, c.height);
-          const d8 = px.data;
-          // Ramp rather than a hard cut, so pen edges stay smooth in print.
-          const INK = 110;   // fully opaque at or below this luminance
-          const PAPER = 175; // fully transparent at or above
-          for (let i = 0; i < d8.length; i += 4) {
-            const lum = (d8[i] + d8[i + 1] + d8[i + 2]) / 3;
-            let a = 0;
-            if (lum <= INK) a = 255;
-            else if (lum < PAPER) a = Math.round(255 * ((PAPER - lum) / (PAPER - INK)));
-            d8[i] = 20;
-            d8[i + 1] = 30;
-            d8[i + 2] = 61; // navy, so it stays dark in black-and-white printing
-            d8[i + 3] = a;
-          }
-          ctx.putImageData(px, 0, 0);
-          // Crop to the ink. Ignore near-transparent stragglers so a stray
-          // speck of paper grain doesn't widen the box.
-          let minX = c.width, minY = c.height, maxX = -1, maxY = -1;
-          for (let py = 0; py < c.height; py++) {
-            for (let pxx = 0; pxx < c.width; pxx++) {
-              if (d8[(py * c.width + pxx) * 4 + 3] > 60) {
-                if (pxx < minX) minX = pxx;
-                if (pxx > maxX) maxX = pxx;
-                if (py < minY) minY = py;
-                if (py > maxY) maxY = py;
-              }
-            }
-          }
-          if (maxX <= minX || maxY <= minY) return resolve(null);
-          const tw = maxX - minX + 1;
-          const th = maxY - minY + 1;
-          const t = document.createElement("canvas");
-          t.width = tw;
-          t.height = th;
-          const tctx = t.getContext("2d");
-          if (!tctx) return resolve(null);
-          tctx.drawImage(c, minX, minY, tw, th, 0, 0, tw, th);
-          resolve({ data: t.toDataURL("image/png"), ratio: tw / th });
-        } catch {
-          resolve(null);
+    const img = await decodeToImage(src);
+    if (!img || !img.width || !img.height) return null;
+
+    // Phone photos are far larger than needed at 40mm wide, and the pixel loop
+    // below is O(n). Cap the long edge; 1600px is still ~1000dpi in print.
+    const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0, w, h);
+
+    let px: ImageData;
+    try {
+      px = ctx.getImageData(0, 0, w, h);
+    } catch {
+      return null; // canvas tainted — CORS not allowed on the bucket
+    }
+    const d8 = px.data;
+
+    // Luminance of every pixel, and a histogram to find the paper tone.
+    const lums = new Uint8Array(w * h);
+    const hist = new Uint32Array(256);
+    for (let i = 0, p = 0; i < d8.length; i += 4, p++) {
+      const lum = (d8[i] * 0.299 + d8[i + 1] * 0.587 + d8[i + 2] * 0.114) | 0;
+      lums[p] = lum;
+      hist[lum]++;
+    }
+    // Paper is the bulk of the frame, so the 75th percentile lands on it.
+    let acc = 0;
+    const target = (w * h) * 0.75;
+    let paperTone = 200;
+    for (let v = 0; v < 256; v++) {
+      acc += hist[v];
+      if (acc >= target) { paperTone = v; break; }
+    }
+    paperTone = Math.max(60, paperTone);
+
+    // Two passes: tight first (clean edges, drops show-through), then looser if
+    // the tight pass found no ink at all.
+    const passes: Array<[number, number]> = [
+      [paperTone * 0.60, paperTone * 0.88],
+      [paperTone * 0.75, paperTone * 0.97],
+    ];
+
+    for (const [INK, PAPER] of passes) {
+      const alpha = new Uint8Array(w * h);
+      let minX = w, minY = h, maxX = -1, maxY = -1;
+      for (let p = 0; p < lums.length; p++) {
+        const lum = lums[p];
+        let a = 0;
+        if (lum <= INK) a = 255;
+        else if (lum < PAPER) a = Math.round(255 * ((PAPER - lum) / (PAPER - INK)));
+        alpha[p] = a;
+        if (a > 60) {
+          const pxx = p % w;
+          const py = (p - pxx) / w;
+          if (pxx < minX) minX = pxx;
+          if (pxx > maxX) maxX = pxx;
+          if (py < minY) minY = py;
+          if (py > maxY) maxY = py;
         }
-      };
-      img.onerror = () => resolve(null);
-      img.crossOrigin = "anonymous";
-      img.src = data;
-    });
+      }
+      if (maxX <= minX || maxY <= minY) continue;
+
+      for (let p = 0, i = 0; p < alpha.length; p++, i += 4) {
+        d8[i] = 20;
+        d8[i + 1] = 30;
+        d8[i + 2] = 61; // navy, so it stays dark in black-and-white printing
+        d8[i + 3] = alpha[p];
+      }
+      ctx.putImageData(px, 0, 0);
+
+      const tw = maxX - minX + 1;
+      const th = maxY - minY + 1;
+      const t = document.createElement("canvas");
+      t.width = tw;
+      t.height = th;
+      const tctx = t.getContext("2d");
+      if (!tctx) return null;
+      tctx.drawImage(c, minX, minY, tw, th, 0, 0, tw, th);
+      return { data: t.toDataURL("image/png"), ratio: tw / th };
+    }
+    return null;
   } catch {
     return null;
   }
