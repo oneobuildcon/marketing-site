@@ -692,8 +692,8 @@ export default function AdminQuotation() {
       `Hello ${[clientName.trim(), honorific].filter(Boolean).join(" ") || "Sir/Madam"},\n\n` +
       `Thank you for your interest in *One O Buildcon*. Please find attached our quotation for your construction project${location.trim() ? ` at ${location.trim()}` : ""}.\n\n` +
       `*Quotation No:* ${quotationNo}  |  *Valid for:* ${validity}\n\n` +
-      `Should you require any clarification, you are welcome to call us or message us here on WhatsApp. If you would like any changes to the specifications or the package, we will gladly revise the quotation to suit your requirement.\n\n` +
-      `Warm regards,\nTeam One O Buildcon\n${header.phone}`
+      `Should you require any clarification, you are most welcome to call or message us at any time. And if anything in the specifications or the package does not quite match what you have in mind, please do let us know — we would be very happy to revise the quotation to suit you.\n\n` +
+      `Warm regards,\nTeam One O Buildcon`
     );
   }
 
