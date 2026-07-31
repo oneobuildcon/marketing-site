@@ -211,7 +211,10 @@ export default function AdminQuotation() {
   function selectPackage(id: string) {
     const preset = quotationPresets.find((p) => p.id === id);
     if (!preset) return;
-    if (pkgId !== id && !confirm(`Load the ${preset.label} specifications? This replaces the current specs, rates & brands with that package's defaults.`)) return;
+    // Re-clicking the current package used to silently reload the defaults and
+    // discard the admin's edits — leave it alone instead.
+    if (pkgId === id) return;
+    if (!confirm(`Load the ${preset.label} specifications? This replaces the current specs, rates & brands with that package's defaults.`)) return;
     setPkgId(id);
     setRate(String(preset.rate));
     setSections(clone(preset.sections));
@@ -585,21 +588,21 @@ export default function AdminQuotation() {
       groups.forEach((g) => {
         const items = g.items.filter(Boolean);
         if (!g.work.trim() && !items.length) return;
-        ensure(items.length * 6.8 + 2);
+        const rows = items.length || 1; // a work with no lines still gets a row
+        ensure(rows * 6.8 + 2);
         const startY = y;
-        items.forEach((it, j) => {
+        (items.length ? items : [""]).forEach((it) => {
+          doc.setTextColor(...navy);
           doc.setFont("helvetica", "normal");
           doc.setFontSize(9.5);
           doc.setDrawColor(225, 225, 225);
           doc.rect(L + 60, y, R - L - 60, 6.8);
-          doc.text(it, L + 62, y + 4.6);
-          if (j === 0) {
-            doc.setFont("helvetica", "bold");
-          }
+          if (it) doc.text(it, L + 62, y + 4.6);
           y += 6.8;
         });
         doc.setDrawColor(225, 225, 225);
         doc.rect(L, startY, 60, y - startY);
+        doc.setTextColor(...navy);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9.5);
         doc.text(g.work, L + 3, startY + 4.6);
