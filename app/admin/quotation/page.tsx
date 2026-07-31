@@ -698,9 +698,9 @@ export default function AdminQuotation() {
     doc.setTextColor(...navy);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
-    // Left margin, the way a letter closes — the stamp sits directly beneath it
-    // and the signature block balances it on the right.
-    doc.text("Thanking you,", L, y);
+    // Centred over the signature that follows below it.
+    if (signW > 0) doc.text("Thanking you,", R - signW / 2, y, { align: "center" });
+    else doc.text("Thanking you,", R, y, { align: "right" });
 
     if (markH > 0) {
       const top = y + 3;
