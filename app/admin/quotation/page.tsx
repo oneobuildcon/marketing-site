@@ -14,6 +14,26 @@ import {
 // editable per quotation.
 const TPL_KEY = "oneo_quotation_template_v2";
 
+// Letterhead banner used at the top of the quotation PDF.
+const LETTERHEAD_SRC = "/letterhead.png";
+const LETTERHEAD_RATIO = 1900 / 250; // keeps the banner's aspect ratio
+
+async function loadLetterhead(): Promise<string | null> {
+  try {
+    const res = await fetch(LETTERHEAD_SRC);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(typeof reader.result === "string" ? reader.result : null);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
 type AreaRow = { label: string; area: string };
 type PayRow = { stage: string; percent: string };
 type FloorRow = { label: string; slab: string };
@@ -184,7 +204,7 @@ export default function AdminQuotation() {
 
   async function buildPDF() {
     saveTemplate();
-    const { jsPDF } = await import("jspdf");
+    const [{ jsPDF }, letterhead] = await Promise.all([import("jspdf"), loadLetterhead()]);
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const navy = [13, 27, 62] as const;
     const amber = [245, 158, 11] as const;
@@ -248,28 +268,35 @@ export default function AdminQuotation() {
       y += 3;
     }
 
-    // ── Page 1: header ──
-    doc.setFillColor(...navy);
-    doc.rect(0, 0, W, 34, "F");
-    doc.setTextColor(...amber);
-    doc.setFontSize(19);
-    doc.setFont("helvetica", "bold");
-    doc.text(header.company, L, 15);
-    doc.setFontSize(7.5);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(210, 210, 210);
-    doc.text(header.subtitle, L, 21);
-    doc.text(header.address, L, 27);
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(8);
-    doc.text(header.phone, R, 11, { align: "right" });
-    doc.text(header.email, R, 16, { align: "right" });
-    doc.text(header.website, R, 21, { align: "right" });
-    doc.setTextColor(...amber);
-    doc.setFont("helvetica", "bold");
-    doc.text(`GSTIN  ${header.gstin}`, R, 27, { align: "right" });
-
-    y = 42;
+    // ── Page 1: letterhead ──
+    // Falls back to the typeset header if the image can't be loaded.
+    if (letterhead) {
+      const imgW = R - L;
+      const imgH = imgW / LETTERHEAD_RATIO;
+      doc.addImage(letterhead, "PNG", L, 8, imgW, imgH);
+      y = 8 + imgH + 8;
+    } else {
+      doc.setFillColor(...navy);
+      doc.rect(0, 0, W, 34, "F");
+      doc.setTextColor(...amber);
+      doc.setFontSize(19);
+      doc.setFont("helvetica", "bold");
+      doc.text(header.company, L, 15);
+      doc.setFontSize(7.5);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(210, 210, 210);
+      doc.text(header.subtitle, L, 21);
+      doc.text(header.address, L, 27);
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(8);
+      doc.text(header.phone, R, 11, { align: "right" });
+      doc.text(header.email, R, 16, { align: "right" });
+      doc.text(header.website, R, 21, { align: "right" });
+      doc.setTextColor(...amber);
+      doc.setFont("helvetica", "bold");
+      doc.text(`GSTIN  ${header.gstin}`, R, 27, { align: "right" });
+      y = 42;
+    }
     doc.setTextColor(...navy);
     doc.setFontSize(15);
     doc.setFont("helvetica", "bold");
