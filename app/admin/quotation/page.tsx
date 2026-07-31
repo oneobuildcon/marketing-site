@@ -30,13 +30,37 @@ async function loadLogo(): Promise<{ data: string; ratio: number } | null> {
       reader.readAsDataURL(blob);
     });
     if (!data) return null;
-    const ratio = await new Promise<number>((resolve) => {
+    // The stored asset is a white mark on a black field. Convert it to a black
+    // mark on transparency so it sits correctly on the white letterhead.
+    return await new Promise((resolve) => {
       const img = new window.Image();
-      img.onload = () => resolve(img.width / img.height || 1.5);
-      img.onerror = () => resolve(1.5);
+      img.onload = () => {
+        try {
+          const c = document.createElement("canvas");
+          c.width = img.width;
+          c.height = img.height;
+          const ctx = c.getContext("2d");
+          if (!ctx) return resolve({ data, ratio: img.width / img.height || 1.5 });
+          ctx.drawImage(img, 0, 0);
+          const px = ctx.getImageData(0, 0, c.width, c.height);
+          const d8 = px.data;
+          for (let i = 0; i < d8.length; i += 4) {
+            const lum = (d8[i] + d8[i + 1] + d8[i + 2]) / 3;
+            // Bright pixels are the glyph → paint them near-black and opaque.
+            // Dark pixels are the backdrop → make them transparent.
+            d8[i] = d8[i + 1] = d8[i + 2] = 20;
+            d8[i + 3] = lum > 110 ? 255 : 0;
+          }
+          ctx.putImageData(px, 0, 0);
+          resolve({ data: c.toDataURL("image/png"), ratio: img.width / img.height || 1.5 });
+        } catch {
+          resolve({ data, ratio: img.width / img.height || 1.5 });
+        }
+      };
+      img.onerror = () => resolve(null);
+      img.crossOrigin = "anonymous";
       img.src = data;
     });
-    return { data, ratio };
   } catch {
     return null;
   }
