@@ -756,18 +756,20 @@ function GroupEditor({ title, groups, setGroups, input }: { title: string; group
       </div>
       <div className="space-y-3">
         {groups.map((g, gi) => (
-          <div key={gi} className="flex gap-2">
-            <input className={`${input} w-44 shrink-0 font-semibold`} placeholder="Work" value={g.work} onChange={(e) => setGroups(groups.map((x, j) => j === gi ? { ...x, work: e.target.value } : x))} />
-            <div className="flex-1 space-y-2">
+          <div key={gi} className="rounded-xl border border-black/8 p-3">
+            <div className="mb-2 flex items-center gap-2">
+              <input className={`${input} font-semibold`} placeholder="Work (e.g. Tile)" value={g.work} onChange={(e) => setGroups(groups.map((x, j) => j === gi ? { ...x, work: e.target.value } : x))} />
+              <button onClick={() => confirm(`Delete "${g.work || "this group"}"?`) && setGroups(groups.filter((_, j) => j !== gi))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600" title="Delete group"><Trash2 className="h-4 w-4" /></button>
+            </div>
+            <div className="space-y-2 pl-3">
               {g.items.map((it, ii) => (
-                <div key={ii} className="flex gap-2">
-                  <input className={input} value={it} onChange={(e) => setGroups(groups.map((x, j) => j === gi ? { ...x, items: x.items.map((y, k) => k === ii ? e.target.value : y) } : x))} />
+                <div key={ii} className="flex items-center gap-2">
+                  <input className={input} placeholder="Rate / brand line" value={it} onChange={(e) => setGroups(groups.map((x, j) => j === gi ? { ...x, items: x.items.map((y, k) => k === ii ? e.target.value : y) } : x))} />
                   <button onClick={() => setGroups(groups.map((x, j) => j === gi ? { ...x, items: x.items.filter((_, k) => k !== ii) } : x))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
                 </div>
               ))}
               <button onClick={() => setGroups(groups.map((x, j) => j === gi ? { ...x, items: [...x.items, ""] } : x))} className="text-xs font-semibold text-navy/50 hover:text-amber">+ add line</button>
             </div>
-            <button onClick={() => setGroups(groups.filter((_, j) => j !== gi))} className="shrink-0 self-start rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
           </div>
         ))}
       </div>
