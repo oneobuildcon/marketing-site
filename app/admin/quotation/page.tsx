@@ -264,7 +264,6 @@ export default function AdminQuotation() {
     const [{ jsPDF }, logo] = await Promise.all([import("jspdf"), loadLogo()]);
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const navy = [13, 27, 62] as const;
-    const amber = [245, 158, 11] as const;
     const W = 210;
     const L = 14, R = W - 14;
     let y = 0;
@@ -274,7 +273,7 @@ export default function AdminQuotation() {
       doc.line(L, 289, R, 289);
       doc.setFontSize(7.5);
       doc.setFont("helvetica", "normal");
-      doc.setTextColor(150, 150, 150);
+      doc.setTextColor(100, 100, 100);
       doc.text(`${header.company}  |  ${header.phone}  |  ${header.email}  |  GSTIN ${header.gstin}`, W / 2, 293, { align: "center" });
     }
     // The footer leaves the draw state grey/small, so reset it after every
@@ -352,7 +351,7 @@ export default function AdminQuotation() {
       doc.text(header.phone, R, 13, { align: "right" });
       doc.text(header.email, R, 19, { align: "right" });
       doc.text(header.website, R, 25, { align: "right" });
-      doc.setTextColor(...gold);
+      doc.setTextColor(...navy);
       doc.setFont("helvetica", "bold");
       doc.text(`GSTIN  ${header.gstin}`, R, 32, { align: "right" });
       // navy / gold rule
@@ -465,9 +464,9 @@ export default function AdminQuotation() {
       y += 7.2;
     });
     ensure(10);
-    doc.setFillColor(...amber);
+    doc.setFillColor(...navy);
     doc.rect(L, y, R - L, 7.5, "F");
-    doc.setTextColor(...navy);
+    doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9.5);
     doc.text("TOTAL", L + 3, y + 5.2);
@@ -477,7 +476,7 @@ export default function AdminQuotation() {
     ensure(6);
     doc.setFont("helvetica", "italic");
     doc.setFontSize(7.5);
-    doc.setTextColor(120, 120, 120);
+    doc.setTextColor(70, 70, 70);
     doc.text("GST 18% extra on the base amount, as per Special Notes.", L, y + 3);
     y += 18;
 
