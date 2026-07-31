@@ -256,7 +256,7 @@ export default function AdminQuotation() {
     doc.setTextColor(...navy);
     doc.setFontSize(15);
     doc.setFont("helvetica", "bold");
-    doc.text("QUOTATION", L, y);
+    doc.text("QUOTATION", W / 2, y, { align: "center" });
     doc.setFontSize(8.5);
     doc.setFont("helvetica", "normal");
     doc.text(`No: ${quotationNo}`, R, y - 4, { align: "right" });
@@ -264,22 +264,30 @@ export default function AdminQuotation() {
     doc.text(`Valid: ${validity}`, R, y + 4, { align: "right" });
     y += 8;
 
-    // Client box
+    // Client box — all client fields stacked on the left.
+    const clientLines = [
+      `Name: ${clientName || "—"}`,
+      `Phone: ${clientPhone || "—"}`,
+      `Location: ${location || "—"}`,
+      ...(address.trim() ? [`Address: ${address.trim()}`] : []),
+    ];
+    const boxH = 12 + clientLines.length * 5 + 7;
     doc.setFillColor(249, 250, 251);
-    doc.roundedRect(L, y, R - L, 27, 2, 2, "F");
+    doc.roundedRect(L, y, R - L, boxH, 2, 2, "F");
     doc.setTextColor(...navy);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     doc.text("Client Details", L + 5, y + 6);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
-    doc.text(`Name: ${clientName || "—"}`, L + 5, y + 12);
-    doc.text(`Phone: ${clientPhone || "—"}`, L + 5, y + 17);
-    doc.text(`Location: ${location || "—"}`, L + 90, y + 12);
-    doc.text(`Address: ${address || "—"}`, L + 90, y + 17);
+    clientLines.forEach((line, i) => doc.text(line, L + 5, y + 12 + i * 5));
     doc.setFont("helvetica", "bold");
-    doc.text(`Package: ${quotationPresets.find((p) => p.id === pkgId)?.label.split(" — ")[0] ?? ""} @ Rs.${rate}/sqft`, L + 5, y + 23);
-    y += 33;
+    doc.text(
+      `Package: ${quotationPresets.find((p) => p.id === pkgId)?.label.split(" — ")[0] ?? ""} @ Rs.${rate}/sqft`,
+      L + 5,
+      y + 12 + clientLines.length * 5 + 2
+    );
+    y += boxH + 6;
 
     // ── Specifications ──
     sectionTitle(`SPECIFICATIONS  —  DETAILS OF WORK  @  Rs. ${rate} / SQ.FT`);
