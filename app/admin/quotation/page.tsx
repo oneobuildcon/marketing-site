@@ -180,6 +180,7 @@ export default function AdminQuotation() {
   const [validity, setValidity] = useState("15 days");
   const [clientName, setClientName] = useState("");
   const [clientPhone, setClientPhone] = useState("");
+  const [honorific, setHonorific] = useState("Sir");
   const [location, setLocation] = useState("");
   const [address, setAddress] = useState("");
   const [floorRows, setFloorRows] = useState<FloorRow[]>(clone(defaultFloorRows));
@@ -688,7 +689,7 @@ export default function AdminQuotation() {
   // the chat with a ready message — the admin just attaches the saved file.
   function whatsAppMessage() {
     return (
-      `Hello ${clientName.trim() || "Sir/Madam"},\n\n` +
+      `Hello ${[clientName.trim(), honorific].filter(Boolean).join(" ") || "Sir/Madam"},\n\n` +
       `Thank you for your interest in *One O Buildcon*. Please find attached our quotation for your construction project${location.trim() ? ` at ${location.trim()}` : ""}.\n\n` +
       `*Quotation No:* ${quotationNo}  |  *Valid for:* ${validity}\n\n` +
       `Please feel free to call us if you would like any clarification. We would be glad to arrange a site visit at your convenience.\n\n` +
@@ -776,7 +777,22 @@ export default function AdminQuotation() {
         <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
           <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-amber">Client &amp; Quotation</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><label className={label}>Client Name</label><input className={input} value={clientName} onChange={(e) => setClientName(e.target.value)} /></div>
+            <div>
+              <label className={label}>Client Name</label>
+              <div className="flex gap-2">
+                <input className={input} value={clientName} onChange={(e) => setClientName(e.target.value)} />
+                <select
+                  className={`${input} max-w-[5.5rem] shrink-0`}
+                  value={honorific}
+                  onChange={(e) => setHonorific(e.target.value)}
+                  title="Added after the name in the WhatsApp greeting"
+                >
+                  <option value="Sir">Sir</option>
+                  <option value="Mam">Mam</option>
+                  <option value="">—</option>
+                </select>
+              </div>
+            </div>
             <div><label className={label}>Client Phone</label><input className={input} value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} /></div>
             <div><label className={label}>Project Location</label><input className={input} value={location} onChange={(e) => setLocation(e.target.value)} /></div>
             <div><label className={label}>Address</label><input className={input} value={address} onChange={(e) => setAddress(e.target.value)} /></div>
