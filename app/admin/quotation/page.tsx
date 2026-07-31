@@ -685,7 +685,7 @@ export default function AdminQuotation() {
     numberedItems(notes);
 
     // ── Closing, stamp & signature, right after the special notes ──
-    const signW = marks.sign ? 52 : 0;
+    const signW = marks.sign ? 42 : 0;
     const signH = marks.sign ? signW / (marks.sign.ratio || 3) : 0;
     const stampW = marks.stamp ? 34 : 0;
     const stampH = marks.stamp ? stampW / (marks.stamp.ratio || 1) : 0;
@@ -698,7 +698,9 @@ export default function AdminQuotation() {
     doc.setTextColor(...navy);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
-    doc.text("Thanking you,", R, y, { align: "right" });
+    // Left margin, the way a letter closes — the stamp sits directly beneath it
+    // and the signature block balances it on the right.
+    doc.text("Thanking you,", L, y);
 
     if (markH > 0) {
       const top = y + 3;
