@@ -1,0 +1,29 @@
+name: Deploy
+
+# Vercel's own GitHub webhook has been unreliable — some pushes to main never
+# reach it and the site silently stays on an old build. GitHub Actions fires
+# from GitHub's side, so this pings the Vercel deploy hook directly and the
+# deployment happens regardless of whether the webhook fired.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel deployment
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "VERCEL_DEPLOY_HOOK secret is not set — skipping."
+            echo "Add it under Settings → Secrets and variables → Actions."
+            exit 0
+          fi
+          code=$(curl -sS -o /tmp/out.json -w "%{http_code}" -X POST "$HOOK")
+          echo "HTTP $code"
+          cat /tmp/out.json
+          # A duplicate trigger is fine; anything else should fail loudly.
+          [ "$code" -ge 200 ] && [ "$code" -lt 300 ]
