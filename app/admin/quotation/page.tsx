@@ -686,12 +686,10 @@ export default function AdminQuotation() {
 
   // WhatsApp can't accept a file through a link, so download the PDF and open
   // the chat with a ready message — the admin just attaches the saved file.
-  async function sendWhatsApp() {
+  function sendWhatsApp() {
     const d = clientPhone.replace(/\D/g, "");
     const to = d.length === 10 ? `91${d}` : d;
     if (to.length < 10) { alert("Enter the client's phone number first."); return; }
-    const doc = await buildPDF();
-    doc.save(fileName());
     const msg =
       `Hello ${clientName.trim() || "Sir/Madam"},\n\n` +
       `Thank you for your interest in *One O Buildcon*. Please find attached our quotation for your construction project${location.trim() ? ` at ${location.trim()}` : ""}.\n\n` +
@@ -701,7 +699,14 @@ export default function AdminQuotation() {
       `*Quotation No:* ${quotationNo}  |  *Valid for:* ${validity}\n\n` +
       `Please feel free to call us if you would like any clarification. We would be glad to arrange a site visit at your convenience.\n\n` +
       `Warm regards,\nTeam One O Buildcon\n${header.phone}`;
+    // Open WhatsApp straight away, while we're still inside the click handler —
+    // building the PDF first loses the user gesture and the tab gets blocked,
+    // leaving only the downloaded file open. The PDF then saves in the
+    // background, ready to attach.
     window.open(`https://wa.me/${to}?text=${encodeURIComponent(msg)}`, "_blank");
+    buildPDF()
+      .then((doc) => doc.save(fileName()))
+      .catch(() => alert("Could not generate the PDF. Please use Download."));
   }
 
   // ── UI helpers ──
