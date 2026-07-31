@@ -5,6 +5,8 @@
 export type SpecSection = { title: string; items: string[] };
 export type RateGroup = { work: string; items: string[] };
 
+export type PayRow = { stage: string; percent: string };
+
 export type QuotationPreset = {
   id: string;
   label: string;
@@ -12,6 +14,10 @@ export type QuotationPreset = {
   sections: SpecSection[];
   rates: RateGroup[];
   brands: RateGroup[];
+  // Optional overrides — packages that measure or bill differently.
+  notes?: string[];
+  payments?: PayRow[];
+  areaPercents?: { plinth: number; ground: number; upper: number; terrace: number };
 };
 
 // Special notes are identical for both packages.
@@ -181,6 +187,79 @@ export const quotationPresets: QuotationPreset[] = [
       { work: "Waterproofing", items: ["Dr. Fixit URP and LW+"] },
       { work: "Electrical Work", items: ["Pipe — Diamond or Polycab", "Wire — Polycab", "Switch & Socket — Anchor Roma Penta"] },
       { work: "Painting", items: ["Interior — Nerolac Tractor Emulsion", "Exterior — Nerolac Suraksha Plus"] },
+    ],
+  },
+  {
+    id: "rcc",
+    label: "RCC & Brick Work — ₹870/sqft",
+    rate: 870,
+    areaPercents: { plinth: 1, ground: 0.75, upper: 1, terrace: 0.5 },
+    sections: [
+      { title: "RATE", items: [
+        "As per the below mode of measuring and scope of works, the rate for R.C.C. and brick work plaster work (for built-up area) will be:",
+        "For work — Rs. 870 / sq.ft + taxes.",
+      ]},
+      { title: "FOR OTHER WORKS", items: [
+        "Raft — Rs. 600 / sq.ft + taxes.",
+        "Retaining wall — Rs. 550 / sq.ft + taxes.",
+        "RCC tank — Rs. 25 / litre.",
+        "Extra height shuttering area rate will differ (up to 3m — 1 time; 3m to 3.5m — 1.25 times; 3.5m to 4.5m — 1.5 times; up to 6m — 2 times).",
+      ]},
+      { title: "SCOPE OF THE WORK", items: [
+        "All work done as per the drawing provided by the architect.",
+        'For brick work, outer wall 9" and all internal walls 6" — red brick or AAC block.',
+        "For outside, double coat plaster of 12mm each — first taar plaster and second dabba finish coat.",
+        "Internally, all taar plaster.",
+        "RCC work as per the structural drawings.",
+        "Floor to floor height considered as 11 feet.",
+      ]},
+      { title: "MATERIAL USAGE", items: [
+        "Steel — Uma / Kalika / equivalent brand (Fe 500 / 550).",
+        "Cement — Birla Super for RCC, and JK Super for brick work plaster.",
+        "Brick — red brick / AAC block.",
+        "Plaster — M sand (plaster sand).",
+        "Aggregate — crush sand for other work.",
+        "Chicken mesh and chemical for plaster.",
+      ]},
+    ],
+    rates: [],
+    brands: [
+      { work: "Steel", items: ["Uma / Kalika / equivalent (Fe 500 / 550)"] },
+      { work: "RCC Work Cement", items: ["Birla Super"] },
+      { work: "Brick Work Plaster", items: ["JK Super"] },
+      { work: "Brick", items: ["Red brick / AAC block"] },
+      { work: "Plaster Sand", items: ["M sand (plaster sand)"] },
+      { work: "Aggregate", items: ["Crush sand for other work"] },
+      { work: "Plaster Reinforcement", items: ["Chicken mesh and chemical"] },
+    ],
+    payments: [
+      { stage: "Advance / Booking", percent: "15" },
+      { stage: "After Plinth", percent: "10" },
+      { stage: "After 1st RCC Slab", percent: "10" },
+      { stage: "After 2nd RCC Slab", percent: "10" },
+      { stage: "After 3rd RCC Slab", percent: "10" },
+      { stage: "After 4th Slab", percent: "10" },
+      { stage: "At the start of Brick work", percent: "10" },
+      { stage: "After Brickwork (2 floors)", percent: "10" },
+      { stage: "Before start of outer Plaster", percent: "5" },
+      { stage: "At the start of inside Plaster", percent: "5" },
+      { stage: "On Handover / Possession", percent: "5" },
+    ],
+    notes: [
+      "Electricity and water are in the client's scope. Borewell and electric meter shall be installed by the client. Water tankers, if required, shall be provided by the client, including space for storage until the underground water tank is built.",
+      "External facade work such as mouldings is not included in this quotation; standard plaster is considered. Any external detailing will be charged extra.",
+      "Landscaping of the outer area beside the parking area is not included.",
+      "Compound wall and gate are not included in this quotation.",
+      "Curing of the project is in the client's scope, including a storage room for material and labour on site.",
+      "If an RCC overhead water tank is required, it will be charged extra.",
+      "GST extra on base amount (18%).",
+      "Minor cracks may appear in walls due to heat of hydration — this is normal and causes no harm to the structure.",
+      "Any work other than that mentioned in this quotation will be charged extra.",
+      "Quotation is valid up to 15 days.",
+      "If excavation and back-filling are done by the client, the plinth rate will be considered as 75% of the slab area.",
+      "The quotation considers manual concreting. If RMC is required, the extra amount will be added to the quote.",
+      "Any disturbance or problem caused by a neighbour or the corporation is to be handled and resolved by the client.",
+      "In case of any natural disaster, pandemic or war, the project timeline will be extended accordingly.",
     ],
   },
 ];

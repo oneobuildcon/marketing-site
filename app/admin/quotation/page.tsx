@@ -214,7 +214,13 @@ export default function AdminQuotation() {
     setSections(clone(preset.sections));
     setRates(clone(preset.rates));
     setBrands(clone(preset.brands));
-    setNotes(clone(defaultSpecialNotes));
+    setNotes(clone(preset.notes ?? defaultSpecialNotes));
+    if (preset.payments) {
+      setPayments(clone(preset.payments));
+      setPaymentsEdited(true); // fixed schedule — don't regenerate from floors
+    } else {
+      setPaymentsEdited(false);
+    }
   }
 
   const rateNum = parseFloat(rate) || 0;
@@ -229,25 +235,35 @@ export default function AdminQuotation() {
   const groundParking = groundUsage === "mixed" ? parseFloat(groundParkingSqft) || 0 : 0;
   const groundSlab = groundUsage === "mixed" ? groundHouse + groundParking : slabs[0] || 0;
   const maxSlab = Math.max(groundSlab, ...slabs.slice(1), 0);
-  const plinthArea = Math.round(groundSlab * 0.5);
-  const terraceArea = Math.round(maxSlab * 0.35);
+  const pct = quotationPresets.find((p) => p.id === pkgId)?.areaPercents ?? {
+    plinth: 0.5,
+    ground: 1,
+    upper: 1,
+    terrace: 0.35,
+  };
+  const plinthArea = Math.round(groundSlab * pct.plinth);
+  const terraceArea = Math.round(maxSlab * pct.terrace);
 
   const areaRows: AreaRow[] = [];
-  areaRows.push({ label: `Plinth (50% of ${inr(groundSlab)} sqft ground slab)`, area: String(plinthArea) });
+  const pctLabel = (v: number) => `${Math.round(v * 100)}%`;
+  areaRows.push({ label: `Plinth (${pctLabel(pct.plinth)} of ${inr(groundSlab)} sqft ground slab)`, area: String(plinthArea) });
   if (groundUsage === "mixed") {
     areaRows.push({ label: "Ground Floor — House (100%)", area: String(Math.round(groundHouse)) });
     areaRows.push({ label: "Ground Floor — Parking (50%)", area: String(Math.round(groundParking * 0.5)) });
   } else {
-    const pct = groundUsage === "parking" ? 0.5 : 1;
+    const gPct = groundUsage === "parking" ? 0.5 : pct.ground;
     areaRows.push({
-      label: `${floorRows[0]?.label || "Ground Floor"}${groundUsage === "parking" ? " — Parking (50%)" : ""}`,
-      area: String(Math.round((slabs[0] || 0) * pct)),
+      label: `${floorRows[0]?.label || "Ground Floor"}${gPct === 1 ? "" : ` (${pctLabel(gPct)})`}`,
+      area: String(Math.round((slabs[0] || 0) * gPct)),
     });
   }
   floorRows.slice(1).forEach((r, i) => {
-    areaRows.push({ label: r.label, area: String(Math.round(slabs[i + 1] || 0)) });
+    areaRows.push({
+      label: `${r.label}${pct.upper === 1 ? "" : ` (${pctLabel(pct.upper)})`}`,
+      area: String(Math.round((slabs[i + 1] || 0) * pct.upper)),
+    });
   });
-  areaRows.push({ label: `Terrace (35% of ${inr(maxSlab)} sqft top slab)`, area: String(terraceArea) });
+  areaRows.push({ label: `Terrace (${pctLabel(pct.terrace)} of ${inr(maxSlab)} sqft top slab)`, area: String(terraceArea) });
 
   const totalArea = areaRows.reduce((s, r) => s + (parseFloat(r.area) || 0), 0);
   const totalAmount = Math.round(totalArea * rateNum);
@@ -573,8 +589,9 @@ export default function AdminQuotation() {
       });
       y += 12;
     }
-    rateTable("RATE CONSIDERED", rates);
-    rateTable("BRAND USED", brands);
+    // A package may not quote item rates (e.g. RCC & brick work) — skip empty tables.
+    if (rates.some((g) => g.work.trim() || g.items.some(Boolean))) rateTable("RATE CONSIDERED", rates);
+    if (brands.some((g) => g.work.trim() || g.items.some(Boolean))) rateTable("BRAND USED", brands);
 
     // ── Bank details ──
     if (bank.accountName || bank.accountNumber || bank.bankName) {
