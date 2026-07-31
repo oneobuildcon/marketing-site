@@ -16,6 +16,8 @@ const TPL_KEY = "oneo_quotation_template_v2";
 
 type AreaRow = { label: string; area: string };
 type PayRow = { stage: string; percent: string };
+type FloorRow = { label: string; slab: string };
+type GroundUsage = "house" | "parking" | "mixed";
 
 const defaultHeader = {
   company: "ONE O BUILDCON",
@@ -44,11 +46,9 @@ const defaultPayments: PayRow[] = [
 
 const defaultBank = { accountName: "", accountNumber: "", bankName: "", ifsc: "", branch: "" };
 
-const defaultAreaRows: AreaRow[] = [
-  { label: "Plinth", area: "" },
-  { label: "Ground Floor", area: "" },
-  { label: "First Floor", area: "" },
-  { label: "Top Terrace", area: "" },
+const defaultFloorRows: FloorRow[] = [
+  { label: "Ground Floor", slab: "" },
+  { label: "First Floor", slab: "" },
 ];
 
 function clone<T>(v: T): T {
@@ -77,7 +77,10 @@ export default function AdminQuotation() {
   const [clientPhone, setClientPhone] = useState("");
   const [location, setLocation] = useState("");
   const [address, setAddress] = useState("");
-  const [areaRows, setAreaRows] = useState<AreaRow[]>(clone(defaultAreaRows));
+  const [floorRows, setFloorRows] = useState<FloorRow[]>(clone(defaultFloorRows));
+  const [groundUsage, setGroundUsage] = useState<GroundUsage>("house");
+  const [groundHouseSqft, setGroundHouseSqft] = useState("");
+  const [groundParkingSqft, setGroundParkingSqft] = useState("");
 
   useEffect(() => {
     try {
@@ -109,11 +112,40 @@ export default function AdminQuotation() {
     setNotes(clone(defaultSpecialNotes));
   }
 
-  // ── Derived totals (GST is extra, as per Special Note 8 — matches the Excel) ──
-  const totalArea = areaRows.reduce((s, r) => s + (parseFloat(r.area) || 0), 0);
   const rateNum = parseFloat(rate) || 0;
-  const totalAmount = Math.round(totalArea * rateNum);
   const inr = (n: number) => n.toLocaleString("en-IN");
+
+  // ── Built-up area, using the same rules as the public cost calculator:
+  // plinth = 50% of ground slab, terrace = 35% of the largest slab,
+  // ground floor counts 100% (house), 50% (parking) or a house/parking split.
+  // GST is extra on the base amount, as per Special Note 8. ──
+  const slabs = floorRows.map((r) => parseFloat(r.slab) || 0);
+  const groundHouse = groundUsage === "mixed" ? parseFloat(groundHouseSqft) || 0 : 0;
+  const groundParking = groundUsage === "mixed" ? parseFloat(groundParkingSqft) || 0 : 0;
+  const groundSlab = groundUsage === "mixed" ? groundHouse + groundParking : slabs[0] || 0;
+  const maxSlab = Math.max(groundSlab, ...slabs.slice(1), 0);
+  const plinthArea = Math.round(groundSlab * 0.5);
+  const terraceArea = Math.round(maxSlab * 0.35);
+
+  const areaRows: AreaRow[] = [];
+  areaRows.push({ label: `Plinth (50% of ${inr(groundSlab)} sqft ground slab)`, area: String(plinthArea) });
+  if (groundUsage === "mixed") {
+    areaRows.push({ label: "Ground Floor — House (100%)", area: String(Math.round(groundHouse)) });
+    areaRows.push({ label: "Ground Floor — Parking (50%)", area: String(Math.round(groundParking * 0.5)) });
+  } else {
+    const pct = groundUsage === "parking" ? 0.5 : 1;
+    areaRows.push({
+      label: `${floorRows[0]?.label || "Ground Floor"}${groundUsage === "parking" ? " — Parking (50%)" : ""}`,
+      area: String(Math.round((slabs[0] || 0) * pct)),
+    });
+  }
+  floorRows.slice(1).forEach((r, i) => {
+    areaRows.push({ label: r.label, area: String(Math.round(slabs[i + 1] || 0)) });
+  });
+  areaRows.push({ label: `Terrace (35% of ${inr(maxSlab)} sqft top slab)`, area: String(terraceArea) });
+
+  const totalArea = areaRows.reduce((s, r) => s + (parseFloat(r.area) || 0), 0);
+  const totalAmount = Math.round(totalArea * rateNum);
 
   async function downloadPDF() {
     saveTemplate();
@@ -452,21 +484,70 @@ export default function AdminQuotation() {
             <div className="flex items-center gap-2">
               <label className="text-xs font-semibold text-navy/60">Rate (Rs./sqft)</label>
               <input className={`${input} w-24`} type="number" value={rate} onChange={(e) => setRate(e.target.value)} />
-              <button onClick={() => setAreaRows([...areaRows, { label: "", area: "" }])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add Floor</button>
+              <button onClick={() => setFloorRows([...floorRows, { label: `Floor ${floorRows.length}`, slab: "" }])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add Floor</button>
             </div>
           </div>
+          {/* Ground floor usage */}
+          <div className="mb-4">
+            <label className={label}>Ground Floor Usage</label>
+            <div className="flex flex-wrap gap-2">
+              {([["house", "Full House"], ["parking", "Full Parking"], ["mixed", "House + Parking"]] as const).map(([v, lbl]) => (
+                <button
+                  key={v}
+                  onClick={() => setGroundUsage(v)}
+                  className={`rounded-lg border px-4 py-2 text-xs font-semibold transition ${
+                    groundUsage === v ? "border-amber bg-navy text-white" : "border-black/10 bg-white text-navy hover:border-amber/40"
+                  }`}
+                >
+                  {lbl}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Slab areas */}
           <div className="space-y-2">
-            {areaRows.map((r, i) => (
-              <div key={i} className="flex gap-2">
-                <input className={input} placeholder="Floor / component" value={r.label} onChange={(e) => setAreaRows(areaRows.map((x, j) => j === i ? { ...x, label: e.target.value } : x))} />
-                <input className={`${input} w-32`} type="number" placeholder="sqft" value={r.area} onChange={(e) => setAreaRows(areaRows.map((x, j) => j === i ? { ...x, area: e.target.value } : x))} />
-                <span className="flex w-28 shrink-0 items-center justify-end text-xs text-navy/50">Rs. {inr(Math.round((parseFloat(r.area) || 0) * rateNum))}</span>
-                <button onClick={() => setAreaRows(areaRows.filter((_, j) => j !== i))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
+            {groundUsage === "mixed" ? (
+              <>
+                <div className="flex gap-2">
+                  <input className={input} value={floorRows[0]?.label ?? "Ground Floor"} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === 0 ? { ...x, label: e.target.value } : x))} />
+                  <input className={`${input} w-32`} type="number" placeholder="house sqft" value={groundHouseSqft} onChange={(e) => setGroundHouseSqft(e.target.value)} />
+                  <input className={`${input} w-32`} type="number" placeholder="parking sqft" value={groundParkingSqft} onChange={(e) => setGroundParkingSqft(e.target.value)} />
+                  <span className="w-10 shrink-0" />
+                </div>
+                <p className="pl-1 text-xs text-navy/40">House area counts 100%, parking area counts 50%.</p>
+              </>
+            ) : (
+              <div className="flex gap-2">
+                <input className={input} value={floorRows[0]?.label ?? "Ground Floor"} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === 0 ? { ...x, label: e.target.value } : x))} />
+                <input className={`${input} w-32`} type="number" placeholder="slab sqft" value={floorRows[0]?.slab ?? ""} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === 0 ? { ...x, slab: e.target.value } : x))} />
+                <span className="w-10 shrink-0" />
+              </div>
+            )}
+            {floorRows.slice(1).map((r, i) => (
+              <div key={i + 1} className="flex gap-2">
+                <input className={input} value={r.label} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === i + 1 ? { ...x, label: e.target.value } : x))} />
+                <input className={`${input} w-32`} type="number" placeholder="slab sqft" value={r.slab} onChange={(e) => setFloorRows(floorRows.map((x, j) => j === i + 1 ? { ...x, slab: e.target.value } : x))} />
+                <button onClick={() => setFloorRows(floorRows.filter((_, j) => j !== i + 1))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
           </div>
-          <div className="mt-4 flex items-center justify-end gap-6 text-sm">
-            <span className="text-navy/60">Total Area: <b className="text-navy">{inr(totalArea)} sqft</b></span>
+
+          {/* Auto breakdown */}
+          <div className="mt-5 rounded-xl border border-black/8 bg-gray-50 p-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-navy/40">Built-up Area Breakdown (auto)</p>
+            <div className="space-y-1">
+              {areaRows.map((r, i) => (
+                <div key={i} className="flex items-center justify-between text-sm">
+                  <span className="text-navy/70">{r.label}</span>
+                  <span className="font-semibold text-navy">{inr(parseFloat(r.area) || 0)} sqft</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-end gap-4 text-sm">
+            <span className="text-navy/60">Total Built-up: <b className="text-navy">{inr(totalArea)} sqft</b></span>
             <span className="rounded-lg bg-amber/10 px-3 py-1 font-bold text-amber">Total: Rs. {inr(totalAmount)}</span>
             <span className="text-xs text-navy/40">GST 18% extra</span>
           </div>
