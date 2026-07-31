@@ -103,7 +103,7 @@ const defaultHeader = {
   email: "oneobuildcon@gmail.com",
   website: "www.oneobuildcon.com",
   gstin: "27GKVPS6241G1ZE",
-  address: "Patharemala, Charholi Budruk, Pimpri Chinchwad, Pune, Maharashtra – 412105",
+  address: "Charholi Budruk, Pimpri Chinchwad, Pune, Maharashtra – 412105",
 };
 
 const ORDINALS = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"];
