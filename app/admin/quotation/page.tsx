@@ -399,15 +399,15 @@ export default function AdminQuotation() {
     numberedItems(notes);
 
     // ── Closing & signature, right after the special notes ──
-    ensure(30);
-    y += 5;
+    ensure(20);
+    y += 6;
     doc.setTextColor(...navy);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.text("Thanking you,", R, y, { align: "right" });
-    y += 18; // blank space to sign by hand
+    y += 7;
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
+    doc.setFontSize(11);
     doc.text(header.company, R, y, { align: "right" });
 
     // ── Estimate + payment schedule: their own page ──
