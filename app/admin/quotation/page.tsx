@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileText, Plus, Trash2, Download, RotateCcw, Package } from "lucide-react";
+import { FileText, Plus, Trash2, Download, RotateCcw, Package, Eye, Send } from "lucide-react";
 import {
   quotationPresets,
   defaultSpecialNotes,
@@ -147,7 +147,7 @@ export default function AdminQuotation() {
   const totalArea = areaRows.reduce((s, r) => s + (parseFloat(r.area) || 0), 0);
   const totalAmount = Math.round(totalArea * rateNum);
 
-  async function downloadPDF() {
+  async function buildPDF() {
     saveTemplate();
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "mm", format: "a4" });
@@ -422,7 +422,42 @@ export default function AdminQuotation() {
     }
 
     footer();
-    doc.save(`Quotation-${clientName.trim() || quotationNo}.pdf`);
+    return doc;
+  }
+
+  const fileName = () => `Quotation-${(clientName.trim() || quotationNo).replace(/\s+/g, "-")}.pdf`;
+
+  async function downloadPDF() {
+    const doc = await buildPDF();
+    doc.save(fileName());
+  }
+
+  // Open the PDF in a new tab so it can be checked before sending.
+  async function previewPDF() {
+    const doc = await buildPDF();
+    const url = URL.createObjectURL(doc.output("blob"));
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  }
+
+  // WhatsApp can't accept a file through a link, so download the PDF and open
+  // the chat with a ready message — the admin just attaches the saved file.
+  async function sendWhatsApp() {
+    const d = clientPhone.replace(/\D/g, "");
+    const to = d.length === 10 ? `91${d}` : d;
+    if (to.length < 10) { alert("Enter the client's phone number first."); return; }
+    const doc = await buildPDF();
+    doc.save(fileName());
+    const msg =
+      `Hello ${clientName.trim() || "Sir/Madam"},\n\n` +
+      `Please find attached the quotation for your construction project${location.trim() ? ` at ${location.trim()}` : ""}.\n\n` +
+      `Package: ${quotationPresets.find((p) => p.id === pkgId)?.label ?? ""}\n` +
+      `Total built-up area: ${inr(totalArea)} sqft\n` +
+      `Estimated amount: Rs. ${inr(totalAmount)} (GST 18% extra)\n\n` +
+      `Quotation No: ${quotationNo}  |  Valid: ${validity}\n\n` +
+      `Please feel free to call us for any clarification.\n\n` +
+      `Warm regards,\nTeam One O Buildcon\n${header.phone}`;
+    window.open(`https://wa.me/${to}?text=${encodeURIComponent(msg)}`, "_blank");
   }
 
   // ── UI helpers ──
@@ -436,9 +471,17 @@ export default function AdminQuotation() {
         <h1 className="flex items-center gap-2 text-2xl font-bold text-navy">
           <FileText className="h-6 w-6 text-amber" /> Quotation Generator
         </h1>
-        <button onClick={downloadPDF} className="flex items-center gap-2 rounded-xl bg-amber px-5 py-2.5 font-semibold text-navy-dark hover:bg-amber-light transition">
-          <Download className="h-4 w-4" /> Download PDF
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button onClick={previewPDF} className="flex items-center gap-2 rounded-xl border border-navy/20 px-4 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5 transition">
+            <Eye className="h-4 w-4" /> Preview
+          </button>
+          <button onClick={downloadPDF} className="flex items-center gap-2 rounded-xl bg-amber px-4 py-2.5 text-sm font-semibold text-navy-dark hover:bg-amber-light transition">
+            <Download className="h-4 w-4" /> Download
+          </button>
+          <button onClick={sendWhatsApp} className="flex items-center gap-2 rounded-xl bg-green-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-600 transition">
+            <Send className="h-4 w-4" /> WhatsApp
+          </button>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -654,7 +697,11 @@ export default function AdminQuotation() {
 
         <div className="flex items-center justify-between gap-3 pb-10">
           <button onClick={saveTemplate} className="flex items-center gap-2 rounded-xl border border-navy/20 px-4 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5"><RotateCcw className="h-4 w-4" /> Save header &amp; bank</button>
-          <button onClick={downloadPDF} className="flex items-center gap-2 rounded-xl bg-amber px-6 py-3 font-semibold text-navy-dark hover:bg-amber-light transition"><Download className="h-4 w-4" /> Download PDF</button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button onClick={previewPDF} className="flex items-center gap-2 rounded-xl border border-navy/20 px-4 py-3 text-sm font-semibold text-navy hover:bg-navy/5 transition"><Eye className="h-4 w-4" /> Preview</button>
+            <button onClick={downloadPDF} className="flex items-center gap-2 rounded-xl bg-amber px-5 py-3 text-sm font-semibold text-navy-dark hover:bg-amber-light transition"><Download className="h-4 w-4" /> Download</button>
+            <button onClick={sendWhatsApp} className="flex items-center gap-2 rounded-xl bg-green-500 px-5 py-3 text-sm font-semibold text-white hover:bg-green-600 transition"><Send className="h-4 w-4" /> WhatsApp</button>
+          </div>
         </div>
       </div>
     </div>
