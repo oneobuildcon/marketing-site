@@ -472,7 +472,9 @@ export default function AdminQuotation() {
 
   const areaRows: AreaRow[] = [];
   const pctLabel = (v: number) => `${Math.round(v * 100)}%`;
-  areaRows.push({ label: `Plinth (${pctLabel(pct.plinth)} of ${inr(groundSlab)} sqft ground slab)`, area: String(plinthArea) });
+  // Only the percentage is shown — the slab area it's taken from is our own
+  // working and shouldn't appear on the client's copy.
+  areaRows.push({ label: `Plinth (${pctLabel(pct.plinth)})`, area: String(plinthArea) });
   if (groundUsage === "mixed") {
     areaRows.push({ label: `Ground Floor — House (${pctLabel(pct.ground)})`, area: String(Math.round(groundHouse * pct.ground)) });
     areaRows.push({ label: `Ground Floor — Parking (${pctLabel(pct.parking)})`, area: String(Math.round(groundParking * pct.parking)) });
@@ -489,7 +491,7 @@ export default function AdminQuotation() {
       area: String(Math.round((slabs[i + 1] || 0) * pct.upper)),
     });
   });
-  areaRows.push({ label: `Terrace (${pctLabel(pct.terrace)} of ${inr(maxSlab)} sqft top slab)`, area: String(terraceArea) });
+  areaRows.push({ label: `Terrace (${pctLabel(pct.terrace)})`, area: String(terraceArea) });
 
   const totalArea = areaRows.reduce((s, r) => s + (parseFloat(r.area) || 0), 0);
   const totalAmount = Math.round(totalArea * rateNum);
