@@ -406,7 +406,7 @@ export default function AdminQuotation() {
   const [pkgId, setPkgId] = useState("basic");
   const [rate, setRate] = useState(String(quotationPresets[0].rate));
   const [sections, setSections] = useState<SpecSection[]>(clone(quotationPresets[0].sections));
-  const [notes, setNotes] = useState<string[]>(clone(defaultSpecialNotes));
+  const [notes, setNotes] = useState<SpecSection[]>(clone(defaultSpecialNotes));
   const [rates, setRates] = useState<RateGroup[]>(clone(quotationPresets[0].rates));
   const [brands, setBrands] = useState<RateGroup[]>(clone(quotationPresets[0].brands));
   const [payments, setPayments] = useState<PayRow[]>(buildPaymentSchedule(2));
@@ -717,20 +717,36 @@ export default function AdminQuotation() {
       numberedItems(sec.items);
     });
 
-    // ── Special notes ──
+    // ── Special notes, grouped ("Client's Scope", "Not Included", …) with the
+    // numbering restarting inside each group. ──
     y += 3;
     {
       // Don't leave the heading stranded at the foot of a page.
       doc.setFontSize(9.5);
-      const firstH = notes
-        .filter(Boolean)
-        .slice(0, 2)
-        .reduce((h, it) => h + (doc.splitTextToSize(it, R - L - 14) as string[]).length * 4.9 + 2, 0);
-      if (y + 9 + firstH > 286) { footer(); doc.addPage(); y = 16; resetStyle(); }
+      const firstItems = (notes[0]?.items ?? []).filter(Boolean).slice(0, 2);
+      const firstH = firstItems.reduce(
+        (h, it) => h + (doc.splitTextToSize(it, R - L - 14) as string[]).length * 4.9 + 2, 0);
+      if (y + 16 + firstH > 286) { footer(); doc.addPage(); y = 16; resetStyle(); }
     }
     sectionTitle("SPECIAL NOTES");
     y += 2;
-    numberedItems(notes);
+    notes.forEach((grp) => {
+      const live = grp.items.filter(Boolean);
+      if (!live.length) return;
+      if (grp.title.trim()) {
+        // Keep a group heading with at least its first note.
+        doc.setFontSize(9.5);
+        const keepH = 6.5 + (doc.splitTextToSize(live[0], R - L - 14) as string[]).length * 4.9 + 2;
+        if (y + keepH > 286) { footer(); doc.addPage(); y = 16; resetStyle(); }
+        doc.setTextColor(...navy);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8.5);
+        doc.text(grp.title, L, y + 4);
+        y += 6.5;
+      }
+      numberedItems(grp.items);
+      y += 1;
+    });
 
     // ── Closing, stamp & signature, right after the special notes ──
     const signW = marks.sign ? 42 : 0;
@@ -1269,14 +1285,36 @@ export default function AdminQuotation() {
         <section className="rounded-2xl border border-black/8 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-bold uppercase tracking-widest text-amber">Special Notes</h2>
-            <button onClick={() => setNotes([...notes, ""])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add Note</button>
+            <button onClick={() => setNotes([...notes, { title: "NEW GROUP", items: [""] }])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add Group</button>
           </div>
-          <div className="space-y-2">
-            {notes.map((n, i) => (
-              <div key={i} className="flex gap-2">
-                <span className="flex w-6 shrink-0 items-center justify-center text-xs font-semibold text-navy/40">{i + 1}</span>
-                <textarea rows={Math.max(1, Math.ceil(n.length / 95))} className={`${input} min-w-0 resize-none`} value={n} onChange={(e) => setNotes(notes.map((x, j) => j === i ? e.target.value : x))} />
-                <button onClick={() => setNotes(notes.filter((_, j) => j !== i))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
+          <p className="mb-3 text-xs text-navy/50">Notes are grouped on the PDF and numbered from 1 inside each group. Leave a group title blank to print it as a plain list.</p>
+          <div className="space-y-5">
+            {notes.map((grp, gi) => (
+              <div key={gi} className="rounded-xl border border-black/8 p-4">
+                <div className="mb-2 flex gap-2">
+                  <input
+                    className={`${input} font-bold`}
+                    placeholder="Group heading (optional)"
+                    value={grp.title}
+                    onChange={(e) => setNotes(notes.map((g, j) => j === gi ? { ...g, title: e.target.value } : g))}
+                  />
+                  <button onClick={() => setNotes(notes.map((g, j) => j === gi ? { ...g, items: [...g.items, ""] } : g))} className="shrink-0 rounded-lg bg-navy/5 px-3 text-xs font-semibold text-navy hover:bg-amber/20" title="Add note"><Plus className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => confirm(`Delete the "${grp.title || "untitled"}" group and its notes?`) && setNotes(notes.filter((_, j) => j !== gi))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600" title="Delete group"><Trash2 className="h-4 w-4" /></button>
+                </div>
+                <div className="space-y-2">
+                  {grp.items.map((n, i) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="flex w-6 shrink-0 items-center justify-center text-xs font-semibold text-navy/40">{i + 1}</span>
+                      <textarea
+                        rows={Math.max(1, Math.ceil(n.length / 95))}
+                        className={`${input} min-w-0 resize-none`}
+                        value={n}
+                        onChange={(e) => setNotes(notes.map((g, j) => j === gi ? { ...g, items: g.items.map((x, k) => k === i ? e.target.value : x) } : g))}
+                      />
+                      <button onClick={() => setNotes(notes.map((g, j) => j === gi ? { ...g, items: g.items.filter((_, k) => k !== i) } : g))} className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>

@@ -15,28 +15,39 @@ export type QuotationPreset = {
   rates: RateGroup[];
   brands: RateGroup[];
   // Optional overrides — packages that measure or bill differently.
-  notes?: string[];
+  notes?: SpecSection[];
   payments?: PayRow[];
   areaPercents?: { plinth: number; ground: number; parking: number; upper: number; terrace: number };
 };
 
-// Special notes are identical for both packages.
-export const defaultSpecialNotes: string[] = [
-  "Electricity and water are in the client's scope. Borewell and electric meter shall be installed by the client. Water tankers, if required, shall be provided by the client, including space for storage until the underground water tank is built.",
-  "External facade work such as mouldings is not included in this quotation; standard plaster is considered. Any external detailing will be charged extra.",
-  "Landscaping of the outer area beside the parking area is not included.",
-  "Compound wall and gate are not included in this quotation.",
-  "Curing of the project is in the client's scope, including a storage room for material and labour on site.",
-  "If an RCC overhead water tank is required, it will be charged extra.",
-  "Excavation and back-filling are not included and will be in the client's scope.",
-  "GST extra on base amount (18%).",
-  "Tiles have a minor natural bend, so a slight difference in level may occur — this is normal.",
-  "Minor cracks may appear in walls due to heat of hydration — this is normal and causes no harm to the structure.",
-  "Any work other than that mentioned in this quotation will be charged extra.",
-  "Quotation is valid up to 15 days.",
-  "In case of any natural disaster, pandemic or war, the project timeline will be extended accordingly.",
-  "In bathrooms and balconies, where the area is small, some water may collect in places — this is normal.",
-  "If a drainage line is available, all lines are connected to the drain line; no septic tank is constructed.",
+// Special notes, grouped so the client can see at a glance what they arrange,
+// what costs extra, and what is simply normal on a site. Numbering restarts in
+// each group. A group with an empty title prints as a plain list — that is how
+// the RCC package keeps its single flat set of notes.
+export const defaultSpecialNotes: SpecSection[] = [
+  { title: "CLIENT'S SCOPE", items: [
+    "Electricity and water connections, borewell and electric meter are arranged by the client. Water tankers, if required, are provided by the client, along with space to store water until the underground tank is built.",
+    "Curing, and a storage room for material and labour on site, are in the client's scope.",
+    "Excavation and back-filling are in the client's scope.",
+  ]},
+  { title: "NOT INCLUDED IN THIS QUOTATION", items: [
+    "External facade work such as mouldings; standard plaster is considered. Any external detailing is charged extra.",
+    "Landscaping of the outer area beside the parking.",
+    "Compound wall and gate.",
+    "RCC overhead water tank, if required, is charged extra.",
+    "Any work not listed in this quotation is charged extra.",
+  ]},
+  { title: "COMMERCIAL TERMS", items: [
+    "GST 18% extra on the base amount.",
+    "This quotation is valid for 15 days.",
+    "In case of natural disaster, pandemic or war, the project timeline extends accordingly.",
+  ]},
+  { title: "PLEASE NOTE", items: [
+    "Tiles have a minor natural bend, so a slight difference in level may occur — this is normal.",
+    "Minor cracks may appear in walls due to heat of hydration — this is normal and causes no harm to the structure.",
+    "In bathrooms and balconies, where the area is small, some water may collect — this is normal.",
+    "Where a drainage line is available, all lines connect to it; no septic tank is constructed.",
+  ]},
 ];
 
 const basePresets: QuotationPreset[] = [
@@ -50,47 +61,47 @@ const basePresets: QuotationPreset[] = [
       ]},
       { title: "BRICKWORK, PLASTER & WATERPROOFING DETAILS", items: [
         `Brick work as per the architect's drawing, using red brick. All walls 6" brick work.`,
-        "Inside sanla finish 12mm thick plaster for all walls. Outside plaster single coat — 12mm plaster dabba finish. JK cement and artificial / plaster sand used.",
-        "Brickbat waterproofing shall be done in all bathrooms using Dr. Fixit URP.",
-        "Terrace waterproofing shall be done in ghotai finish using Dr. Fixit LW URP liquid and JK Super cement.",
+        "Internal walls — 12mm sanla-finish plaster. External walls — 12mm single-coat dabba finish. JK cement with plaster sand.",
+        "Brickbat waterproofing in all bathrooms, using Dr. Fixit URP.",
+        "Terrace waterproofing in ghotai finish, using Dr. Fixit LW URP and JK Super cement.",
       ]},
       { title: "GRILL, RAILING, SLIDING WINDOW & DOOR DETAILS", items: [
-        "Window grill using 10mm bar in typical Bombay design in MS, or as per selection on site.",
+        "MS window grills in 10mm bar, typical Bombay design, or as selected on site.",
         'SS railing for staircase — 2" round pipe, 0.75" pipe and 1.5" pipe, 10mm glass for balcony.',
-        "All sliding windows shall be 3-track, including mosquito net and white powder coating (18x40mm section).",
-        "Ventilators with louvered glass and mosquito net shall be provided for bathrooms and toilets.",
-        "All door frames in typical Steel Gray granite. Different granite selection shall cost extra.",
-        "Flush doors laminated on both sides for the main door and bedroom doors, including Europa lock for all bedroom doors, hinges, fittings, etc.",
-        "Bathroom door in FRP material, including fittings, tadi patti, hinges, etc.",
+        "Sliding windows — 3-track, 18x40mm section, white powder coated, with mosquito net.",
+        "Bathroom and toilet ventilators with louvered glass and mosquito net.",
+        "Door frames in Steel Gray granite. Any other granite is charged extra.",
+        "Main and bedroom doors — flush doors laminated both sides, with Europa locks, hinges and fittings.",
+        "Bathroom doors in FRP, with tadi patti, hinges and fittings.",
       ]},
       { title: "TILE & GRANITE DETAILS", items: [
-        "Toilet / bathroom dado using 300 x 600mm tile.",
-        "Bathroom flooring in anti-skid tile 300 x 300mm.",
-        "600 x 600mm tile is used for flooring, up to the considered rate.",
-        "All door frames fitted in Steel Gray granite.",
-        "All window frames fitted with Steel Gray granite with chamfer polish in single frame.",
-        "Staircase riser and tread shall be covered with Steel Gray granite.",
-        "For the kitchen platform, Z-black granite will be used.",
+        "Bathroom dado — 300 x 600mm tile.",
+        "Bathroom flooring — 300 x 300mm anti-skid tile.",
+        "Flooring — 600 x 600mm tile, within the rate considered.",
+        "Door frames in Steel Gray granite.",
+        "Window frames in single-piece Steel Gray granite, chamfer polished.",
+        "Staircase treads and risers in Steel Gray granite.",
+        "Kitchen platform in Z-black granite.",
         'Parking tile of size 16" x 16".',
-        "If any selected material is above or below the mentioned rate, the rate difference for material and labour will be added to the billing.",
+        "Material selected above or below the stated rate is billed at the difference, including labour.",
       ]},
       { title: "PLUMBING DETAILS", items: [
-        "All inside lines are concealed and outside lines are clamped. Pipes used: CPVC, UPVC, PVC (Prince brand).",
-        "For bathroom — P-trap commode, flush tank, mixer set, wash basin (Cera / Varmora brand).",
-        "External plumbing, chamber making, and connection to the septic tank / main line chamber.",
+        "Internal lines concealed, external lines clamped. CPVC, UPVC and PVC pipes (Prince).",
+        "Bathroom — P-trap commode, flush tank, mixer set and wash basin (Cera / Varmora).",
+        "External plumbing, chambers, and connection to the septic tank or main line.",
       ]},
       { title: "ELECTRICAL DETAILS", items: [
-        "All electrical points are concealed (25-18mm pipe), Polycab wire, Anchor Roma switch and socket.",
-        "Per floor, individual main 2.5 sq mm wire; normal points 1 sq mm; power points 1.5 sq mm.",
-        "Per room 5 points are given — 1 fan point, 1 light point, 1 AC point, 1 charging point and 1 extra point.",
-        "Fittings such as lights and fans are provided by the client.",
-        "Wiring for the inverter and the inverter itself are not included; these will be charged extra as per requirement.",
-        "All electrical work is considered after the electric meter and main wire connection from MSEB, arranged by the client.",
+        "Concealed points in 25-18mm pipe, Polycab wire, Anchor Roma switches and sockets.",
+        "Per floor — 2.5 sq mm main; 1 sq mm light points; 1.5 sq mm power points.",
+        "Five points per room: fan, light, AC, charging and one spare.",
+        "Light and fan fittings are provided by the client.",
+        "Inverter and its wiring are not included; charged extra as required.",
+        "Electrical work starts after the MSEB meter and main connection, arranged by the client.",
       ]},
       { title: "POP WORK", items: ["Not included."] },
       { title: "PAINTING", items: [
-        "Exterior surface — Nerolac Suraksha Plus including 1 coat primer and 2 coats paint.",
-        "Interior — Oil Bound Distemper (OBD) including 1 coat primer, 2 coats putty and 2 coats paint.",
+        "Exterior — Nerolac Suraksha Plus: 1 coat primer, 2 coats paint.",
+        "Interior — Oil Bound Distemper: 1 coat primer, 2 coats putty, 2 coats paint.",
       ]},
       { title: "GYPSUM CEILING", items: ["Not included."] },
     ],
@@ -125,17 +136,17 @@ const basePresets: QuotationPreset[] = [
       { title: "BRICKWORK, PLASTER & WATERPROOFING DETAILS", items: [
         `Brick work as per the architect's drawing, using red brick. Outer wall 9" and all internal walls 6".`,
         "Inside taar finish 12mm thick plaster for all walls. Outside plaster double coat — one coat 12mm taar plaster and second coat 12mm plaster dabba finish. JK cement and artificial / plaster sand used.",
-        "Brickbat waterproofing shall be done in all bathrooms using Dr. Fixit URP.",
-        "Terrace waterproofing shall be done in brickbat using Dr. Fixit LW URP liquid and JK Super cement.",
+        "Brickbat waterproofing in all bathrooms, using Dr. Fixit URP.",
+        "Terrace waterproofing in brickbat, using Dr. Fixit LW URP and JK Super cement.",
       ]},
       { title: "GRILL, RAILING, SLIDING WINDOW & DOOR DETAILS", items: [
-        "Window grill using 10mm bar in typical Bombay design in MS, or as per selection on site.",
+        "MS window grills in 10mm bar, typical Bombay design, or as selected on site.",
         'SS railing for staircase — 2" round pipe, 0.75" pipe and 1.5" pipe, 10mm glass for balcony.',
-        "All sliding windows shall be 3-track, including mosquito net and white powder coating (18x40mm section).",
-        "Ventilators with louvered glass and mosquito net shall be provided for bathrooms and toilets.",
+        "Sliding windows — 3-track, 18x40mm section, white powder coated, with mosquito net.",
+        "Bathroom and toilet ventilators with louvered glass and mosquito net.",
         "All door frames in typical Z-black granite. Different granite selection shall cost extra.",
-        "Flush doors laminated on both sides for the main door and bedroom doors, including Europa lock for all bedroom doors, hinges, fittings, etc.",
-        "Bathroom door in FRP material, including fittings, tadi patti, hinges, etc.",
+        "Main and bedroom doors — flush doors laminated both sides, with Europa locks, hinges and fittings.",
+        "Bathroom doors in FRP, with tadi patti, hinges and fittings.",
       ]},
       { title: "TILE & GRANITE DETAILS", items: [
         "Toilet / bathroom dado using 1200 x 600mm tile.",
@@ -143,23 +154,23 @@ const basePresets: QuotationPreset[] = [
         "1200 x 1200mm tile is used for flooring, up to the considered rate.",
         "All door frames fitted in Z-black granite.",
         "All window frames fitted with pearl black granite with chamfer polish in single frame.",
-        "Staircase riser and tread shall be covered with Z-black granite.",
+        "Staircase treads and risers in Z-black granite.",
         "For the kitchen platform, quartz will be used.",
         'Parking tile of size 16" x 16".',
-        "If any selected material is above or below the mentioned rate, the rate difference for material and labour will be added to the billing.",
+        "Material selected above or below the stated rate is billed at the difference, including labour.",
       ]},
       { title: "PLUMBING DETAILS", items: [
-        "All inside lines are concealed and outside lines are clamped. Pipes used: CPVC, UPVC, PVC (Prince brand).",
+        "Internal lines concealed, external lines clamped. CPVC, UPVC and PVC pipes (Prince).",
         "For bathroom — wall hanging commode, flush valve, diverter spout set, wash basin (Cera / Varmora brand).",
-        "External plumbing, chamber making, and connection to the septic tank / main line chamber.",
+        "External plumbing, chambers, and connection to the septic tank or main line.",
       ]},
       { title: "ELECTRICAL DETAILS", items: [
-        "All electrical points are concealed (25-18mm pipe), Polycab wire, Anchor Roma switch and socket.",
-        "Per floor, individual main 2.5 sq mm wire; normal points 1 sq mm; power points 1.5 sq mm.",
+        "Concealed points in 25-18mm pipe, Polycab wire, Anchor Roma switches and sockets.",
+        "Per floor — 2.5 sq mm main; 1 sq mm light points; 1.5 sq mm power points.",
         "All electrical points are as per the drawing given by the architect.",
         "Fittings such as lights and fans are in the client's scope. The architect is to provide the position of lights and fans one week before the slab.",
-        "Wiring for the inverter and the inverter itself are not included; these will be charged extra as per requirement.",
-        "All electrical work is considered after the electric meter and main wire connection from MSEB.",
+        "Inverter and its wiring are not included; charged extra as required.",
+        "Electrical work starts after the MSEB meter and main connection.",
       ]},
       { title: "POP WORK", items: ["POP (Plaster of Paris) for all internal walls, excluding bathrooms and ceilings."] },
       { title: "PAINTING", items: [
@@ -245,7 +256,7 @@ const basePresets: QuotationPreset[] = [
       { stage: "At the start of inside Plaster", percent: "5" },
       { stage: "On Handover / Possession", percent: "5" },
     ],
-    notes: [
+    notes: [{ title: "", items: [
       "Electricity and water are in the client's scope. Borewell and electric meter shall be installed by the client. Water tankers, if required, shall be provided by the client, including space for storage until the underground water tank is built.",
       "External facade work such as mouldings is not included in this quotation; standard plaster is considered. Any external detailing will be charged extra.",
       "Landscaping of the outer area beside the parking area is not included.",
@@ -260,7 +271,7 @@ const basePresets: QuotationPreset[] = [
       "The quotation considers manual concreting. If RMC is required, the extra amount will be added to the quote.",
       "Any disturbance or problem caused by a neighbour or the corporation is to be handled and resolved by the client.",
       "In case of any natural disaster, pandemic or war, the project timeline will be extended accordingly.",
-    ],
+    ]}],
   },
 ];
 
