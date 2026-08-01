@@ -26,9 +26,10 @@ export type QuotationPreset = {
 // the RCC package keeps its single flat set of notes.
 export const defaultSpecialNotes: SpecSection[] = [
   { title: "CLIENT'S SCOPE", items: [
-    "Electricity and water connections, borewell and electric meter are arranged by the client. Water tankers, if required, are provided by the client, along with space to store water until the underground tank is built.",
-    "Curing, and a storage room for material and labour on site, are in the client's scope.",
-    "Excavation and back-filling are in the client's scope.",
+    "Electricity and water connections, borewell and electric meter.",
+    "Water tankers, if required, and space to store water until the underground tank is ready.",
+    "Curing, and a store room on site for material and labour.",
+    "Excavation and back-filling.",
   ]},
   { title: "NOT INCLUDED IN THIS QUOTATION", items: [
     "External facade work such as mouldings; standard plaster is considered. Any external detailing is charged extra.",
