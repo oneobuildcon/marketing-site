@@ -372,6 +372,31 @@ function clone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v));
 }
 
+// Rupees in words, Indian numbering (crore / lakh / thousand). Printed under
+// the estimate total so a misread digit can't turn into a dispute.
+function amountInWords(n: number): string {
+  const num = Math.round(Math.abs(n));
+  if (!num) return "Rupees Zero Only";
+  const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+    "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+  const two = (v: number): string =>
+    v < 20 ? ones[v] : `${tens[Math.floor(v / 10)]}${v % 10 ? ` ${ones[v % 10]}` : ""}`;
+  const three = (v: number): string =>
+    v >= 100 ? `${ones[Math.floor(v / 100)]} Hundred${v % 100 ? ` ${two(v % 100)}` : ""}` : two(v);
+
+  const parts: string[] = [];
+  const crore = Math.floor(num / 10000000);
+  const lakh = Math.floor((num % 10000000) / 100000);
+  const thousand = Math.floor((num % 100000) / 1000);
+  const rest = num % 1000;
+  if (crore) parts.push(`${three(crore)} Crore`);
+  if (lakh) parts.push(`${three(lakh)} Lakh`);
+  if (thousand) parts.push(`${three(thousand)} Thousand`);
+  if (rest) parts.push(three(rest));
+  return `Rupees ${parts.join(" ")} Only`;
+}
+
 export default function AdminQuotation() {
   // Persisted template bits
   const [header, setHeader] = useState(defaultHeader);
@@ -392,6 +417,7 @@ export default function AdminQuotation() {
   const [quotationNo, setQuotationNo] = useState("");
   const [date, setDate] = useState("");
   const [validity, setValidity] = useState("15 days");
+  const [duration, setDuration] = useState("Approx. 12 months from date of commencement");
   const [clientName, setClientName] = useState("");
   const [clientPhone, setClientPhone] = useState("");
   const [honorific, setHonorific] = useState("Sir");
@@ -631,7 +657,8 @@ export default function AdminQuotation() {
       `Location: ${location || "—"}`,
       ...(address.trim() ? [`Address: ${address.trim()}`] : []),
     ];
-    const boxRows = Math.max(clientLines.length, 2); // meta column is No + Date
+    const metaLines = [`No: ${quotationNo}`, `Date: ${date}`, `Valid for: ${validity}`];
+    const boxRows = Math.max(clientLines.length, metaLines.length);
     const boxH = boxRows * 5 + 6;
     doc.setFillColor(249, 250, 251);
     doc.roundedRect(L, y, R - L, boxH, 2, 2, "F");
@@ -640,10 +667,29 @@ export default function AdminQuotation() {
     doc.setFontSize(8.5);
     clientLines.forEach((line, i) => doc.text(line, L + 5, y + 7 + i * 5));
     // Quotation meta, right-aligned level with the client rows.
-    [`No: ${quotationNo}`, `Date: ${date}`].forEach((line, i) =>
-      doc.text(line, R - 5, y + 7 + i * 5, { align: "right" })
-    );
+    metaLines.forEach((line, i) => doc.text(line, R - 5, y + 7 + i * 5, { align: "right" }));
     y += boxH + 5;
+
+    // ── Project summary: the size of the job, up front, so the client isn't
+    // hunting through to page three to find it. ──
+    {
+      const floorCount = floorRows.filter((r) => (parseFloat(r.slab) || 0) > 0).length;
+      const bits = [
+        floorCount ? `${floorCount} floor${floorCount > 1 ? "s" : ""}` : "",
+        totalArea ? `${inr(totalArea)} sqft built-up` : "",
+        `Rs. ${inr(rateNum)} / sqft`,
+        duration.trim() ? `Duration: ${duration.trim()}` : "",
+      ].filter(Boolean);
+      if (bits.length) {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8.5);
+        doc.setTextColor(70, 70, 70);
+        const lines = doc.splitTextToSize(bits.join("   |   "), R - L) as string[];
+        lines.forEach((ln, i) => doc.text(ln, L, y + i * 4.6));
+        y += lines.length * 4.6 + 3;
+        doc.setTextColor(...navy);
+      }
+    }
 
     // ── Specifications ──
     sectionTitle(`SPECIFICATIONS  —  DETAILS OF WORK  @  Rs. ${rate} / SQ.FT`);
@@ -720,6 +766,33 @@ export default function AdminQuotation() {
     doc.setFontSize(11);
     doc.text(header.company, R, y, { align: "right" });
 
+    // ── Client acceptance: makes this a document the client can sign and
+    // return, rather than one they only read. ──
+    {
+      ensure(30);
+      y += 12;
+      doc.setDrawColor(200, 200, 200);
+      doc.line(L, y, R, y);
+      y += 7;
+      doc.setTextColor(...navy);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.text("ACCEPTED BY CLIENT", L, y);
+      y += 10;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      const colW = (R - L) / 3;
+      ["Name", "Signature", "Date"].forEach((lbl, i) => {
+        const x = L + i * colW;
+        doc.setDrawColor(150, 150, 150);
+        doc.line(x, y, x + colW - 8, y);
+        doc.setTextColor(90, 90, 90);
+        doc.text(lbl, x, y + 4.5);
+      });
+      y += 8;
+      doc.setTextColor(...navy);
+    }
+
     // ── Estimate + payment schedule: always together on one page ──
     // Row height and type size shrink to fit however many slabs there are, so
     // this pair never spills onto a second page.
@@ -727,7 +800,7 @@ export default function AdminQuotation() {
     {
       const eRows = areaRows.filter((r) => r.label.trim() || r.area.trim());
       const pRows = payments.filter((p) => p.stage.trim());
-      const fixed = 9 + 2 + 7 + 7.5 + 9 + 6 + 14 + 9 + 2 + 7 + 7 + 4; // titles, headers, totals, note, gaps
+      const fixed = 9 + 2 + 7 + 7.5 + 9 + 6 + 6 + 14 + 9 + 2 + 7 + 7 + 4; // titles, headers, totals, words, note, gaps
       const available = 284 - y;
       const rowCount = eRows.length + pRows.length;
       let rowH = 7.2;
@@ -744,11 +817,13 @@ export default function AdminQuotation() {
       doc.setTextColor(...navy);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(fs);
+      // No Rate column — it is the same figure on every row and already stated
+      // in the section heading.
+      const eCols = [L + 96, L + 136];
       doc.text("Floor", L + 3, y + 4.8);
-      doc.text("Approx Area (sqft)", L + 95, y + 4.8, { align: "right" });
-      doc.text("Rate", L + 130, y + 4.8, { align: "right" });
+      doc.text("Approx Area (sqft)", L + 132, y + 4.8, { align: "right" });
       doc.text("Amount", R - 3, y + 4.8, { align: "right" });
-      [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
+      eCols.forEach((cx) => doc.line(cx, y, cx, y + 7));
       y += 7;
       eRows.forEach((r) => {
         const a = parseFloat(r.area) || 0;
@@ -758,10 +833,9 @@ export default function AdminQuotation() {
         doc.setDrawColor(225, 225, 225);
         doc.rect(L, y, R - L, rowH);
         doc.text(r.label || "—", L + 3, y + tx);
-        doc.text(inr(a), L + 95, y + tx, { align: "right" });
-        doc.text(inr(rateNum), L + 130, y + tx, { align: "right" });
+        doc.text(inr(a), L + 132, y + tx, { align: "right" });
         doc.text(`Rs. ${inr(Math.round(a * rateNum))}`, R - 3, y + tx, { align: "right" });
-        [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + rowH));
+        eCols.forEach((cx) => doc.line(cx, y, cx, y + rowH));
         y += rowH;
       });
       doc.setFillColor(...navy);
@@ -770,12 +844,17 @@ export default function AdminQuotation() {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(fs);
       doc.text("TOTAL", L + 3, y + 5.2);
-      doc.text(`${inr(totalArea)} sqft`, L + 95, y + 5.2, { align: "right" });
+      doc.text(`${inr(totalArea)} sqft`, L + 132, y + 5.2, { align: "right" });
       doc.text(`Rs. ${inr(totalAmount)}`, R - 3, y + 5.2, { align: "right" });
       doc.setDrawColor(255, 255, 255);
-      [L + 60, L + 99, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7.5));
+      eCols.forEach((cx) => doc.line(cx, y, cx, y + 7.5));
       doc.setDrawColor(225, 225, 225);
       y += 9;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.setTextColor(...navy);
+      doc.text(amountInWords(totalAmount), L, y + 3);
+      y += 6;
       doc.setFont("helvetica", "italic");
       doc.setFontSize(7.5);
       doc.setTextColor(70, 70, 70);
@@ -905,6 +984,16 @@ export default function AdminQuotation() {
     }
 
     footer();
+
+    // Page numbers last, once the total is known.
+    const pageCount = doc.getNumberOfPages();
+    for (let p = 1; p <= pageCount; p++) {
+      doc.setPage(p);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Page ${p} of ${pageCount}`, R, 293, { align: "right" });
+    }
     return doc;
   }
 
@@ -1037,6 +1126,10 @@ export default function AdminQuotation() {
             <div className="grid grid-cols-2 gap-4">
               <div><label className={label}>Date</label><input className={input} value={date} onChange={(e) => setDate(e.target.value)} /></div>
               <div><label className={label}>Valid For</label><input className={input} value={validity} onChange={(e) => setValidity(e.target.value)} /></div>
+            </div>
+            <div className="sm:col-span-2">
+              <label className={label}>Project Duration</label>
+              <input className={input} value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="e.g. Approx. 12 months from date of commencement" />
             </div>
           </div>
         </section>
