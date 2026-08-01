@@ -39,7 +39,7 @@ export const defaultSpecialNotes: string[] = [
   "If a drainage line is available, all lines are connected to the drain line; no septic tank is constructed.",
 ];
 
-export const quotationPresets: QuotationPreset[] = [
+const basePresets: QuotationPreset[] = [
   {
     id: "basic",
     label: "Basic — ₹1499/sqft",
@@ -262,4 +262,25 @@ export const quotationPresets: QuotationPreset[] = [
       "In case of any natural disaster, pandemic or war, the project timeline will be extended accordingly.",
     ],
   },
+];
+
+// Premium and Royal start life as exact copies of Standard, at the rates shown
+// on the website's Packages page. They exist so a quotation can be raised for
+// them today; every line is editable in the admin before the PDF is generated,
+// so the specifications can be tuned package by package over time.
+const standard = basePresets.find((p) => p.id === "standard")!;
+
+function copyOfStandard(id: string, name: string, rate: number): QuotationPreset {
+  return {
+    ...structuredClone(standard),
+    id,
+    label: `${name} — ₹${rate}/sqft`,
+    rate,
+  };
+}
+
+export const quotationPresets: QuotationPreset[] = [
+  ...basePresets,
+  copyOfStandard("premium", "Premium", 1949),
+  copyOfStandard("royal", "Royal", 2099),
 ];
