@@ -933,6 +933,64 @@ export default function AdminQuotation() {
       doc.setTextColor(...navy);
     }
 
+    // ── Rates & brands: always together on one page ──
+    {
+      const live = (gs: RateGroup[]) => gs.filter((g) => g.work.trim() || g.items.some(Boolean));
+      const liveRates = live(rates);
+      const liveBrands = live(brands);
+      const countRows = (gs: RateGroup[]) => gs.reduce((n, g) => n + Math.max(1, g.items.filter(Boolean).length), 0);
+      const tables = [
+        ["RATE CONSIDERED", liveRates] as const,
+        ["BRAND USED", liveBrands] as const,
+      ].filter(([, gs]) => gs.length);
+
+      if (tables.length) {
+        newPage();
+        const fixed = 9 + 2 + tables.length * (7 + 12) + 6;
+        const totalRows = tables.reduce((n, [, gs]) => n + countRows(gs), 0);
+        const available = 284 - y;
+        let rowH = 6.8;
+        if (totalRows > 0) rowH = Math.min(6.8, Math.max(4.4, (available - fixed) / totalRows));
+        const fs = rowH >= 6.2 ? 9.5 : rowH >= 5.5 ? 8.5 : rowH >= 5 ? 8 : 7.5;
+        const tx = rowH / 2 + 1.2;
+
+        sectionTitle("RATE CONSIDERED & BRANDS USED");
+        y += 2;
+        tables.forEach(([headerLabel, groups]) => {
+          doc.setFillColor(238, 240, 244);
+          doc.rect(L, y, R - L, 7, "F");
+          doc.setDrawColor(225, 225, 225);
+          doc.rect(L, y, R - L, 7);
+          doc.setTextColor(...navy);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(fs);
+          doc.text("WORK", L + 3, y + 4.8);
+          doc.text(headerLabel, L + 62, y + 4.8);
+          y += 7;
+          groups.forEach((g) => {
+            const items = g.items.filter(Boolean);
+            const startY = y;
+            (items.length ? items : [""]).forEach((it) => {
+              doc.setTextColor(...navy);
+              doc.setFont("helvetica", "normal");
+              doc.setFontSize(fs);
+              doc.setDrawColor(225, 225, 225);
+              doc.rect(L + 60, y, R - L - 60, rowH);
+              if (it) doc.text(it, L + 62, y + tx);
+              y += rowH;
+            });
+            doc.setDrawColor(225, 225, 225);
+            doc.rect(L, startY, 60, y - startY);
+            doc.setTextColor(...navy);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(fs);
+            doc.text(g.work, L + 3, startY + tx);
+          });
+          y += 12;
+        });
+      }
+    }
+
     // ── Estimate + payment schedule: always together on one page ──
     // Row height and type size shrink to fit however many slabs there are, so
     // this pair never spills onto a second page.
@@ -1044,64 +1102,6 @@ export default function AdminQuotation() {
       doc.text(`Rs. ${inr(Math.round((totalAmount * paySum) / 100))}`, R - 3, y + 4.8, { align: "right" });
       [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
       y += 11;
-    }
-
-    // ── Rates & brands: always together on one page ──
-    {
-      const live = (gs: RateGroup[]) => gs.filter((g) => g.work.trim() || g.items.some(Boolean));
-      const liveRates = live(rates);
-      const liveBrands = live(brands);
-      const countRows = (gs: RateGroup[]) => gs.reduce((n, g) => n + Math.max(1, g.items.filter(Boolean).length), 0);
-      const tables = [
-        ["RATE CONSIDERED", liveRates] as const,
-        ["BRAND USED", liveBrands] as const,
-      ].filter(([, gs]) => gs.length);
-
-      if (tables.length) {
-        newPage();
-        const fixed = 9 + 2 + tables.length * (7 + 12) + 6;
-        const totalRows = tables.reduce((n, [, gs]) => n + countRows(gs), 0);
-        const available = 284 - y;
-        let rowH = 6.8;
-        if (totalRows > 0) rowH = Math.min(6.8, Math.max(4.4, (available - fixed) / totalRows));
-        const fs = rowH >= 6.2 ? 9.5 : rowH >= 5.5 ? 8.5 : rowH >= 5 ? 8 : 7.5;
-        const tx = rowH / 2 + 1.2;
-
-        sectionTitle("RATE CONSIDERED & BRANDS USED");
-        y += 2;
-        tables.forEach(([headerLabel, groups]) => {
-          doc.setFillColor(238, 240, 244);
-          doc.rect(L, y, R - L, 7, "F");
-          doc.setDrawColor(225, 225, 225);
-          doc.rect(L, y, R - L, 7);
-          doc.setTextColor(...navy);
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(fs);
-          doc.text("WORK", L + 3, y + 4.8);
-          doc.text(headerLabel, L + 62, y + 4.8);
-          y += 7;
-          groups.forEach((g) => {
-            const items = g.items.filter(Boolean);
-            const startY = y;
-            (items.length ? items : [""]).forEach((it) => {
-              doc.setTextColor(...navy);
-              doc.setFont("helvetica", "normal");
-              doc.setFontSize(fs);
-              doc.setDrawColor(225, 225, 225);
-              doc.rect(L + 60, y, R - L - 60, rowH);
-              if (it) doc.text(it, L + 62, y + tx);
-              y += rowH;
-            });
-            doc.setDrawColor(225, 225, 225);
-            doc.rect(L, startY, 60, y - startY);
-            doc.setTextColor(...navy);
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(fs);
-            doc.text(g.work, L + 3, startY + tx);
-          });
-          y += 12;
-        });
-      }
     }
 
     // ── Bank details ──
