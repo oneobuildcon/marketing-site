@@ -30,7 +30,6 @@ export const defaultSpecialNotes: SpecSection[] = [
     "Water tankers, if required, and space to store water until the underground tank is ready.",
     "Curing of the project is in the client's scope.",
     "A store room on site for material and labour.",
-    "Excavation and back-filling.",
   ]},
   { title: "NOT INCLUDED IN THIS QUOTATION", items: [
     "External facade work such as mouldings; standard plaster is considered. Any external detailing is charged extra.",
