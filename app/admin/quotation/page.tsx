@@ -564,6 +564,15 @@ export default function AdminQuotation() {
     }
   }
 
+  // Discards whatever is on screen and reloads the locked, saved version.
+  function restoreSavedSpecs() {
+    const name = pkgName(pkgId);
+    if (!overrides[pkgId]) return;
+    if (!confirm(`Discard the changes on screen and reload the saved ${name} specifications?`)) return;
+    applyPackage(pkgId);
+    setSpecsMsg(`Saved ${name} reloaded.`);
+  }
+
   // Throws away the saved version and goes back to the specs in the code.
   async function resetPackageSpecs() {
     const name = pkgName(pkgId);
@@ -1239,19 +1248,30 @@ export default function AdminQuotation() {
               {savingSpecs ? "Saving…" : `Save specs to ${pkgName(pkgId)}`}
             </button>
             {overrides[pkgId] && (
-              <button
-                onClick={resetPackageSpecs}
-                disabled={savingSpecs}
-                className="rounded-xl border border-navy/20 px-4 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5 disabled:opacity-50 transition"
-              >
-                Reset to original
-              </button>
+              <>
+                <button
+                  onClick={restoreSavedSpecs}
+                  disabled={savingSpecs}
+                  className="rounded-xl border border-navy/20 px-4 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5 disabled:opacity-50 transition"
+                  title="Discard the changes on screen and reload your saved version"
+                >
+                  Restore saved version
+                </button>
+                <button
+                  onClick={resetPackageSpecs}
+                  disabled={savingSpecs}
+                  className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 disabled:opacity-50 transition"
+                  title="Delete the saved version and go back to the original specifications"
+                >
+                  Delete saved version
+                </button>
+              </>
             )}
             {specsMsg && <span className="text-xs font-semibold text-navy/70">{specsMsg}</span>}
           </div>
           <p className="mt-2 text-xs text-navy/50">
-            Saving stores the specs, rates, brands, notes, payment schedule and percentages for this package permanently, on every device.
-            Edits you don&apos;t save apply to this quotation only.
+            <strong>Save</strong> locks the current specs, rates, brands, notes, schedule and percentages to this package, on every device — every future quotation starts from them.
+            Edits you don&apos;t save apply to this quotation only, and <strong>Restore saved version</strong> brings your locked version back at any time.
           </p>
         </section>
 
