@@ -397,6 +397,13 @@ function amountInWords(n: number): string {
   return `Rupees ${parts.join(" ")} Only`;
 }
 
+// Preset labels read "Standard — ₹1649/sqft"; the name alone is the bit before
+// the dash, so a saved rate change doesn't leave a stale figure in messages.
+function pkgName(id: string): string {
+  const p = quotationPresets.find((x) => x.id === id);
+  return p ? p.label.split(" — ")[0] : id;
+}
+
 export default function AdminQuotation() {
   // Persisted template bits
   const [header, setHeader] = useState(defaultHeader);
@@ -431,6 +438,12 @@ export default function AdminQuotation() {
   const DEFAULT_PCT = { plinth: 50, ground: 100, parking: 50, upper: 100, terrace: 35 };
   const [pcts, setPcts] = useState(DEFAULT_PCT);
 
+  // Saved package specifications, keyed by package id. A package the admin has
+  // never saved simply isn't in here and keeps following the code defaults.
+  const [overrides, setOverrides] = useState<Record<string, any>>({});
+  const [specsMsg, setSpecsMsg] = useState("");
+  const [savingSpecs, setSavingSpecs] = useState(false);
+
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(TPL_KEY) || "null");
@@ -441,6 +454,21 @@ export default function AdminQuotation() {
     } catch {}
     setQuotationNo(`QT-${Date.now().toString().slice(-6)}`);
     setDate(new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }));
+
+    // Pull saved specs, then re-apply the current package so the admin sees
+    // their own version rather than the code defaults.
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/quotation-specs");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && typeof data === "object") {
+          setOverrides(data);
+          applyPackage("basic", data);
+        }
+      } catch {}
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function saveTemplate() {
@@ -449,19 +477,32 @@ export default function AdminQuotation() {
     } catch {}
   }
 
-  function selectPackage(id: string) {
-    const preset = quotationPresets.find((p) => p.id === id);
+  // A package's effective content: code defaults with any saved edits on top.
+  function mergedPreset(id: string, ovs: Record<string, any> = overrides) {
+    const p = quotationPresets.find((x) => x.id === id);
+    if (!p) return null;
+    const o = ovs[id] || {};
+    return {
+      ...p,
+      rate: typeof o.rate === "number" && o.rate > 0 ? o.rate : p.rate,
+      sections: o.sections ?? p.sections,
+      rates: o.rates ?? p.rates,
+      brands: o.brands ?? p.brands,
+      notes: o.notes ?? p.notes ?? defaultSpecialNotes,
+      payments: o.payments ?? p.payments,
+      areaPercents: o.areaPercents ?? p.areaPercents,
+    };
+  }
+
+  function applyPackage(id: string, ovs: Record<string, any> = overrides) {
+    const preset = mergedPreset(id, ovs);
     if (!preset) return;
-    // Re-clicking the current package used to silently reload the defaults and
-    // discard the admin's edits — leave it alone instead.
-    if (pkgId === id) return;
-    if (!confirm(`Load the ${preset.label} specifications? This replaces the current specs, rates & brands with that package's defaults.`)) return;
     setPkgId(id);
     setRate(String(preset.rate));
     setSections(clone(preset.sections));
     setRates(clone(preset.rates));
     setBrands(clone(preset.brands));
-    setNotes(clone(preset.notes ?? defaultSpecialNotes));
+    setNotes(clone(preset.notes));
     const ap = preset.areaPercents;
     setPcts(ap
       ? { plinth: ap.plinth * 100, ground: ap.ground * 100, parking: ap.parking * 100, upper: ap.upper * 100, terrace: ap.terrace * 100 }
@@ -471,6 +512,80 @@ export default function AdminQuotation() {
       setPaymentsEdited(true); // fixed schedule — don't regenerate from floors
     } else {
       setPaymentsEdited(false);
+    }
+  }
+
+  function selectPackage(id: string) {
+    const preset = quotationPresets.find((p) => p.id === id);
+    if (!preset) return;
+    // Re-clicking the current package used to silently reload the defaults and
+    // discard the admin's edits — leave it alone instead.
+    if (pkgId === id) return;
+    if (!confirm(`Load the ${pkgName(preset.id)} specifications? Any unsaved changes to the current package will be lost.`)) return;
+    setSpecsMsg("");
+    applyPackage(id);
+  }
+
+  // Writes the current specs, rates, brands, notes, schedule and percentages to
+  // this package so every future quotation starts from them.
+  async function savePackageSpecs() {
+    const name = pkgName(pkgId);
+    if (!confirm(`Save these specifications to ${name}? Every future ${name} quotation will start from them.`)) return;
+    setSavingSpecs(true);
+    setSpecsMsg("");
+    const value = {
+      rate: parseFloat(rate) || 0,
+      sections,
+      rates,
+      brands,
+      notes,
+      payments,
+      areaPercents: {
+        plinth: (pcts.plinth || 0) / 100,
+        ground: (pcts.ground || 0) / 100,
+        parking: (pcts.parking || 0) / 100,
+        upper: (pcts.upper || 0) / 100,
+        terrace: (pcts.terrace || 0) / 100,
+      },
+    };
+    try {
+      const res = await fetch("/api/admin/quotation-specs", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: pkgId, value }),
+      });
+      if (!res.ok) throw new Error((await res.json())?.error || "Save failed");
+      setOverrides((prev) => ({ ...prev, [pkgId]: value }));
+      setSpecsMsg(`Saved to ${name}.`);
+    } catch (e: any) {
+      setSpecsMsg(e?.message || "Could not save. Please try again.");
+    } finally {
+      setSavingSpecs(false);
+    }
+  }
+
+  // Throws away the saved version and goes back to the specs in the code.
+  async function resetPackageSpecs() {
+    const name = pkgName(pkgId);
+    if (!confirm(`Discard the saved ${name} specifications and go back to the original defaults?`)) return;
+    setSavingSpecs(true);
+    setSpecsMsg("");
+    try {
+      const res = await fetch("/api/admin/quotation-specs", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: pkgId, value: null }),
+      });
+      if (!res.ok) throw new Error((await res.json())?.error || "Reset failed");
+      const next = { ...overrides };
+      delete next[pkgId];
+      setOverrides(next);
+      applyPackage(pkgId, next);
+      setSpecsMsg(`${name} restored to defaults.`);
+    } catch (e: any) {
+      setSpecsMsg(e?.message || "Could not reset. Please try again.");
+    } finally {
+      setSavingSpecs(false);
     }
   }
 
@@ -1108,11 +1223,36 @@ export default function AdminQuotation() {
                   pkgId === p.id ? "border-amber bg-navy text-white" : "border-black/10 bg-white text-navy hover:border-amber/40"
                 }`}
               >
-                {p.label}
+                {pkgName(p.id)} — ₹{mergedPreset(p.id)?.rate ?? p.rate}/sqft
+                {overrides[p.id] && <span className="ml-1 text-[10px] font-normal opacity-70">• saved</span>}
               </button>
             ))}
           </div>
           <p className="mt-3 text-xs text-navy/50">Selecting a package loads its specifications, rates &amp; brands. Everything stays editable below.</p>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-black/8 pt-4">
+            <button
+              onClick={savePackageSpecs}
+              disabled={savingSpecs}
+              className="rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white hover:bg-navy/90 disabled:opacity-50 transition"
+            >
+              {savingSpecs ? "Saving…" : `Save specs to ${pkgName(pkgId)}`}
+            </button>
+            {overrides[pkgId] && (
+              <button
+                onClick={resetPackageSpecs}
+                disabled={savingSpecs}
+                className="rounded-xl border border-navy/20 px-4 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5 disabled:opacity-50 transition"
+              >
+                Reset to original
+              </button>
+            )}
+            {specsMsg && <span className="text-xs font-semibold text-navy/70">{specsMsg}</span>}
+          </div>
+          <p className="mt-2 text-xs text-navy/50">
+            Saving stores the specs, rates, brands, notes, payment schedule and percentages for this package permanently, on every device.
+            Edits you don&apos;t save apply to this quotation only.
+          </p>
         </section>
 
         {/* Client & meta */}
