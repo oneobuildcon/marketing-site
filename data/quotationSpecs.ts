@@ -28,7 +28,8 @@ export const defaultSpecialNotes: SpecSection[] = [
   { title: "CLIENT'S SCOPE", items: [
     "Electricity and water connections, borewell and electric meter.",
     "Water tankers, if required, and space to store water until the underground tank is ready.",
-    "Curing, and a store room on site for material and labour.",
+    "Curing of the project is in the client's scope.",
+    "A store room on site for material and labour.",
     "Excavation and back-filling.",
   ]},
   { title: "NOT INCLUDED IN THIS QUOTATION", items: [
