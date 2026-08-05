@@ -321,6 +321,11 @@ const defaultHeader = {
 };
 
 const ORDINALS = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"];
+// Floors are named the way the defaults are ("Ground Floor", "First Floor"),
+// so a floor added by hand doesn't come out as "Floor 2".
+const FLOOR_NAMES = ["Ground Floor", "First Floor", "Second Floor", "Third Floor", "Fourth Floor",
+  "Fifth Floor", "Sixth Floor", "Seventh Floor", "Eighth Floor", "Ninth Floor", "Tenth Floor"];
+const floorName = (i: number) => FLOOR_NAMES[i] ?? `Floor ${i}`;
 
 // Four stages have fixed percentages: advance 15%, after plinth 10%,
 // before painting 5% and on handover 5%. The remaining 65% is split across
@@ -1317,7 +1322,7 @@ export default function AdminQuotation() {
             <div className="flex flex-wrap items-center gap-2">
               <label className="text-xs font-semibold text-navy/60">Rate (Rs./sqft)</label>
               <input className={`${input} max-w-[6rem]`} type="number" value={rate} onChange={(e) => setRate(e.target.value)} />
-              <button onClick={() => setFloorRows([...floorRows, { label: `Floor ${floorRows.length}`, slab: "" }])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add Floor</button>
+              <button onClick={() => setFloorRows([...floorRows, { label: floorName(floorRows.length), slab: "" }])} className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"><Plus className="h-3 w-3" /> Add Floor</button>
             </div>
           </div>
           {/* Ground floor usage */}
