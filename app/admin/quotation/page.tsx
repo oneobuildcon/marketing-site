@@ -776,12 +776,12 @@ export default function AdminQuotation() {
 
     // Client box — all client fields stacked on the left.
     const clientLines = [
-      `Name: ${clientName || "—"}`,
+      `Client Name: ${clientName || "—"}`,
       `Phone: ${clientPhone || "—"}`,
-      `Location: ${location || "—"}`,
+      `Project Location: ${location || "—"}`,
       ...(address.trim() ? [`Address: ${address.trim()}`] : []),
     ];
-    const metaLines = [`No: ${quotationNo}`, `Date: ${date}`, `Valid for: ${validity}`];
+    const metaLines = [`Quotation No: ${quotationNo}`, `Date: ${date}`, `Valid for: ${validity}`];
     const boxRows = Math.max(clientLines.length, metaLines.length);
     const boxH = boxRows * 5 + 6;
     doc.setFillColor(249, 250, 251);
@@ -816,7 +816,7 @@ export default function AdminQuotation() {
     }
 
     // ── Specifications ──
-    sectionTitle(`SPECIFICATIONS  —  DETAILS OF WORK  @  Rs. ${rate} / SQ.FT`);
+    sectionTitle(`SCOPE OF WORK & SPECIFICATIONS  —  Rs. ${inr(rateNum)} PER SQ.FT`);
     y += 2;
     sections.forEach((sec) => {
       if (!sec.title.trim() && sec.items.every((i) => !i.trim())) return;
@@ -940,8 +940,8 @@ export default function AdminQuotation() {
       const liveBrands = live(brands);
       const countRows = (gs: RateGroup[]) => gs.reduce((n, g) => n + Math.max(1, g.items.filter(Boolean).length), 0);
       const tables = [
-        ["RATE CONSIDERED", liveRates] as const,
-        ["BRAND USED", liveBrands] as const,
+        ["RATES CONSIDERED", liveRates] as const,
+        ["BRANDS USED", liveBrands] as const,
       ].filter(([, gs]) => gs.length);
 
       if (tables.length) {
@@ -954,7 +954,7 @@ export default function AdminQuotation() {
         const fs = rowH >= 6.2 ? 9.5 : rowH >= 5.5 ? 8.5 : rowH >= 5 ? 8 : 7.5;
         const tx = rowH / 2 + 1.2;
 
-        sectionTitle("RATE CONSIDERED & BRANDS USED");
+        sectionTitle("RATES & BRANDS CONSIDERED");
         y += 2;
         tables.forEach(([headerLabel, groups]) => {
           doc.setFillColor(238, 240, 244);
@@ -1006,7 +1006,7 @@ export default function AdminQuotation() {
       const fs = rowH >= 6.6 ? 9.5 : rowH >= 5.8 ? 8.5 : rowH >= 5.2 ? 8 : 7.5;
       const tx = rowH / 2 + 1.3; // baseline inside a row
 
-      sectionTitle("TENTATIVE ESTIMATE");
+      sectionTitle("TENTATIVE COST ESTIMATE");
       y += 2;
       doc.setFillColor(238, 240, 244);
       doc.rect(L, y, R - L, 7, "F");
@@ -1018,8 +1018,8 @@ export default function AdminQuotation() {
       // No Rate column — it is the same figure on every row and already stated
       // in the section heading.
       const eCols = [L + 96, L + 136];
-      doc.text("Floor", L + 3, y + 4.8);
-      doc.text("Approx Area (sqft)", L + 132, y + 4.8, { align: "right" });
+      doc.text("Description", L + 3, y + 4.8);
+      doc.text("Approx. Area (sq.ft)", L + 132, y + 4.8, { align: "right" });
       doc.text("Amount", R - 3, y + 4.8, { align: "right" });
       eCols.forEach((cx) => doc.line(cx, y, cx, y + 7));
       y += 7;
@@ -1068,8 +1068,8 @@ export default function AdminQuotation() {
       doc.setTextColor(...navy);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(fs);
-      doc.text("SR", L + 3, y + 4.8);
-      doc.text("Stage", L + 14, y + 4.8);
+      doc.text("Sr.", L + 3, y + 4.8);
+      doc.text("Stage of Work", L + 14, y + 4.8);
       doc.text("%", L + 130, y + 4.8, { align: "right" });
       doc.text("Amount", R - 3, y + 4.8, { align: "right" });
       [L + 11, L + 112, L + 134].forEach((cx) => doc.line(cx, y, cx, y + 7));
@@ -1112,7 +1112,7 @@ export default function AdminQuotation() {
       doc.setTextColor(...navy);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9);
-      doc.text("Bank Details", L + 5, y + 6);
+      doc.text("Bank Details for Payment", L + 5, y + 6);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8.5);
       doc.text(`Account Name: ${bank.accountName}`, L + 5, y + 12);

@@ -57,16 +57,16 @@ const basePresets: QuotationPreset[] = [
     label: "Basic — ₹1499/sqft",
     rate: 1499,
     sections: [
-      { title: "RCC DETAILS", items: [
+      { title: "RCC WORK", items: [
         "As per the architect's drawing, with plate shuttering for slabs. Steel: Uma / Kalika or equivalent. Cement: Birla Super 53 Grade.",
       ]},
-      { title: "BRICKWORK, PLASTER & WATERPROOFING DETAILS", items: [
+      { title: "BRICKWORK, PLASTER & WATERPROOFING", items: [
         `Brick work as per the architect's drawing, in red brick. All walls 6".`,
         "Internal walls — 12mm sanla-finish plaster. External walls — 12mm single-coat dabba finish. JK cement with plaster sand.",
         "Brickbat waterproofing in all bathrooms, using Dr. Fixit URP.",
         "Terrace waterproofing in ghotai finish, using Dr. Fixit LW URP and JK Super cement.",
       ]},
-      { title: "GRILL, RAILING, SLIDING WINDOW & DOOR DETAILS", items: [
+      { title: "GRILLS, RAILINGS, WINDOWS & DOORS", items: [
         "MS window grills in 10mm bar, typical Bombay design, or as selected on site.",
         'Staircase — SS railing in 2" round, 1.5" and 0.75" pipe. Balcony — 10mm glass railing.',
         "Sliding windows — 3-track, 18x40mm section, white powder coated, with mosquito net.",
@@ -75,7 +75,7 @@ const basePresets: QuotationPreset[] = [
         "Main and bedroom doors — flush, laminated both sides, with Europa locks, hinges and fittings.",
         "Bathroom doors in FRP, with tadi patti, hinges and fittings.",
       ]},
-      { title: "TILE & GRANITE DETAILS", items: [
+      { title: "TILE & GRANITE WORK", items: [
         "Bathroom dado — 300 x 600mm tile.",
         "Bathroom flooring — 300 x 300mm anti-skid tile.",
         "Flooring — 600 x 600mm tile, within the rate considered.",
@@ -85,12 +85,12 @@ const basePresets: QuotationPreset[] = [
         'Parking tile — 16" x 16".',
         "Material selected above or below the stated rate is billed at the difference, including labour.",
       ]},
-      { title: "PLUMBING DETAILS", items: [
+      { title: "PLUMBING WORK", items: [
         "Internal lines concealed, external lines clamped. CPVC, UPVC and PVC pipes (Prince).",
         "Bathroom — P-trap commode, flush tank, mixer set and wash basin (Cera / Varmora).",
         "External plumbing, chambers, and connection to the septic tank or main line.",
       ]},
-      { title: "ELECTRICAL DETAILS", items: [
+      { title: "ELECTRICAL WORK", items: [
         "Concealed points in 25-18mm pipe, Polycab wire, Anchor Roma switches and sockets.",
         "Per floor — 2.5 sq mm main; 1 sq mm light points; 1.5 sq mm power points.",
         "Five points per room: fan, light, AC, charging and one spare.",
@@ -130,16 +130,16 @@ const basePresets: QuotationPreset[] = [
     label: "Standard — ₹1649/sqft",
     rate: 1649,
     sections: [
-      { title: "RCC DETAILS", items: [
+      { title: "RCC WORK", items: [
         "As per the architect's drawing, with plate shuttering for slabs. Steel: Uma / Kalika or equivalent. Cement: Birla Super 53 Grade.",
       ]},
-      { title: "BRICKWORK, PLASTER & WATERPROOFING DETAILS", items: [
+      { title: "BRICKWORK, PLASTER & WATERPROOFING", items: [
         `Brick work as per the architect's drawing, in red brick. Outer walls 9", internal walls 6".`,
         "Internal walls — 12mm taar-finish plaster. External walls — double coat: 12mm taar plaster, then 12mm dabba finish. JK cement with plaster sand.",
         "Brickbat waterproofing in all bathrooms, using Dr. Fixit URP.",
         "Terrace waterproofing in brickbat, using Dr. Fixit LW URP and JK Super cement.",
       ]},
-      { title: "GRILL, RAILING, SLIDING WINDOW & DOOR DETAILS", items: [
+      { title: "GRILLS, RAILINGS, WINDOWS & DOORS", items: [
         "MS window grills in 10mm bar, typical Bombay design, or as selected on site.",
         'Staircase — SS railing in 2" round, 1.5" and 0.75" pipe. Balcony — 10mm glass railing.',
         "Sliding windows — 3-track, 18x40mm section, white powder coated, with mosquito net.",
@@ -148,7 +148,7 @@ const basePresets: QuotationPreset[] = [
         "Main and bedroom doors — flush, laminated both sides, with Europa locks, hinges and fittings.",
         "Bathroom doors in FRP, with tadi patti, hinges and fittings.",
       ]},
-      { title: "TILE & GRANITE DETAILS", items: [
+      { title: "TILE & GRANITE WORK", items: [
         "Bathroom dado — 1200 x 600mm tile.",
         "Bathroom and balcony flooring — 600 x 600mm anti-skid tile.",
         "Flooring — 1200 x 1200mm tile, within the rate considered.",
@@ -158,12 +158,12 @@ const basePresets: QuotationPreset[] = [
         'Parking tile — 16" x 16".',
         "Material selected above or below the stated rate is billed at the difference, including labour.",
       ]},
-      { title: "PLUMBING DETAILS", items: [
+      { title: "PLUMBING WORK", items: [
         "Internal lines concealed, external lines clamped. CPVC, UPVC and PVC pipes (Prince).",
         "Bathroom — wall-hung commode, flush valve, diverter spout set and wash basin (Cera / Varmora).",
         "External plumbing, chambers, and connection to the septic tank or main line.",
       ]},
-      { title: "ELECTRICAL DETAILS", items: [
+      { title: "ELECTRICAL WORK", items: [
         "Concealed points in 25-18mm pipe, Polycab wire, Anchor Roma switches and sockets.",
         "Per floor — 2.5 sq mm main; 1 sq mm light points; 1.5 sq mm power points.",
         "Electrical points as per the architect's drawing.",
@@ -205,17 +205,17 @@ const basePresets: QuotationPreset[] = [
     rate: 870,
     areaPercents: { plinth: 1, ground: 0.75, parking: 0.75, upper: 1, terrace: 0.5 },
     sections: [
-      { title: "RATE", items: [
+      { title: "RATE CONSIDERED", items: [
         "Rates for RCC and brick work with plaster, on built-up area, as per the measurement basis and scope below:",
         "RCC and brick work — Rs. 870 / sq.ft + taxes.",
       ]},
-      { title: "FOR OTHER WORKS", items: [
+      { title: "RATES FOR OTHER WORKS", items: [
         "Raft — Rs. 600 / sq.ft + taxes.",
         "Retaining wall — Rs. 550 / sq.ft + taxes.",
         "RCC tank — Rs. 25 / litre.",
         "Shuttering rate varies with height: up to 3m — 1x; 3m to 3.5m — 1.25x; 3.5m to 4.5m — 1.5x; up to 6m — 2x.",
       ]},
-      { title: "SCOPE OF THE WORK", items: [
+      { title: "SCOPE OF WORK", items: [
         "All work as per the architect's drawing.",
         'Brick work — outer walls 9", internal walls 6", in red brick or AAC block.',
         "External — double coat plaster, 12mm each: taar plaster, then dabba finish.",
@@ -223,7 +223,7 @@ const basePresets: QuotationPreset[] = [
         "RCC work as per the structural drawings.",
         "Floor-to-floor height considered as 11 feet.",
       ]},
-      { title: "MATERIAL USAGE", items: [
+      { title: "MATERIALS USED", items: [
         "Steel — Uma / Kalika / equivalent brand (Fe 500 / 550).",
         "Cement — Birla Super for RCC, JK Super for brick work plaster.",
         "Brick — red brick / AAC block.",
