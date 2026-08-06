@@ -55,8 +55,8 @@ export const defaultSpecialNotes: SpecSection[] = [
 const basePresets: QuotationPreset[] = [
   {
     id: "basic",
-    label: "Basic — ₹1549/sqft",
-    rate: 1549,
+    label: "Basic — ₹1499/sqft",
+    rate: 1499,
     sections: [
       { title: "RCC WORK", items: [
         "As per the architect's drawing, with plate shuttering for slabs.",
@@ -128,8 +128,8 @@ const basePresets: QuotationPreset[] = [
   },
   {
     id: "standard",
-    label: "Standard — ₹1699/sqft",
-    rate: 1699,
+    label: "Standard — ₹1649/sqft",
+    rate: 1649,
     sections: [
       { title: "RCC WORK", items: [
         "As per the architect's drawing, with plate shuttering for slabs.",

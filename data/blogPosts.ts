@@ -24,19 +24,19 @@ export const defaultBlogPosts: BlogPost[] = [
     slug: "house-construction-cost-per-sqft-pune",
     title: "House Construction Cost per Sq.Ft in Pune — 2026 Rates",
     summary:
-      "Turnkey construction in Pune runs Rs. 1,549 to Rs. 2,099 per sq.ft in 2026, and Rs. 870 for RCC and brick work only. Here is what sits behind those figures, how built-up area is measured, and two real Pune projects worked through.",
+      "Turnkey construction in Pune runs Rs. 1,499 to Rs. 2,099 per sq.ft in 2026, and Rs. 870 for RCC and brick work only. Here is what sits behind those figures, how built-up area is measured, and two real Pune projects worked through.",
     cover: "",
     date: "2026-08-06",
     published: true,
     author: "Avinash Shinde, Founder — One O Buildcon",
     faqs: [
-      { q: "What is the construction cost per sq.ft in Pune in 2026?", a: "Turnkey construction runs about Rs. 1,549 to Rs. 2,099 per sq.ft depending on the finishing specification. RCC and brick work only is about Rs. 870 per sq.ft. GST at 18% is extra on the base amount." },
+      { q: "What is the construction cost per sq.ft in Pune in 2026?", a: "Turnkey construction runs about Rs. 1,499 to Rs. 2,099 per sq.ft depending on the finishing specification. RCC and brick work only is about Rs. 870 per sq.ft. GST at 18% is extra on the base amount." },
       { q: "Is the rate applied to carpet area or built-up area?", a: "Built-up area. Plinth is counted at about 50% of the ground slab, upper floors at 100% each, and terrace at about 35% of the top slab. A 1,000 sq.ft footprint over two floors bills at roughly 2,850 sq.ft, not 2,000." },
-      { q: "How much does it cost to build a 2,000 sq.ft house in Pune?", a: "At a Standard turnkey rate of Rs. 1,699 per sq.ft, 2,000 sq.ft of built-up area works out to about Rs. 34 lakh before GST. The figure moves with the package chosen and the material selections made during construction." },
+      { q: "How much does it cost to build a 2,000 sq.ft house in Pune?", a: "At a Standard turnkey rate of Rs. 1,649 per sq.ft, 2,000 sq.ft of built-up area works out to about Rs. 33 lakh before GST. The figure moves with the package chosen and the material selections made during construction." },
       { q: "What is normally excluded from a construction quotation?", a: "Compound wall and gate, landscaping, external facade detailing, overhead RCC water tank, borewell, electricity meter, water connection, and furniture or interior work. These exclusions are normal; the problem is only when they are not written down." },
       { q: "Why do two contractors quote very different rates for the same house?", a: "Usually because they are quoting different houses. Compare how each measures built-up area, the material rates they have considered, and the brands they name. Once those three match, the rates become comparable." },
     ],
-    body: `Almost every conversation starts the same way: "What is your rate per sq.ft?" The short answer, for a bungalow in and around Pune in 2026, is **Rs. 1,549 to Rs. 2,099 per sq.ft for turnkey construction**, and **Rs. 870 per sq.ft if you want only the RCC and brick work**. The range depends on the finishing specification, not on the structure — the concrete and steel are much the same at either end.
+    body: `Almost every conversation starts the same way: "What is your rate per sq.ft?" The short answer, for a bungalow in and around Pune in 2026, is **Rs. 1,499 to Rs. 2,099 per sq.ft for turnkey construction**, and **Rs. 870 per sq.ft if you want only the RCC and brick work**. The range depends on the finishing specification, not on the structure — the concrete and steel are much the same at either end.
 
 The longer answer matters more, because the rate alone will not tell you what a house costs. Two contractors can quote the same figure and hand you houses that differ by lakhs. What follows is our own rate card, how built-up area is actually measured, and two real projects worked through.
 
@@ -45,14 +45,14 @@ The longer answer matters more, because the rate alone will not tell you what a 
 | Package | Rate per sq.ft |
 | --- | --- |
 | RCC & brick work only | Rs. 870 |
-| Basic turnkey | Rs. 1,549 |
-| Standard turnkey | Rs. 1,699 |
+| Basic turnkey | Rs. 1,499 |
+| Standard turnkey | Rs. 1,649 |
 | Premium turnkey | Rs. 1,949 |
 | Royal turnkey | Rs. 2,099 |
 
 All rates are on built-up area, and GST at 18% is extra on the base amount.
 
-## What separates Rs. 870 from Rs. 1,699
+## What separates Rs. 870 from Rs. 1,649
 
 The Rs. 870 rate covers the structure: footings, columns, beams, slabs, brickwork and plaster. You get a completed shell. Everything after that — flooring, granite, plumbing fittings, wiring, doors, windows, painting — is yours to arrange.
 
@@ -71,19 +71,19 @@ A house is not billed on carpet area. Built-up area is counted like this:
 - **Upper floors** — 100% each
 - **Terrace** — about 35% of the top slab
 
-So a 1,000 sq.ft footprint over two floors is not 2,000 sq.ft of billing. Add plinth at 500 and terrace at 350 and you are near 2,850 sq.ft. At Rs. 1,699 that is the difference between Rs. 34 lakh and Rs. 48.4 lakh — on the same house, at the same rate.
+So a 1,000 sq.ft footprint over two floors is not 2,000 sq.ft of billing. Add plinth at 500 and terrace at 350 and you are near 2,850 sq.ft. At Rs. 1,649 that is the difference between Rs. 33 lakh and Rs. 47 lakh — on the same house, at the same rate.
 
 Ask any contractor to show you this calculation in writing before you compare their number with anyone else's.
 
 ## Three real projects
 
-**Charoli, Pune — 5,565 sq.ft, completed 2025.** A modern bungalow with exposed brick accents, wooden louvers and open balconies. At our Standard turnkey rate of Rs. 1,699, a built-up area of 5,565 sq.ft works out to about **Rs. 94.6 lakh** before GST. At the Premium rate of Rs. 1,949 the same area would be about Rs. 1.08 crore.
+**Charoli, Pune — 5,565 sq.ft, completed 2025.** A modern bungalow with exposed brick accents, wooden louvers and open balconies. At our Standard turnkey rate of Rs. 1,649, a built-up area of 5,565 sq.ft works out to about **Rs. 91.8 lakh** before GST. At the Premium rate of Rs. 1,949 the same area would be about Rs. 1.08 crore.
 
-**Charoli, Pune — 3,330 sq.ft, completed 2023.** A modern bungalow with a double-height living room, glass balcony railings and terracotta facade accents. At the Standard turnkey rate of Rs. 1,699, 3,330 sq.ft comes to about **Rs. 56.6 lakh** before GST. This is closer to the size most families build, and a useful benchmark if you are planning a G+1 on a standard plot.
+**Charoli, Pune — 3,330 sq.ft, completed 2023.** A modern bungalow with a double-height living room, glass balcony railings and terracotta facade accents. At the Standard turnkey rate of Rs. 1,649, 3,330 sq.ft comes to about **Rs. 54.9 lakh** before GST. This is closer to the size most families build, and a useful benchmark if you are planning a G+1 on a standard plot.
 
 **Lohegaon, Pune — 5,700 sq.ft, under construction.** A premium bungalow built on an RCC structure with quality brickwork. At Rs. 1,949 per sq.ft, 5,700 sq.ft comes to roughly **Rs. 1.11 crore** before GST.
 
-Two things to note honestly. First, these are the arithmetic at the stated rates — the contracted value on any specific project depends on the package chosen and on selections made during construction. Second, both are large bungalows; a 2,000 to 3,000 sq.ft house is a far more common size, and at Rs. 1,699 that lands between Rs. 34 lakh and Rs. 51 lakh before GST.
+Two things to note honestly. First, these are the arithmetic at the stated rates — the contracted value on any specific project depends on the package chosen and on selections made during construction. Second, both are large bungalows; a 2,000 to 3,000 sq.ft house is a far more common size, and at Rs. 1,649 that lands between Rs. 33 lakh and Rs. 49 lakh before GST.
 
 ## What is not in the rate
 
