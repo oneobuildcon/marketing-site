@@ -12,6 +12,16 @@ async function findPost(slug: string) {
   return posts.find((p) => p.slug === slug && p.published) ?? null;
 }
 
+// Other published posts, newest first. Automatic, so posts written in the
+// admin get linked without anyone having to maintain a list.
+async function relatedPosts(slug: string, limit = 3) {
+  const posts = await getBlogPosts();
+  return posts
+    .filter((p) => p.published && p.slug !== slug)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, limit);
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -48,6 +58,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const post = await findPost(slug);
   if (!post) notFound();
+  const related = await relatedPosts(slug);
 
   // Article structured data, so the post can show a headline and date in search.
   const jsonLd = {
@@ -133,7 +144,48 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </section>
         )}
 
-        <div className="mt-12 rounded-2xl border border-amber/30 bg-amber/5 p-6">
+        {related.length > 0 && (
+          <section className="mt-12 border-t border-black/8 pt-8">
+            <h2 className="mb-4 text-xl font-bold text-navy sm:text-2xl">Read next</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {related.map((r) => (
+                <Link
+                  key={r.slug}
+                  href={`/blog/${r.slug}`}
+                  className="group rounded-xl border border-black/8 bg-white p-4 transition hover:border-amber/40 hover:shadow-sm"
+                >
+                  <div className="text-sm font-bold leading-snug text-navy group-hover:text-amber">
+                    {r.title}
+                  </div>
+                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-navy/60">{r.summary}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="mt-8 rounded-2xl border border-black/8 bg-white p-5">
+          <h2 className="mb-3 text-sm font-bold uppercase tracking-widest text-amber">Where we build</h2>
+          <div className="flex flex-wrap gap-2 text-sm">
+            <Link href="/rcc-contractor-pune" className="rounded-lg border border-navy/15 px-3 py-1.5 font-medium text-navy transition hover:border-amber hover:text-amber">
+              RCC contractor in Pune
+            </Link>
+            <Link href="/bungalow-construction-pimpri-chinchwad" className="rounded-lg border border-navy/15 px-3 py-1.5 font-medium text-navy transition hover:border-amber hover:text-amber">
+              Bungalow construction in Pimpri-Chinchwad
+            </Link>
+            <Link href="/construction-company-charholi" className="rounded-lg border border-navy/15 px-3 py-1.5 font-medium text-navy transition hover:border-amber hover:text-amber">
+              Construction company in Charholi
+            </Link>
+            <Link href="/projects" className="rounded-lg border border-navy/15 px-3 py-1.5 font-medium text-navy transition hover:border-amber hover:text-amber">
+              Our completed projects
+            </Link>
+            <Link href="/packages" className="rounded-lg border border-navy/15 px-3 py-1.5 font-medium text-navy transition hover:border-amber hover:text-amber">
+              Packages &amp; rates
+            </Link>
+          </div>
+        </section>
+
+        <div className="mt-8 rounded-2xl border border-amber/30 bg-amber/5 p-6">
           <h2 className="mb-2 text-lg font-bold text-navy">Planning to build in Pune?</h2>
           <p className="mb-4 text-sm leading-relaxed text-navy/70">
             We prepare written quotations with the built-up area calculation, material rates, brands

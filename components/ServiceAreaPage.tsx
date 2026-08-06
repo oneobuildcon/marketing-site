@@ -1,10 +1,18 @@
 import Link from "next/link";
 import { CheckCircle2, Phone, Calculator, MapPin, HardHat } from "lucide-react";
 import type { ServiceArea } from "@/lib/serviceAreas";
+import { getBlogPosts } from "@/lib/site-db";
 
 // Server-rendered locality landing page (no client JS beyond the shared
 // Navbar/Footer) — keeps it fast on mobile.
-export default function ServiceAreaPage({ area }: { area: ServiceArea }) {
+export default async function ServiceAreaPage({ area }: { area: ServiceArea }) {
+  // Three most recent guides, so these pages feed the blog and the blog feeds
+  // them back — internal links Google can follow in both directions.
+  const guides = (await getBlogPosts())
+    .filter((p) => p.published)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 3);
+
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -103,6 +111,28 @@ export default function ServiceAreaPage({ area }: { area: ServiceArea }) {
           </div>
         </div>
       </section>
+
+      {/* Guides */}
+      {guides.length > 0 && (
+        <section className="bg-white py-14">
+          <div className="mx-auto max-w-5xl px-6">
+            <h2 className="mb-1 text-2xl font-bold text-navy">Useful guides</h2>
+            <p className="mb-6 text-sm text-navy/60">Costs, timelines and what to check before you appoint a contractor.</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {guides.map((g) => (
+                <Link
+                  key={g.slug}
+                  href={`/blog/${g.slug}`}
+                  className="group rounded-xl border border-black/8 p-4 transition hover:border-amber/40 hover:shadow-sm"
+                >
+                  <div className="text-sm font-bold leading-snug text-navy group-hover:text-amber">{g.title}</div>
+                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-navy/60">{g.summary}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="bg-navy py-14 text-white">
