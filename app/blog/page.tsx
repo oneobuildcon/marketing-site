@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { CalendarDays } from "lucide-react";
 import { getBlogPosts } from "@/lib/site-db";
 
@@ -17,6 +18,11 @@ export const metadata: Metadata = {
     siteName: "One O Buildcon",
   },
 };
+
+// next/image only accepts hosts listed in next.config.mjs.
+function optimisable(url: string) {
+  return url.startsWith("/") || /^https:\/\/[^/]*\.supabase\.co\//.test(url);
+}
 
 function formatDate(d: string) {
   const dt = new Date(d);
@@ -56,8 +62,23 @@ export default async function BlogIndex() {
                 className="group flex flex-col overflow-hidden rounded-2xl border border-black/8 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 {p.cover ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.cover} alt={p.title} className="h-44 w-full object-cover" />
+                  // Optimised through next/image so a full-size phone photo is
+                  // not shipped to a phone. Falls back to a plain img for URLs
+                  // outside the configured remote hosts.
+                  optimisable(p.cover) ? (
+                    <div className="relative h-44 w-full">
+                      <Image
+                        src={p.cover}
+                        alt={p.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 50vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.cover} alt={p.title} className="h-44 w-full object-cover" />
+                  )
                 ) : (
                   <div className="h-3 w-full bg-gradient-to-r from-navy to-amber" />
                 )}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, Phone, User } from "lucide-react";
 import BlogBody from "@/components/BlogBody";
@@ -45,6 +46,10 @@ export async function generateMetadata({
       ...(post.cover ? { images: [{ url: post.cover }] } : {}),
     },
   };
+}
+
+function optimisable(url: string) {
+  return url.startsWith("/") || /^https:\/\/[^/]*\.supabase\.co\//.test(url);
 }
 
 function formatDate(d: string) {
@@ -121,10 +126,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {post.summary}
         </p>
 
-        {post.cover && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={post.cover} alt={post.title} className="mb-8 w-full rounded-2xl object-cover" />
-        )}
+        {post.cover &&
+          (optimisable(post.cover) ? (
+            <Image
+              src={post.cover}
+              alt={post.title}
+              width={1200}
+              height={675}
+              priority
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="mb-8 h-auto w-full rounded-2xl object-cover"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={post.cover} alt={post.title} className="mb-8 w-full rounded-2xl object-cover" />
+          ))}
 
         <BlogBody body={post.body} />
 

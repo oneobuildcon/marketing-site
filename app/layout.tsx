@@ -59,7 +59,9 @@ export const metadata: Metadata = {
     description: "Premium bungalows, row houses & residential buildings by trusted RCC contractors in Pune.",
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
-  verification: { google: "" },
+  // Search Console is verified through the domain/DNS record, so no
+  // google-site-verification meta tag is needed. An empty one renders a
+  // useless tag, so it is left out entirely.
 };
 
 export default function RootLayout({
