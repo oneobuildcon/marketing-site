@@ -60,7 +60,10 @@ export default function AdminBlog() {
   function addPost() {
     const today = new Date().toISOString().slice(0, 10);
     setPosts([
-      { slug: "", title: "", summary: "", cover: "", date: today, published: false, body: "" },
+      {
+        slug: "", title: "", summary: "", cover: "", date: today, published: false, body: "",
+        author: "Avinash Shinde, Founder — One O Buildcon", faqs: [],
+      },
       ...posts,
     ]);
     setOpenIdx(0);
@@ -208,6 +211,10 @@ export default function AdminBlog() {
                   </div>
                 </div>
                 <div>
+                  <label className={label}>Author byline</label>
+                  <input className={input} value={p.author ?? ""} onChange={(e) => update(i, { author: e.target.value })} placeholder="e.g. Avinash Shinde, Founder — One O Buildcon" />
+                </div>
+                <div>
                   <label className={label}>Body</label>
                   <textarea
                     rows={18}
@@ -215,6 +222,44 @@ export default function AdminBlog() {
                     value={p.body}
                     onChange={(e) => update(i, { body: e.target.value })}
                   />
+                </div>
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className={`${label} mb-0`}>FAQs — shown at the foot of the post</label>
+                    <button
+                      onClick={() => update(i, { faqs: [...(p.faqs ?? []), { q: "", a: "" }] })}
+                      className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white"
+                    >
+                      <Plus className="h-3 w-3" /> Add FAQ
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {(p.faqs ?? []).map((f, fi) => (
+                      <div key={fi} className="rounded-xl border border-black/8 p-3">
+                        <div className="flex gap-2">
+                          <input
+                            className={`${input} font-semibold`}
+                            placeholder="Question"
+                            value={f.q}
+                            onChange={(e) => update(i, { faqs: (p.faqs ?? []).map((x, k) => (k === fi ? { ...x, q: e.target.value } : x)) })}
+                          />
+                          <button
+                            onClick={() => update(i, { faqs: (p.faqs ?? []).filter((_, k) => k !== fi) })}
+                            className="shrink-0 rounded-lg p-2 text-red-400 hover:bg-red-50 hover:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <textarea
+                          rows={2}
+                          className={`${input} mt-2 resize-none`}
+                          placeholder="Answer"
+                          value={f.a}
+                          onChange={(e) => update(i, { faqs: (p.faqs ?? []).map((x, k) => (k === fi ? { ...x, a: e.target.value } : x)) })}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

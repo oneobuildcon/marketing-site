@@ -13,6 +13,10 @@ export type BlogPost = {
   date: string;       // YYYY-MM-DD
   published: boolean;
   body: string;
+  // Google weighs demonstrated first-hand experience, so posts carry a byline.
+  author?: string;
+  // Rendered at the foot of the post and emitted as FAQPage structured data.
+  faqs?: { q: string; a: string }[];
 };
 
 export const defaultBlogPosts: BlogPost[] = [
@@ -24,6 +28,13 @@ export const defaultBlogPosts: BlogPost[] = [
     cover: "",
     date: "2026-08-06",
     published: true,
+    author: "Avinash Shinde, Founder — One O Buildcon",
+    faqs: [
+      { q: "What is the construction cost per sq.ft in Pune?", a: "It depends entirely on the specification behind the rate. A turnkey package covering structure, flooring, plumbing, electrical, doors, windows and painting sits in a different band from a structure-only rate. Ask for the itemised specification and the material rates considered before comparing any two figures." },
+      { q: "Is the rate applied to carpet area or built-up area?", a: "Built-up area. Plinth is usually counted at about 50% of the ground slab, upper floors at 100% each, and terrace at around 35% of the top slab. Ask for this calculation in writing — it changes the total more than the rate does." },
+      { q: "What is normally excluded from a construction quotation?", a: "Compound wall and gate, landscaping, external facade detailing, overhead RCC water tanks, borewell, electricity meter, water connection, and furniture or interior work. These exclusions are normal; the problem is only when they are not written down." },
+      { q: "Why do two contractors quote very different rates for the same house?", a: "Usually because they are quoting different houses. Check the material rates considered, the brands named, and how each measures built-up area. Once those three match, the rates become comparable." },
+    ],
     body: `Almost every conversation about building a house in Pune starts the same way: "What is your rate per sq.ft?" It is a fair question, but the number on its own tells you very little. Two contractors can quote the same rate and hand you houses that differ by lakhs in value.
 
 Here is what actually sits behind that figure.
@@ -88,7 +99,7 @@ If you would like a written quotation with all of this set out — built-up area
       "Turnkey means you hand over a drawing and receive a finished house. Here is the work that sits between those two points, stage by stage.",
     cover: "",
     date: "2026-08-06",
-    published: true,
+    published: false,
     body: `"Turnkey" is one of those words that sounds precise and often is not. In practice it should mean one thing: you hand over an approved drawing, and you receive a house you can move into, with one contractor answerable for all of it.
 
 Here is what that involves.
@@ -147,7 +158,7 @@ If a contractor can give you all four on paper, you are dealing with someone who
       "Some owners give out only the structure and manage the finishing themselves. It can save money, and it can cost a great deal. Here is how to decide.",
     cover: "",
     date: "2026-08-06",
-    published: true,
+    published: false,
     body: `There are two common ways to build a house in Pune. You give one contractor the whole job, or you give out the RCC and brickwork and manage the finishing yourself.
 
 Both are legitimate. Which suits you depends less on money than on time.
@@ -202,6 +213,12 @@ Either way, insist on the same things: itemised specifications, named brands, a 
     cover: "",
     date: "2026-08-06",
     published: true,
+    author: "Avinash Shinde, Founder — One O Buildcon",
+    faqs: [
+      { q: "What should I check before paying an advance to a contractor?", a: "A written built-up area calculation, the material rates considered, the brands named for steel, cement, waterproofing, pipes, fittings and paint, and a stage-wise payment schedule tied to completed work rather than dates." },
+      { q: "How should payments be structured during house construction?", a: "By stage, not by date — typically an advance, then payments after plinth, after each RCC slab, after brickwork, after plaster, before painting, and on handover. This keeps payment tied to work you can see." },
+      { q: "Should I ask to visit a contractor's ongoing site?", a: "Yes. Finished photographs are easy to produce; a live site shows how a contractor actually works — supervision, material storage, safety and cleanliness. A contractor with nothing to hide will arrange it the same week." },
+    ],
     body: `Choosing a contractor is the single decision that determines how the next year of your life goes. Here are the questions worth asking, and what a good answer sounds like.
 
 ## 1. Can I see the built-up area calculation?

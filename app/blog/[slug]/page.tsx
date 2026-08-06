@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, Phone } from "lucide-react";
+import { ArrowLeft, CalendarDays, Phone, User } from "lucide-react";
 import BlogBody from "@/components/BlogBody";
 import { getBlogPosts } from "@/lib/site-db";
 
@@ -66,9 +66,26 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     mainEntityOfPage: `https://oneobuildcon.com/blog/${post.slug}`,
   };
 
+  // FAQPage markup is a bonus rather than a guarantee — Google has cut back FAQ
+  // rich results — but it costs nothing and the block is useful to readers.
+  const faqLd = post.faqs?.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: post.faqs.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      }
+    : null;
+
   return (
     <div className="bg-cream">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {faqLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      )}
 
       <article className="mx-auto max-w-3xl px-6 py-10 sm:py-14">
         <Link
@@ -78,8 +95,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <ArrowLeft className="h-4 w-4" /> All posts
         </Link>
 
-        <div className="mb-3 flex items-center gap-1.5 text-xs font-semibold text-amber">
-          <CalendarDays className="h-3.5 w-3.5" /> {formatDate(post.date)}
+        <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-amber">
+          <span className="flex items-center gap-1.5">
+            <CalendarDays className="h-3.5 w-3.5" /> {formatDate(post.date)}
+          </span>
+          {post.author && (
+            <span className="flex items-center gap-1.5 text-navy/50">
+              <User className="h-3.5 w-3.5" /> {post.author}
+            </span>
+          )}
         </div>
         <h1 className="mb-4 text-2xl font-bold leading-tight text-navy sm:text-4xl">{post.title}</h1>
         <p className="mb-8 border-l-4 border-amber pl-4 text-base leading-relaxed text-navy/70">
@@ -92,6 +116,22 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         )}
 
         <BlogBody body={post.body} />
+
+        {post.faqs && post.faqs.length > 0 && (
+          <section className="mt-12">
+            <h2 className="mb-4 text-xl font-bold text-navy sm:text-2xl">Frequently asked questions</h2>
+            <div className="space-y-3">
+              {post.faqs.map((f, i) => (
+                <details key={i} className="group rounded-xl border border-black/8 bg-white p-4">
+                  <summary className="cursor-pointer list-none text-sm font-semibold text-navy marker:hidden">
+                    {f.q}
+                  </summary>
+                  <p className="mt-2 text-sm leading-relaxed text-navy/70">{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+        )}
 
         <div className="mt-12 rounded-2xl border border-amber/30 bg-amber/5 p-6">
           <h2 className="mb-2 text-lg font-bold text-navy">Planning to build in Pune?</h2>
