@@ -263,6 +263,48 @@ export default function AdminBlog() {
                     )}
                   </div>
                 </div>
+                <div className="rounded-xl border border-amber/30 bg-amber/5 p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-widest text-amber">Marathi version</div>
+                      <p className="mt-0.5 text-[11px] text-navy/50">
+                        Optional. Fill all three and the post also appears at /mr/blog/{p.slug || "…"}.
+                      </p>
+                    </div>
+                    {p.mr?.title && p.mr?.body && (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">LIVE</span>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className={label}>शीर्षक (title)</label>
+                      <input
+                        className={input}
+                        value={p.mr?.title ?? ""}
+                        onChange={(e) => update(i, { mr: { title: e.target.value, summary: p.mr?.summary ?? "", body: p.mr?.body ?? "", faqs: p.mr?.faqs } })}
+                      />
+                    </div>
+                    <div>
+                      <label className={label}>सारांश (summary)</label>
+                      <textarea
+                        rows={2}
+                        className={`${input} resize-none`}
+                        value={p.mr?.summary ?? ""}
+                        onChange={(e) => update(i, { mr: { title: p.mr?.title ?? "", summary: e.target.value, body: p.mr?.body ?? "", faqs: p.mr?.faqs } })}
+                      />
+                    </div>
+                    <div>
+                      <label className={label}>मजकूर (body)</label>
+                      <textarea
+                        rows={12}
+                        className={`${input} resize-y font-mono text-[13px]`}
+                        value={p.mr?.body ?? ""}
+                        onChange={(e) => update(i, { mr: { title: p.mr?.title ?? "", summary: p.mr?.summary ?? "", body: e.target.value, faqs: p.mr?.faqs } })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div>
                   <label className={label}>Author byline</label>
                   <input className={input} value={p.author ?? ""} onChange={(e) => update(i, { author: e.target.value })} placeholder="e.g. Avinash Shinde, Founder — One O Buildcon" />

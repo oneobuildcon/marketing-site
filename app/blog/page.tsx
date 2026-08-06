@@ -10,7 +10,13 @@ export const metadata: Metadata = {
   title: "Blog | One O Buildcon — Construction Guides for Pune Home Owners",
   description:
     "Practical guides on house construction in Pune — costs per sq.ft, what turnkey packages include, choosing a contractor, and how built-up area is measured.",
-  alternates: { canonical: "https://oneobuildcon.com/blog" },
+  alternates: {
+    canonical: "https://oneobuildcon.com/blog",
+    languages: {
+      "en-IN": "https://oneobuildcon.com/blog",
+      "mr-IN": "https://oneobuildcon.com/mr/blog",
+    },
+  },
   openGraph: {
     title: "One O Buildcon Blog",
     description: "Practical guides on building a house in Pune, written by people who build them.",

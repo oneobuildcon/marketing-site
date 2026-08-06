@@ -32,10 +32,17 @@ export async function generateMetadata({
   const post = await findPost(slug);
   if (!post) return { title: "Post not found | One O Buildcon" };
   const url = `https://oneobuildcon.com/blog/${post.slug}`;
+  const mrUrl = `https://oneobuildcon.com/mr/blog/${post.slug}`;
+  const hasMr = !!(post.mr?.title && post.mr?.body);
   return {
     title: `${post.title} | One O Buildcon`,
     description: post.summary,
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      // Declared only when a Marathi version actually exists, so hreflang
+      // never points at a page that would 404.
+      ...(hasMr ? { languages: { "en-IN": url, "mr-IN": mrUrl } } : {}),
+    },
     openGraph: {
       type: "article",
       title: post.title,
