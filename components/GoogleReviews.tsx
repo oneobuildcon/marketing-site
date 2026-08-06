@@ -93,7 +93,7 @@ export default function GoogleReviews({
       )}
 
       <div className="grid gap-5 md:grid-cols-3">
-        {data.reviews.slice(0, 6).map((r, i) => (
+        {data.reviews.slice(0, 9).map((r, i) => (
           <figure key={i} className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <Stars n={r.rating} />
             <blockquote className="mt-3 text-sm leading-relaxed text-white/80">

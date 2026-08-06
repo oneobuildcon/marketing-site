@@ -16,7 +16,45 @@ type Review = {
   url?: string;
 };
 
+// Featurable connects to the Business Profile itself, so it returns every
+// review rather than the five the Places API is limited to. Preferred when
+// configured; the Places API stays as the fallback.
+async function fromFeaturable(widgetId: string) {
+  const res = await fetch(`https://featurable.com/api/v1/widgets/${widgetId}`, {
+    next: { revalidate },
+  });
+  if (!res.ok) throw new Error(`Featurable returned ${res.status}`);
+  const d = (await res.json()) as any;
+  const reviews: Review[] = (d.reviews ?? [])
+    .map((r: any) => ({
+      author: r.reviewer?.displayName ?? 'Google user',
+      photo: r.reviewer?.profilePhotoUrl,
+      rating: typeof r.starRating === 'number' ? r.starRating : Number(r.starRating) || 5,
+      text: r.comment ?? '',
+      relative: r.relativeTimeDescription ?? r.createTime?.slice(0, 10) ?? '',
+    }))
+    .filter((r: Review) => r.text.trim().length > 0);
+  return {
+    configured: true,
+    source: 'featurable',
+    rating: d.averageRating ?? null,
+    total: d.totalReviewCount ?? reviews.length,
+    mapsUrl: d.profileUrl ?? null,
+    reviews,
+  };
+}
+
 export async function GET() {
+  const widgetId = process.env.FEATURABLE_WIDGET_ID;
+  if (widgetId) {
+    try {
+      return NextResponse.json(await fromFeaturable(widgetId));
+    } catch (e: any) {
+      // Fall through to the Places API rather than showing nothing.
+      console.error('reviews (featurable):', e?.message);
+    }
+  }
+
   const key = process.env.GOOGLE_PLACES_API_KEY;
   const placeId = process.env.GOOGLE_PLACE_ID;
   if (!key || !placeId) {
@@ -47,6 +85,7 @@ export async function GET() {
 
     return NextResponse.json({
       configured: true,
+      source: 'places',
       rating: d.rating ?? null,
       total: d.userRatingCount ?? 0,
       mapsUrl: d.googleMapsUri ?? null,
