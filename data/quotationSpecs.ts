@@ -58,13 +58,13 @@ const basePresets: QuotationPreset[] = [
     rate: 1499,
     sections: [
       { title: "RCC WORK", items: [
-        "As per the architect's drawing, with plate shuttering for slabs. Steel: Uma / Kalika or equivalent. Cement: Birla Super 53 Grade.",
+        "As per the architect's drawing, with plate shuttering for slabs.",
       ]},
       { title: "BRICKWORK, PLASTER & WATERPROOFING", items: [
         `Brick work as per the architect's drawing, in red brick. All walls 6".`,
-        "Internal walls — 12mm sanla-finish plaster. External walls — 12mm single-coat dabba finish. JK cement with plaster sand.",
-        "Brickbat waterproofing in all bathrooms, using Dr. Fixit URP.",
-        "Terrace waterproofing in ghotai finish, using Dr. Fixit LW URP and JK Super cement.",
+        "Internal walls — 12mm sanla-finish plaster. External walls — 12mm single-coat dabba finish, with plaster sand.",
+        "Brickbat waterproofing in all bathrooms.",
+        "Terrace waterproofing in ghotai finish.",
       ]},
       { title: "GRILLS, RAILINGS, WINDOWS & DOORS", items: [
         "MS window grills in 10mm bar, typical Bombay design, or as selected on site.",
@@ -72,7 +72,7 @@ const basePresets: QuotationPreset[] = [
         "Sliding windows — 3-track, 18x40mm section, white powder coated, with mosquito net.",
         "Bathroom and toilet ventilators with louvered glass and mosquito net.",
         "Door frames in Steel Gray granite. Any other granite is charged extra.",
-        "Main and bedroom doors — flush, laminated both sides, with Europa locks, hinges and fittings.",
+        "Main and bedroom doors — flush, laminated both sides, with locks, hinges and fittings.",
         "Bathroom doors in FRP, with tadi patti, hinges and fittings.",
       ]},
       { title: "TILE & GRANITE WORK", items: [
@@ -86,12 +86,12 @@ const basePresets: QuotationPreset[] = [
         "Material selected above or below the stated rate is billed at the difference, including labour.",
       ]},
       { title: "PLUMBING WORK", items: [
-        "Internal lines concealed, external lines clamped. CPVC, UPVC and PVC pipes (Prince).",
-        "Bathroom — P-trap commode, flush tank, mixer set and wash basin (Cera / Varmora).",
+        "Internal lines concealed, external lines clamped, in CPVC, UPVC and PVC pipes.",
+        "Bathroom — P-trap commode, flush tank, mixer set and wash basin.",
         "External plumbing, chambers, and connection to the septic tank or main line.",
       ]},
       { title: "ELECTRICAL WORK", items: [
-        "Concealed points in 25-18mm pipe, Polycab wire, Anchor Roma switches and sockets.",
+        "Concealed points in 25-18mm pipe, with switches and sockets.",
         "Per floor — 2.5 sq mm main; 1 sq mm light points; 1.5 sq mm power points.",
         "Five points per room: fan, light, AC, charging and one spare.",
         "Light and fan fittings are provided by the client.",
@@ -100,8 +100,8 @@ const basePresets: QuotationPreset[] = [
       ]},
       { title: "POP WORK", items: ["Not included."] },
       { title: "PAINTING", items: [
-        "Exterior — Nerolac Suraksha Plus: 1 coat primer, 2 coats paint.",
-        "Interior — Oil Bound Distemper: 1 coat primer, 2 coats putty, 2 coats paint.",
+        "Exterior — 1 coat primer, 2 coats paint.",
+        "Interior — oil bound distemper: 1 coat primer, 2 coats putty, 2 coats paint.",
       ]},
       { title: "GYPSUM CEILING", items: ["Not included."] },
     ],
@@ -131,13 +131,13 @@ const basePresets: QuotationPreset[] = [
     rate: 1649,
     sections: [
       { title: "RCC WORK", items: [
-        "As per the architect's drawing, with plate shuttering for slabs. Steel: Uma / Kalika or equivalent. Cement: Birla Super 53 Grade.",
+        "As per the architect's drawing, with plate shuttering for slabs.",
       ]},
       { title: "BRICKWORK, PLASTER & WATERPROOFING", items: [
         `Brick work as per the architect's drawing, in red brick. Outer walls 9", internal walls 6".`,
-        "Internal walls — 12mm taar-finish plaster. External walls — double coat: 12mm taar plaster, then 12mm dabba finish. JK cement with plaster sand.",
-        "Brickbat waterproofing in all bathrooms, using Dr. Fixit URP.",
-        "Terrace waterproofing in brickbat, using Dr. Fixit LW URP and JK Super cement.",
+        "Internal walls — 12mm taar-finish plaster. External walls — double coat: 12mm taar plaster, then 12mm dabba finish, with plaster sand.",
+        "Brickbat waterproofing in all bathrooms.",
+        "Terrace waterproofing in brickbat.",
       ]},
       { title: "GRILLS, RAILINGS, WINDOWS & DOORS", items: [
         "MS window grills in 10mm bar, typical Bombay design, or as selected on site.",
@@ -145,7 +145,7 @@ const basePresets: QuotationPreset[] = [
         "Sliding windows — 3-track, 18x40mm section, white powder coated, with mosquito net.",
         "Bathroom and toilet ventilators with louvered glass and mosquito net.",
         "Door frames in Z-black granite. Any other granite is charged extra.",
-        "Main and bedroom doors — flush, laminated both sides, with Europa locks, hinges and fittings.",
+        "Main and bedroom doors — flush, laminated both sides, with locks, hinges and fittings.",
         "Bathroom doors in FRP, with tadi patti, hinges and fittings.",
       ]},
       { title: "TILE & GRANITE WORK", items: [
@@ -159,12 +159,12 @@ const basePresets: QuotationPreset[] = [
         "Material selected above or below the stated rate is billed at the difference, including labour.",
       ]},
       { title: "PLUMBING WORK", items: [
-        "Internal lines concealed, external lines clamped. CPVC, UPVC and PVC pipes (Prince).",
-        "Bathroom — wall-hung commode, flush valve, diverter spout set and wash basin (Cera / Varmora).",
+        "Internal lines concealed, external lines clamped, in CPVC, UPVC and PVC pipes.",
+        "Bathroom — wall-hung commode, flush valve, diverter spout set and wash basin.",
         "External plumbing, chambers, and connection to the septic tank or main line.",
       ]},
       { title: "ELECTRICAL WORK", items: [
-        "Concealed points in 25-18mm pipe, Polycab wire, Anchor Roma switches and sockets.",
+        "Concealed points in 25-18mm pipe, with switches and sockets.",
         "Per floor — 2.5 sq mm main; 1 sq mm light points; 1.5 sq mm power points.",
         "Electrical points as per the architect's drawing.",
         "Light and fan fittings are provided by the client. Their positions to be given by the architect one week before the slab.",
@@ -173,8 +173,8 @@ const basePresets: QuotationPreset[] = [
       ]},
       { title: "POP WORK", items: ["POP (Plaster of Paris) for all internal walls, excluding bathrooms and ceilings."] },
       { title: "PAINTING", items: [
-        "Exterior — Nerolac Suraksha: 1 coat primer, 2 coats paint.",
-        "Interior — Asian Tractor Emulsion: 1 coat primer, 2 coats putty, 2 coats paint.",
+        "Exterior — 1 coat primer, 2 coats paint.",
+        "Interior — emulsion: 1 coat primer, 2 coats putty, 2 coats paint.",
       ]},
       { title: "GYPSUM CEILING", items: ["Not included."] },
     ],
@@ -224,8 +224,8 @@ const basePresets: QuotationPreset[] = [
         "Floor-to-floor height considered as 11 feet.",
       ]},
       { title: "MATERIALS USED", items: [
-        "Steel — Uma / Kalika / equivalent brand (Fe 500 / 550).",
-        "Cement — Birla Super for RCC, JK Super for brick work plaster.",
+        "Steel — Fe 500 / 550.",
+        "Cement — as per the brands table.",
         "Brick — red brick / AAC block.",
         "Plaster — M sand (plaster sand).",
         "Aggregate — crush sand.",
