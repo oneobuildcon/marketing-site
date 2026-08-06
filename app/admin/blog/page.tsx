@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Save, Eye, EyeOff, FileText, Upload } from "lucide-react";
-import type { BlogPost } from "@/data/blogPosts";
+import { Plus, Trash2, Save, Eye, EyeOff, FileText, Upload, DownloadCloud } from "lucide-react";
+import { defaultBlogPosts, type BlogPost } from "@/data/blogPosts";
 
 const input =
   "w-full rounded-lg border border-black/15 px-3 py-2 text-sm text-navy focus:outline-none focus:border-amber focus:ring-2 focus:ring-amber/20";
@@ -69,6 +69,21 @@ export default function AdminBlog() {
     setOpenIdx(0);
   }
 
+  // Posts saved here replace the code defaults entirely, so newly written
+  // starter posts would otherwise never appear. This pulls in only the ones
+  // whose slug is missing, leaving everything already edited untouched.
+  function importNewPosts() {
+    const have = new Set(posts.map((p) => p.slug));
+    const missing = defaultBlogPosts.filter((p) => !have.has(p.slug));
+    if (!missing.length) {
+      setMsg("No new posts to add — you already have them all.");
+      return;
+    }
+    if (!confirm(`Add ${missing.length} new post${missing.length > 1 ? "s" : ""}?\n\n${missing.map((p) => "• " + p.title).join("\n")}\n\nYour existing posts are not changed.`)) return;
+    setPosts([...missing, ...posts]);
+    setMsg(`${missing.length} added — press Save all to keep them.`);
+  }
+
   function removePost(i: number) {
     if (!confirm(`Delete "${posts[i].title || "this post"}"? This cannot be undone once saved.`)) return;
     setPosts(posts.filter((_, j) => j !== i));
@@ -102,6 +117,13 @@ export default function AdminBlog() {
         </h1>
         <div className="flex items-center gap-2">
           {msg && <span className="text-xs font-semibold text-navy/70">{msg}</span>}
+          <button
+            onClick={importNewPosts}
+            title="Pull in any newly written posts that aren't in your list yet"
+            className="flex items-center gap-1 rounded-lg border border-navy/20 px-3 py-2 text-xs font-semibold text-navy hover:bg-navy/5"
+          >
+            <DownloadCloud className="h-3.5 w-3.5" /> Get new posts
+          </button>
           <button
             onClick={addPost}
             className="flex items-center gap-1 rounded-lg border border-navy/20 px-3 py-2 text-xs font-semibold text-navy hover:bg-navy/5"
