@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import InstagramFeed from "@/components/InstagramFeed";
+import GoogleReviews from "@/components/GoogleReviews";
 import FAQ from "@/components/FAQ";
 import CraneAnimation from "@/components/CraneAnimation";
 
@@ -345,6 +346,8 @@ function TravelingDot({ active }: { active: boolean }) {
 }
 
 export default function Home() {
+  // Live Google reviews replace the static rating card once they load.
+  const [hasLiveReviews, setHasLiveReviews] = useState(false);
   const { lang } = useLanguage();
   const t = translations[lang];
 
@@ -656,7 +659,13 @@ export default function Home() {
               <Star className="h-4 w-4 fill-navy-dark" /> {lang === "en" ? "Review us on Google" : "Google वर रिव्ह्यू द्या"}
             </a>
           </motion.div>
-          {/* Real reviews live on Google — we link out instead of showing invented quotes. */}
+          {/* Live from the Google Business Profile when the Places API is set up. */}
+          <div className="mt-10">
+            <GoogleReviews lang={lang} onLoaded={setHasLiveReviews} />
+          </div>
+
+          {/* Shown until live reviews are available, so the section is never empty. */}
+          {!hasLiveReviews && (
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mt-10 rounded-2xl bg-white/5 border border-white/10 p-8 text-center">
             <div className="flex items-center justify-center gap-1">
               {[...Array(5)].map((_, j) => (
@@ -680,6 +689,7 @@ export default function Home() {
               </a>
             </div>
           </motion.div>
+          )}
         </div>
       </section>
 
