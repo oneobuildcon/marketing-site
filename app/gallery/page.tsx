@@ -1,9 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useLanguage } from "@/lib/LanguageContext";
 
 type GalleryImage = { url: string; caption?: string };
+
+// next/image only accepts hosts listed in next.config.mjs; anything else
+// falls back to a plain img rather than throwing.
+function optimisable(url: string) {
+  return url.startsWith("/") || /^https:\/\/[^/]*\.supabase\.co\//.test(url);
+}
 
 const copy = {
   en: {
@@ -64,13 +71,28 @@ export default function GalleryPage() {
                 onClick={() => setActive(i)}
                 className="group block w-full overflow-hidden rounded-2xl shadow-sm focus:outline-none"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={img.url}
-                  alt={img.caption || "One O Buildcon project"}
-                  className="w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-                  loading="lazy"
-                />
+                {optimisable(img.url) ? (
+                  // Photos are uploaded straight from a phone, so they are far
+                  // larger than the grid needs. next/image resizes and converts
+                  // them per device instead of shipping the original.
+                  <Image
+                    src={img.url}
+                    alt={img.caption || "One O Buildcon project"}
+                    width={800}
+                    height={600}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    loading={i < 3 ? "eager" : "lazy"}
+                    className="h-auto w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                  />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={img.url}
+                    alt={img.caption || "One O Buildcon project"}
+                    className="w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                    loading="lazy"
+                  />
+                )}
                 {img.caption && (
                   <span className="block bg-navy/90 px-3 py-2 text-left text-sm text-white">{img.caption}</span>
                 )}
