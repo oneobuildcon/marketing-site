@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Save, Eye, EyeOff, FileText, Upload, DownloadCloud, RefreshCw } from "lucide-react";
+import { Plus, Trash2, Save, Eye, EyeOff, FileText, Upload, DownloadCloud, RefreshCw, Languages } from "lucide-react";
 import { defaultBlogPosts, type BlogPost } from "@/data/blogPosts";
 
 const input =
@@ -24,6 +24,7 @@ export default function AdminBlog() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [translating, setTranslating] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -112,6 +113,34 @@ export default function AdminBlog() {
     if (!confirm(`Delete "${posts[i].title || "this post"}"? This cannot be undone once saved.`)) return;
     setPosts(posts.filter((_, j) => j !== i));
     setOpenIdx(null);
+  }
+
+  // Fills the Marathi fields from the English ones. The result is a draft to
+  // edit, not final copy — machine translation does not know that "taar
+  // plaster" is a trade term rather than a phrase to translate literally.
+  async function translateToMarathi(i: number) {
+    const p = posts[i];
+    if (!p.title && !p.body) {
+      alert("Write the English post first.");
+      return;
+    }
+    if (p.mr?.body && !confirm("Replace the Marathi text already written for this post?")) return;
+    setTranslating(i);
+    try {
+      const res = await fetch("/api/admin/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: p.title, summary: p.summary, body: p.body }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d?.error || "Translation failed");
+      update(i, { mr: { title: d.title, summary: d.summary, body: d.body, faqs: p.mr?.faqs } });
+      setMsg("Translated — please read it through before publishing.");
+    } catch (e: any) {
+      alert(e?.message || "Could not translate. Please try again.");
+    } finally {
+      setTranslating(null);
+    }
   }
 
   async function uploadCover(i: number, file: File) {
@@ -269,11 +298,22 @@ export default function AdminBlog() {
                       <div className="text-xs font-bold uppercase tracking-widest text-amber">Marathi version</div>
                       <p className="mt-0.5 text-[11px] text-navy/50">
                         Optional. Fill all three and the post also appears at /mr/blog/{p.slug || "…"}.
+                        Translate gives you a draft — read it through and fix the trade terms before publishing.
                       </p>
                     </div>
-                    {p.mr?.title && p.mr?.body && (
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">LIVE</span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {p.mr?.title && p.mr?.body && (
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">LIVE</span>
+                      )}
+                      <button
+                        onClick={() => translateToMarathi(i)}
+                        disabled={translating !== null}
+                        className="flex items-center gap-1 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                      >
+                        <Languages className="h-3 w-3" />
+                        {translating === i ? "Translating…" : "Translate"}
+                      </button>
+                    </div>
                   </div>
                   <div className="space-y-3">
                     <div>
