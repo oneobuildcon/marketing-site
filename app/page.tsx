@@ -285,6 +285,9 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
 
 const fadeUp = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
+// Above the fold, never start invisible — the hero is the LCP element and
+// fading it in from opacity 0 delays the largest paint until hydration.
+const heroFade = { hidden: { opacity: 1, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
 function TypewriterText({ words }: { words: string[] }) {
   const [index, setIndex] = useState(0);
@@ -408,7 +411,7 @@ export default function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden bg-navy text-white" style={{ minHeight: "90vh", display: "flex", alignItems: "center" }}>
         <motion.div className="absolute inset-0" style={{ y: heroImgY }}>
-          <Image src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1600&q=80" alt="Premium bungalow" fill priority className="object-cover opacity-30 scale-110" />
+          <Image src="/projects/shinde/1.jpg" alt="Completed One O Buildcon bungalow in Charoli, Pune" fill priority sizes="100vw" className="object-cover opacity-30 scale-110" />
         </motion.div>
         <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "40px 40px", animation: "dotGridMove 8s linear infinite" }} />
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
@@ -424,26 +427,26 @@ export default function Home() {
 
         <div className="relative mx-auto max-w-6xl px-6 py-20 sm:py-28 w-full">
           <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col items-start gap-6">
-            <motion.div variants={fadeUp} className="flex items-center gap-2">
+            <motion.div variants={heroFade} className="flex items-center gap-2">
               <HardHat className="h-5 w-5 text-amber" />
               <p className="text-sm font-semibold uppercase tracking-widest text-amber-light">{t.badge}</p>
             </motion.div>
-            <motion.h1 variants={fadeUp} className="max-w-2xl text-3xl font-bold leading-tight sm:text-6xl">
+            <motion.h1 variants={heroFade} className="max-w-2xl text-3xl font-bold leading-tight sm:text-6xl">
               {t.heroTitle1}{" "}
               <span className="text-amber">{t.heroHighlight}</span>{" "}
               {t.heroTitle2}
             </motion.h1>
-            <motion.div variants={fadeUp} className="flex items-center gap-3 text-2xl font-bold sm:text-3xl">
+            <motion.div variants={heroFade} className="flex items-center gap-3 text-2xl font-bold sm:text-3xl">
               <span className="text-white/70">{t.weBuild}</span>
               <span className="min-w-[200px] inline-block">
                 <TypewriterText words={t.typewriterWords} />
               </span>
             </motion.div>
-            <motion.p variants={fadeUp} className="max-w-xl text-white/80 text-lg">{t.heroDesc}</motion.p>
-            <motion.div variants={fadeUp} className="w-48 h-0.5 bg-amber/30 relative overflow-hidden rounded-full">
+            <motion.p variants={heroFade} className="max-w-xl text-white/80 text-lg">{t.heroDesc}</motion.p>
+            <motion.div variants={heroFade} className="w-48 h-0.5 bg-amber/30 relative overflow-hidden rounded-full">
               <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-transparent via-amber to-transparent" style={{ animation: "shimmerSweep 2.5s ease-in-out infinite" }} />
             </motion.div>
-            <motion.div variants={fadeUp} className="flex flex-col w-full gap-3 sm:flex-row sm:flex-wrap sm:w-auto sm:gap-4">
+            <motion.div variants={heroFade} className="flex flex-col w-full gap-3 sm:flex-row sm:flex-wrap sm:w-auto sm:gap-4">
               <Link href="/contact" className="rounded-md bg-amber px-8 py-3 text-center font-semibold text-navy-dark transition hover:bg-amber-light hover:scale-105 transform">
                 {t.ctaMain}
               </Link>
