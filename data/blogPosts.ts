@@ -22,75 +22,96 @@ export type BlogPost = {
 export const defaultBlogPosts: BlogPost[] = [
   {
     slug: "house-construction-cost-per-sqft-pune",
-    title: "House Construction Cost per Sq.Ft in Pune — What You Actually Pay",
+    title: "House Construction Cost per Sq.Ft in Pune — 2026 Rates",
     summary:
-      "A straight explanation of what a per-sq.ft rate covers, what it never covers, and how built-up area is measured — so you can compare two quotations honestly.",
+      "Turnkey construction in Pune runs Rs. 1,499 to Rs. 2,099 per sq.ft in 2026, and Rs. 870 for RCC and brick work only. Here is what sits behind those figures, how built-up area is measured, and two real Pune projects worked through.",
     cover: "",
     date: "2026-08-06",
     published: true,
     author: "Avinash Shinde, Founder — One O Buildcon",
     faqs: [
-      { q: "What is the construction cost per sq.ft in Pune?", a: "It depends entirely on the specification behind the rate. A turnkey package covering structure, flooring, plumbing, electrical, doors, windows and painting sits in a different band from a structure-only rate. Ask for the itemised specification and the material rates considered before comparing any two figures." },
-      { q: "Is the rate applied to carpet area or built-up area?", a: "Built-up area. Plinth is usually counted at about 50% of the ground slab, upper floors at 100% each, and terrace at around 35% of the top slab. Ask for this calculation in writing — it changes the total more than the rate does." },
-      { q: "What is normally excluded from a construction quotation?", a: "Compound wall and gate, landscaping, external facade detailing, overhead RCC water tanks, borewell, electricity meter, water connection, and furniture or interior work. These exclusions are normal; the problem is only when they are not written down." },
-      { q: "Why do two contractors quote very different rates for the same house?", a: "Usually because they are quoting different houses. Check the material rates considered, the brands named, and how each measures built-up area. Once those three match, the rates become comparable." },
+      { q: "What is the construction cost per sq.ft in Pune in 2026?", a: "Turnkey construction runs about Rs. 1,499 to Rs. 2,099 per sq.ft depending on the finishing specification. RCC and brick work only is about Rs. 870 per sq.ft. GST at 18% is extra on the base amount." },
+      { q: "Is the rate applied to carpet area or built-up area?", a: "Built-up area. Plinth is counted at about 50% of the ground slab, upper floors at 100% each, and terrace at about 35% of the top slab. A 1,000 sq.ft footprint over two floors bills at roughly 2,850 sq.ft, not 2,000." },
+      { q: "How much does it cost to build a 2,000 sq.ft house in Pune?", a: "At a Standard turnkey rate of Rs. 1,649 per sq.ft, 2,000 sq.ft of built-up area works out to about Rs. 33 lakh before GST. The figure moves with the package chosen and the material selections made during construction." },
+      { q: "What is normally excluded from a construction quotation?", a: "Compound wall and gate, landscaping, external facade detailing, overhead RCC water tank, borewell, electricity meter, water connection, and furniture or interior work. These exclusions are normal; the problem is only when they are not written down." },
+      { q: "Why do two contractors quote very different rates for the same house?", a: "Usually because they are quoting different houses. Compare how each measures built-up area, the material rates they have considered, and the brands they name. Once those three match, the rates become comparable." },
     ],
-    body: `Almost every conversation about building a house in Pune starts the same way: "What is your rate per sq.ft?" It is a fair question, but the number on its own tells you very little. Two contractors can quote the same rate and hand you houses that differ by lakhs in value.
+    body: `Almost every conversation starts the same way: "What is your rate per sq.ft?" The short answer, for a bungalow in and around Pune in 2026, is **Rs. 1,499 to Rs. 2,099 per sq.ft for turnkey construction**, and **Rs. 870 per sq.ft if you want only the RCC and brick work**. The range depends on the finishing specification, not on the structure — the concrete and steel are much the same at either end.
 
-Here is what actually sits behind that figure.
+The longer answer matters more, because the rate alone will not tell you what a house costs. Two contractors can quote the same figure and hand you houses that differ by lakhs. What follows is our own rate card, how built-up area is actually measured, and two real projects worked through.
 
-## What a per-sq.ft rate includes
+## Our 2026 rates
 
-A turnkey rate should cover the structure and all the finishing work needed to hand you a house you can live in:
+| Package | Rate per sq.ft |
+| --- | --- |
+| RCC & brick work only | Rs. 870 |
+| Basic turnkey | Rs. 1,499 |
+| Standard turnkey | Rs. 1,649 |
+| Premium turnkey | Rs. 1,949 |
+| Royal turnkey | Rs. 2,099 |
 
-- Excavation-ready RCC work — footings, columns, beams, slabs
-- Brickwork and plaster, internal and external
-- Waterproofing for bathrooms and the terrace
-- Flooring, dado, granite for windows, doors and the kitchen platform
-- Plumbing, including fittings up to a stated rate
-- Electrical wiring, switches and points
-- Painting, internal and external
-- Doors, windows, grills and railings
+All rates are on built-up area, and GST at 18% is extra on the base amount.
 
-If a quotation does not list these line by line, you cannot tell what has been left out.
+## What separates Rs. 870 from Rs. 1,649
 
-## What it almost never includes
+The Rs. 870 rate covers the structure: footings, columns, beams, slabs, brickwork and plaster. You get a completed shell. Everything after that — flooring, granite, plumbing fittings, wiring, doors, windows, painting — is yours to arrange.
 
-This is where most disputes start. Standard exclusions across the industry are:
+The turnkey rates cover that same structure plus all the finishing work, with one contractor answerable for the whole house.
+
+So roughly **half the turnkey rate is structure and half is finishing**. That is the split worth understanding before you decide which route to take, because the finishing half is where your choices — and your time — actually go.
+
+## Built-up area is not floor area
+
+This is the part most people get wrong, and it changes the total more than the rate does.
+
+A house is not billed on carpet area. Built-up area is counted like this:
+
+- **Plinth** — about 50% of the ground slab area
+- **Ground floor** — 100% if it is living space, 50% if it is parking
+- **Upper floors** — 100% each
+- **Terrace** — about 35% of the top slab
+
+So a 1,000 sq.ft footprint over two floors is not 2,000 sq.ft of billing. Add plinth at 500 and terrace at 350 and you are near 2,850 sq.ft. At Rs. 1,649 that is the difference between Rs. 33 lakh and Rs. 47 lakh — on the same house, at the same rate.
+
+Ask any contractor to show you this calculation in writing before you compare their number with anyone else's.
+
+## Two real projects
+
+**Charoli, Pune — 5,565 sq.ft, completed 2025.** A modern bungalow with exposed brick accents, wooden louvers and open balconies. At our Standard turnkey rate of Rs. 1,649, a built-up area of 5,565 sq.ft works out to about **Rs. 91.7 lakh** before GST. At the Premium rate of Rs. 1,949 the same area would be about Rs. 1.08 crore.
+
+**Lohegaon, Pune — 5,700 sq.ft, under construction.** A premium bungalow built on an RCC structure with quality brickwork. At Rs. 1,949 per sq.ft, 5,700 sq.ft comes to roughly **Rs. 1.11 crore** before GST.
+
+Two things to note honestly. First, these are the arithmetic at the stated rates — the contracted value on any specific project depends on the package chosen and on selections made during construction. Second, both are large bungalows; a 2,000 to 3,000 sq.ft house is a far more common size, and at Rs. 1,649 that lands between Rs. 33 lakh and Rs. 49 lakh before GST.
+
+## What is not in the rate
+
+This is where most disputes begin. Standard exclusions, across the industry and in our own quotations:
 
 - Compound wall and gate
-- Landscaping
+- Landscaping outside the parking area
 - External facade detailing and mouldings
-- Overhead RCC water tanks
+- Overhead RCC water tank
 - Borewell, electricity meter and water connection
 - Furniture and interior work
+- Excavation and back-filling, on some packages
 
-None of these are unreasonable to exclude. The problem is only when they are not written down.
+None of these are unreasonable to exclude. The problem is only when they are not written down before you pay an advance.
 
-## How built-up area is measured
+## Why one contractor says Rs. 1,500 and another says Rs. 2,100
 
-This matters as much as the rate itself. A house is not billed on carpet area. The built-up area typically counts:
+Usually because they are quoting two different houses. Check three things and the gap normally explains itself:
 
-- **Plinth** — usually 50% of the ground slab area
-- **Ground floor** — 100% if it is living space, less if it is parking
-- **Upper floors** — 100% each
-- **Terrace** — usually around 35% of the top slab
+1. **The built-up area measurement.** If one counts terrace at 50% and the other at 35%, the rates are not comparable at all.
+2. **The material rates considered.** A quotation allowing Rs. 35 per sq.ft for tiles and one allowing Rs. 100 per sq.ft are different houses at the same headline rate.
+3. **The brands named.** Steel, cement, waterproofing, wiring, pipes and CP fittings should all be stated by name, not left as "standard quality".
 
-So a 1,000 sq.ft footprint over two floors is not 2,000 sq.ft of billing — with plinth and terrace it comes closer to 2,850. Ask any contractor to show you this breakdown in writing. If they will not, that is your answer.
+A quotation that does not contain all three is not a quotation. It is a number.
 
-## Comparing two quotations properly
+## What we put in writing
 
-Put them side by side and check three things:
+Every quotation we issue sets out the built-up area calculation floor by floor, the specification for each trade, the material rates considered, the brands used, a stage-wise payment schedule tied to completed work, and the exclusions. It is a five-page document, and it exists so you can compare us honestly against anyone else.
 
-1. **The same built-up area** — if one measures terrace at 50% and the other at 35%, the rates are not comparable at all.
-2. **The material rates considered** — a quotation that allows Rs. 35/sq.ft for tiles and one that allows Rs. 80/sq.ft are different houses at the same headline rate.
-3. **The brands named** — steel, cement, waterproofing, wiring and CP fittings should all be stated by name.
-
-## The honest summary
-
-A low rate is not a saving if the specification is thin, and a high rate is not quality if it is not itemised. Ask for the breakdown, read the exclusions, and compare like with like.
-
-If you would like a written quotation with all of this set out — built-up area calculation, material rates, brands and a stage-wise payment schedule — we are happy to prepare one for your plot.`,
+If you have a plot and a drawing, we will prepare one for your project.`,
   },
   {
     slug: "what-is-included-turnkey-construction-package",

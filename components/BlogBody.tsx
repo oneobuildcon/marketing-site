@@ -19,6 +19,7 @@ export default function BlogBody({ body }: { body: string }) {
   const lines = body.split("\n");
   let paragraph: string[] = [];
   let bullets: string[] = [];
+  let rows: string[][] = [];
 
   const flushParagraph = (key: string) => {
     if (!paragraph.length) return;
@@ -45,14 +46,56 @@ export default function BlogBody({ body }: { body: string }) {
     bullets = [];
   };
 
+  // "| a | b |" rows form a table; a "|---|---|" row marks the header divider.
+  const flushTable = (key: string) => {
+    if (!rows.length) return;
+    const body = rows.filter((r) => !r.every((c) => /^-{2,}$/.test(c.trim())));
+    const [head, ...rest] = body;
+    blocks.push(
+      <div key={key} className="mb-6 overflow-x-auto">
+        <table className="w-full min-w-[20rem] border-collapse text-sm">
+          <thead>
+            <tr className="bg-navy text-white">
+              {head.map((c, i) => (
+                <th key={i} className="border border-navy px-3 py-2 text-left font-semibold">
+                  {inline(c, `${key}-h${i}`)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rest.map((r, ri) => (
+              <tr key={ri} className={ri % 2 ? "bg-black/[0.02]" : ""}>
+                {r.map((c, ci) => (
+                  <td key={ci} className="border border-black/10 px-3 py-2 text-navy/80">
+                    {inline(c, `${key}-${ri}-${ci}`)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+    rows = [];
+  };
+
   lines.forEach((raw, i) => {
     const line = raw.trim();
     if (!line) {
+      flushTable(`t${i}`);
       flushBullets(`u${i}`);
       flushParagraph(`p${i}`);
       return;
     }
+    if (line.startsWith("|")) {
+      flushBullets(`u${i}`);
+      flushParagraph(`p${i}`);
+      rows.push(line.replace(/^\||\|$/g, "").split("|").map((c) => c.trim()));
+      return;
+    }
     if (line.startsWith("## ")) {
+      flushTable(`t${i}`);
       flushBullets(`u${i}`);
       flushParagraph(`p${i}`);
       blocks.push(
@@ -70,6 +113,7 @@ export default function BlogBody({ body }: { body: string }) {
     flushBullets(`u${i}`);
     paragraph.push(line);
   });
+  flushTable("t-end");
   flushBullets("u-end");
   flushParagraph("p-end");
 
