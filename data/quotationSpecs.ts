@@ -116,13 +116,13 @@ const basePresets: QuotationPreset[] = [
     brands: [
       { work: "Steel", items: ["Uma, Kalika or equivalent"] },
       { work: "Cement (RCC)", items: ["Birla Super 53 Grade"] },
-      { work: "Cement (Plaster)", items: ["JK Super 43 Grade"] },
+      { work: "Cement (All other work)", items: ["JK Super 43 Grade"] },
       { work: "Plumbing Pipes", items: ["Prince / Paras"] },
       { work: "CP Fittings", items: ["Cera or Varmora"] },
       { work: "Water Tank", items: ["Plasto"] },
       { work: "Waterproofing", items: ["Dr. Fixit URP and LW+"] },
       { work: "Electrical Work", items: ["Pipe — Diamond or Polycab", "Wire — Polycab", "Switch & Socket — Anchor Roma Penta"] },
-      { work: "Painting", items: ["Interior — Oil Bound Distemper (OBD)", "Exterior — Nerolac Suraksha Plus"] },
+      { work: "Painting", items: ["Interior — Oil Bound Distemper (OBD)", "Exterior — Nerolac Suraksha Plus", "Brand - Nerolac/Asian"] },
     ],
   },
   {
@@ -189,14 +189,14 @@ const basePresets: QuotationPreset[] = [
     brands: [
       { work: "Steel", items: ["Uma, Kalika or equivalent"] },
       { work: "Cement (RCC)", items: ["Birla Super 53 Grade"] },
-      { work: "Cement (Plaster)", items: ["JK Super 43 Grade"] },
+      { work: "Cement (All other work)", items: ["JK Super 43 Grade"] },
       { work: "Plumbing Pipes", items: ["Prince"] },
       { work: "CP Fittings", items: ["Cera or Varmora"] },
       { work: "Water Tank", items: ["Plasto"] },
       { work: "POP", items: ["Sadab Gypsum"] },
       { work: "Waterproofing", items: ["Dr. Fixit URP and LW+"] },
       { work: "Electrical Work", items: ["Pipe — Diamond or Polycab", "Wire — Polycab", "Switch & Socket — Anchor Roma Penta"] },
-      { work: "Painting", items: ["Interior — Nerolac Tractor Emulsion", "Exterior — Nerolac Suraksha Plus"] },
+      { work: "Painting", items: ["Interior — Nerolac Tractor Emulsion", "Exterior — Nerolac Suraksha Plus", "Brand - Nerolac/Asian"] },
     ],
   },
   {
@@ -236,7 +236,7 @@ const basePresets: QuotationPreset[] = [
     brands: [
       { work: "Steel", items: ["Uma / Kalika / equivalent (Fe 500 / 550)"] },
       { work: "Cement (RCC)", items: ["Birla Super"] },
-      { work: "Cement (Plaster)", items: ["JK Super"] },
+      { work: "Cement (All other work)", items: ["JK Super"] },
       { work: "Brick", items: ["Red brick / AAC block"] },
       { work: "Plaster Sand", items: ["M sand (plaster sand)"] },
       { work: "Aggregate", items: ["Crush sand for other work"] },
