@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Languages, Download } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 
@@ -36,6 +37,21 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { lang, setLang } = useLanguage();
   const t = navLabels[lang];
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Blog posts have real Marathi pages on their own URLs rather than a
+  // client-side swap, so the toggle has to navigate there instead of only
+  // flipping the language context.
+  function toggleLanguage() {
+    const next = lang === "en" ? "mr" : "en";
+    setLang(next);
+    if (next === "mr" && pathname.startsWith("/blog")) {
+      router.push("/mr" + pathname);
+    } else if (next === "en" && pathname.startsWith("/mr/blog")) {
+      router.push(pathname.replace(/^\/mr/, ""));
+    }
+  }
 
   const links = [
     { href: "/about", label: t.about },
@@ -70,7 +86,7 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-3">
           <button
-            onClick={() => setLang(lang === "en" ? "mr" : "en")}
+            onClick={toggleLanguage}
             className="flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/10 hover:border-amber/40"
             aria-label="Toggle language"
           >
@@ -123,7 +139,7 @@ export default function Navbar() {
           </li>
           <li>
             <button
-              onClick={() => { setLang(lang === "en" ? "mr" : "en"); setOpen(false); }}
+              onClick={() => { toggleLanguage(); setOpen(false); }}
               className="flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/10"
             >
               <Languages className="h-4 w-4 text-amber" />

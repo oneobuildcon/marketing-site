@@ -38,9 +38,10 @@ function formatDate(d: string) {
 }
 
 export default async function BlogIndex() {
-  const posts = (await getBlogPosts())
-    .filter((p) => p.published)
-    .sort((a, b) => b.date.localeCompare(a.date));
+  const all = await getBlogPosts();
+  const posts = all.filter((p) => p.published).sort((a, b) => b.date.localeCompare(a.date));
+  // Only offer the Marathi index if something is actually there to read.
+  const hasMarathi = posts.some((p) => p.mr?.title && p.mr?.body);
 
   return (
     <div className="bg-cream">
@@ -53,6 +54,11 @@ export default async function BlogIndex() {
             Straight answers about building a house in Pune — what things cost, what packages
             include, and what to ask before you hire anyone.
           </p>
+          {hasMarathi && (
+            <Link href="/mr/blog" className="mt-5 inline-block text-sm font-semibold text-amber-light hover:underline">
+              मराठीत वाचा →
+            </Link>
+          )}
         </div>
       </section>
 

@@ -111,12 +111,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       )}
 
       <article className="mx-auto max-w-3xl px-6 py-10 sm:py-14">
-        <Link
-          href="/blog"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm font-semibold text-navy/60 transition hover:text-amber"
-        >
-          <ArrowLeft className="h-4 w-4" /> All posts
-        </Link>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-navy/60 transition hover:text-amber"
+          >
+            <ArrowLeft className="h-4 w-4" /> All posts
+          </Link>
+          {post.mr?.title && post.mr?.body && (
+            <Link href={`/mr/blog/${post.slug}`} className="text-sm font-semibold text-amber hover:underline">
+              मराठीत वाचा →
+            </Link>
+          )}
+        </div>
 
         <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-amber">
           <span className="flex items-center gap-1.5">
