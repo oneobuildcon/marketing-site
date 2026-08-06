@@ -296,3 +296,39 @@ export async function saveBlogPosts(posts: BlogPost[]): Promise<void> {
     .upsert({ key: 'blog', value: { posts }, updated_at: new Date().toISOString() });
   if (error) throw error;
 }
+
+// ── Reviews entered by hand ─────────────────────────────────────────────────
+// Used when no review API is configured. The admin copies real Google reviews
+// in; nothing here is invented, and the display links out to Google so any
+// visitor can verify them.
+export type ManualReview = { author: string; rating: number; text: string; date: string };
+export type ManualReviews = { rating: number | null; total: number; url: string; items: ManualReview[] };
+
+const EMPTY_REVIEWS: ManualReviews = { rating: null, total: 0, url: '', items: [] };
+
+export async function getManualReviews(): Promise<ManualReviews> {
+  if (!hasSupabase()) return EMPTY_REVIEWS;
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'reviews')
+      .maybeSingle();
+    if (error) throw error;
+    const v = data?.value as ManualReviews | undefined;
+    if (v && Array.isArray(v.items)) return { ...EMPTY_REVIEWS, ...v };
+  } catch (e) {
+    console.error('getManualReviews:', e);
+  }
+  return EMPTY_REVIEWS;
+}
+
+export async function saveManualReviews(value: ManualReviews): Promise<void> {
+  if (!hasSupabase()) throw new Error('Database not configured');
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert({ key: 'reviews', value, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}

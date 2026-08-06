@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getManualReviews } from '@/lib/site-db';
 
 // Google Places API (New). Needs two environment variables:
 //   GOOGLE_PLACES_API_KEY — from Google Cloud, with Places API enabled
@@ -77,7 +78,21 @@ export async function GET() {
 
   const key = process.env.GOOGLE_PLACES_API_KEY;
   if (!key) {
-    return NextResponse.json({ configured: false, reviews: [], rating: null, total: 0 });
+    // No review API configured — fall back to the reviews entered in the admin.
+    const m = await getManualReviews();
+    return NextResponse.json({
+      configured: m.items.length > 0,
+      source: 'manual',
+      rating: m.rating,
+      total: m.total,
+      mapsUrl: m.url || null,
+      reviews: m.items.map((r) => ({
+        author: r.author,
+        rating: r.rating,
+        text: r.text,
+        relative: r.date,
+      })),
+    });
   }
 
   try {

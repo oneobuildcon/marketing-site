@@ -58,6 +58,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <FileText className="h-4 w-4 text-amber" /> Blog
           </Link>
           <Link
+            href="/admin/reviews"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/5 hover:text-white"
+          >
+            <Star className="h-4 w-4 text-amber" /> Reviews
+          </Link>
+          <Link
             href="/admin/review-request"
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/5 hover:text-white"
           >
