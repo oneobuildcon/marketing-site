@@ -1097,7 +1097,7 @@ export default function CalculatorPage() {
           "@context": "https://schema.org",
           "@type": "FAQPage",
           mainEntity: [
-            { "@type": "Question", name: "What is the construction cost per sq ft in Pune in 2026?", acceptedAnswer: { "@type": "Answer", text: "Construction cost in Pune depends on the package and finishes you choose. One O Buildcon packages start from ₹1,499 per sq.ft (incl. GST). Use the calculator on this page for an instant estimate for your specific home." } },
+            { "@type": "Question", name: "What is the construction cost per sq ft in Pune in 2026?", acceptedAnswer: { "@type": "Answer", text: "Construction cost in Pune depends on the package and finishes you choose. One O Buildcon packages start from ₹1,499 per sq.ft, with GST at 18% extra on the base amount. Use the calculator on this page for an instant estimate for your specific home." } },
             { "@type": "Question", name: "How is built-up area calculated?", acceptedAnswer: { "@type": "Answer", text: "Built-up area is estimated floor by floor. Our calculator adds each floor's slab area, plus about 50% of the ground slab for the plinth and 35% of the top slab for the terrace." } },
             { "@type": "Question", name: "Does the estimate include GST?", acceptedAnswer: { "@type": "Answer", text: "Yes. The calculator shows both the base construction cost and the total including 18% GST." } },
             { "@type": "Question", name: "Is the calculator estimate final?", acceptedAnswer: { "@type": "Answer", text: "It is an accurate ballpark based on your area and chosen package. For a fixed figure, our team does a free site visit and prepares a detailed quotation." } },
@@ -1120,7 +1120,7 @@ export default function CalculatorPage() {
               </ul>
               <h3 className="text-lg font-bold text-navy pt-2">What's included in our packages?</h3>
               <p>Every One O Buildcon package covers design &amp; drawings, earthwork, RCC structure, brickwork &amp; plaster, waterproofing, flooring, kitchen, bathroom, doors, windows, plumbing and electrical work. See our <Link href="/packages" className="text-amber font-semibold hover:underline">packages page</Link> for a full breakdown, or explore <Link href="/rcc-contractor-pune" className="text-amber font-semibold hover:underline">RCC contractor services in Pune</Link>.</p>
-              <p className="text-sm text-navy/50 pt-2">Construction cost per sq ft in Pune starts from ₹1,499 (incl. GST) with One O Buildcon. Get a free, detailed, site-specific quotation from our team.</p>
+              <p className="text-sm text-navy/50 pt-2">Construction cost per sq ft in Pune starts from ₹1,499 with One O Buildcon, GST extra. Get a free, detailed, site-specific quotation from our team.</p>
             </div>
           ) : (
             <div className="space-y-4 text-navy/75">
