@@ -44,6 +44,26 @@ async function fromFeaturable(widgetId: string) {
   };
 }
 
+// Looking up the Place ID by hand is fiddly, so the API does it: one text
+// search for the business name, cached like everything else. Set
+// GOOGLE_PLACE_ID explicitly to skip this and save a call.
+async function findPlaceId(key: string): Promise<string | null> {
+  const query = process.env.GOOGLE_PLACE_QUERY || 'ONE O BUILDCON, Charholi, Pune';
+  const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': key,
+      'X-Goog-FieldMask': 'places.id,places.displayName',
+    },
+    body: JSON.stringify({ textQuery: query, maxResultCount: 1 }),
+    next: { revalidate },
+  });
+  if (!res.ok) throw new Error(`Place search returned ${res.status}`);
+  const d = (await res.json()) as any;
+  return d?.places?.[0]?.id ?? null;
+}
+
 export async function GET() {
   const widgetId = process.env.FEATURABLE_WIDGET_ID;
   if (widgetId) {
@@ -56,12 +76,15 @@ export async function GET() {
   }
 
   const key = process.env.GOOGLE_PLACES_API_KEY;
-  const placeId = process.env.GOOGLE_PLACE_ID;
-  if (!key || !placeId) {
+  if (!key) {
     return NextResponse.json({ configured: false, reviews: [], rating: null, total: 0 });
   }
 
   try {
+    const placeId = process.env.GOOGLE_PLACE_ID || (await findPlaceId(key));
+    if (!placeId) {
+      return NextResponse.json({ configured: true, reviews: [], rating: null, total: 0, error: 'Business not found' });
+    }
     const res = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
       headers: {
         'X-Goog-Api-Key': key,
