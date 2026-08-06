@@ -13,6 +13,7 @@ const navLabels = {
     projects: "Projects",
     gallery: "Gallery",
     calculator: "Calculator",
+    blog: "Blog",
     contact: "Contact",
     getQuote: "Get a Quote",
     toggleLabel: "मराठी",
@@ -24,6 +25,7 @@ const navLabels = {
     projects: "प्रकल्प",
     gallery: "गॅलरी",
     calculator: "कॅल्क्युलेटर",
+    blog: "ब्लॉग",
     contact: "संपर्क करा",
     getQuote: "कोटेशन मागवा",
     toggleLabel: "English",
@@ -42,6 +44,7 @@ export default function Navbar() {
     { href: "/projects", label: t.projects },
     { href: "/gallery", label: t.gallery },
     { href: "/calculator", label: t.calculator },
+    { href: "/blog", label: t.blog },
     { href: "/contact", label: t.contact },
   ];
 

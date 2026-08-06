@@ -1,0 +1,120 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, CalendarDays, Phone } from "lucide-react";
+import BlogBody from "@/components/BlogBody";
+import { getBlogPosts } from "@/lib/site-db";
+
+export const dynamic = "force-dynamic";
+
+async function findPost(slug: string) {
+  const posts = await getBlogPosts();
+  return posts.find((p) => p.slug === slug && p.published) ?? null;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await findPost(slug);
+  if (!post) return { title: "Post not found | One O Buildcon" };
+  const url = `https://oneobuildcon.com/blog/${post.slug}`;
+  return {
+    title: `${post.title} | One O Buildcon`,
+    description: post.summary,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.summary,
+      url,
+      siteName: "One O Buildcon",
+      publishedTime: post.date,
+      ...(post.cover ? { images: [{ url: post.cover }] } : {}),
+    },
+  };
+}
+
+function formatDate(d: string) {
+  const dt = new Date(d);
+  return isNaN(dt.getTime())
+    ? d
+    : dt.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+}
+
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = await findPost(slug);
+  if (!post) notFound();
+
+  // Article structured data, so the post can show a headline and date in search.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.summary,
+    datePublished: post.date,
+    ...(post.cover ? { image: post.cover } : {}),
+    author: { "@type": "Organization", name: "One O Buildcon" },
+    publisher: {
+      "@type": "Organization",
+      name: "One O Buildcon",
+      logo: { "@type": "ImageObject", url: "https://oneobuildcon.com/logo.png" },
+    },
+    mainEntityOfPage: `https://oneobuildcon.com/blog/${post.slug}`,
+  };
+
+  return (
+    <div className="bg-cream">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
+      <article className="mx-auto max-w-3xl px-6 py-10 sm:py-14">
+        <Link
+          href="/blog"
+          className="mb-6 inline-flex items-center gap-1.5 text-sm font-semibold text-navy/60 transition hover:text-amber"
+        >
+          <ArrowLeft className="h-4 w-4" /> All posts
+        </Link>
+
+        <div className="mb-3 flex items-center gap-1.5 text-xs font-semibold text-amber">
+          <CalendarDays className="h-3.5 w-3.5" /> {formatDate(post.date)}
+        </div>
+        <h1 className="mb-4 text-2xl font-bold leading-tight text-navy sm:text-4xl">{post.title}</h1>
+        <p className="mb-8 border-l-4 border-amber pl-4 text-base leading-relaxed text-navy/70">
+          {post.summary}
+        </p>
+
+        {post.cover && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={post.cover} alt={post.title} className="mb-8 w-full rounded-2xl object-cover" />
+        )}
+
+        <BlogBody body={post.body} />
+
+        <div className="mt-12 rounded-2xl border border-amber/30 bg-amber/5 p-6">
+          <h2 className="mb-2 text-lg font-bold text-navy">Planning to build in Pune?</h2>
+          <p className="mb-4 text-sm leading-relaxed text-navy/70">
+            We prepare written quotations with the built-up area calculation, material rates, brands
+            and a stage-wise payment schedule set out in full — so you can compare honestly.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 rounded-xl bg-amber px-5 py-2.5 text-sm font-semibold text-navy-dark transition hover:bg-amber-light"
+            >
+              <Phone className="h-4 w-4" /> Get a quotation
+            </Link>
+            <Link
+              href="/calculator"
+              className="inline-flex items-center gap-2 rounded-xl border border-navy/20 px-5 py-2.5 text-sm font-semibold text-navy transition hover:bg-navy/5"
+            >
+              Cost calculator
+            </Link>
+          </div>
+        </div>
+      </article>
+    </div>
+  );
+}

@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { getProjects } from "@/lib/db";
 import { serviceAreas } from "@/lib/serviceAreas";
+import { getBlogPosts } from "@/lib/site-db";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -18,6 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/packages`, priority: 0.6, changeFrequency: "monthly" as const },
     { url: `${base}/company-profile`, priority: 0.5, changeFrequency: "monthly" as const },
     { url: `${base}/gallery`, priority: 0.6, changeFrequency: "weekly" as const },
+    { url: `${base}/blog`, priority: 0.7, changeFrequency: "weekly" as const },
     ...serviceAreas.map((a) => ({ url: `${base}/${a.slug}`, priority: 0.8, changeFrequency: "monthly" as const })),
   ];
 
@@ -35,5 +37,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("sitemap: could not load projects:", e);
   }
 
-  return [...staticPages, ...projectPages];
+  let blogPages: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await getBlogPosts();
+    blogPages = posts
+      .filter((p) => p.published)
+      .map((p) => ({
+        url: `${base}/blog/${p.slug}`,
+        lastModified: new Date(p.date),
+        priority: 0.7,
+        changeFrequency: "monthly" as const,
+      }));
+  } catch (e) {
+    console.error("sitemap: could not load blog posts:", e);
+  }
+
+  return [...staticPages, ...projectPages, ...blogPages];
 }

@@ -262,3 +262,37 @@ export async function saveQuotationOverrides(value: QuotationOverrides): Promise
     .upsert({ key: 'quotationSpecs', value, updated_at: new Date().toISOString() });
   if (error) throw error;
 }
+
+// ── Blog ────────────────────────────────────────────────────────────────────
+// Posts live in site_settings as one JSON array, which avoids a schema
+// migration and is plenty for the volume a company blog carries. The starter
+// posts in data/blogPosts.ts are used until the admin saves for the first time.
+import { defaultBlogPosts, type BlogPost } from '@/data/blogPosts';
+export type { BlogPost };
+
+export async function getBlogPosts(): Promise<BlogPost[]> {
+  if (!hasSupabase()) return defaultBlogPosts;
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'blog')
+      .maybeSingle();
+    if (error) throw error;
+    const v = data?.value as { posts?: BlogPost[] } | undefined;
+    if (v?.posts && Array.isArray(v.posts)) return v.posts;
+  } catch (e) {
+    console.error('getBlogPosts: falling back to starter posts:', e);
+  }
+  return defaultBlogPosts;
+}
+
+export async function saveBlogPosts(posts: BlogPost[]): Promise<void> {
+  if (!hasSupabase()) throw new Error('Database not configured');
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert({ key: 'blog', value: { posts }, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}
