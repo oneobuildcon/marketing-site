@@ -411,7 +411,9 @@ export default function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden bg-navy text-white" style={{ minHeight: "90vh", display: "flex", alignItems: "center" }}>
         <motion.div className="absolute inset-0" style={{ y: heroImgY }}>
-          <Image src="/hero.jpg" alt="Completed One O Buildcon bungalow in Charoli, Pune" fill priority sizes="(max-width: 768px) 100vw, 1280px" quality={60} className="object-cover opacity-30 scale-110" />
+          {/* Already cropped and compressed to 74 KB, so it skips the image optimiser
+              — that round-trip costs more on a slow connection than the bytes it saves. */}
+          <Image src="/hero.jpg" alt="Completed One O Buildcon bungalow in Charoli, Pune" fill priority unoptimized sizes="100vw" className="object-cover opacity-30 scale-110" />
         </motion.div>
         <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "40px 40px", animation: "dotGridMove 8s linear infinite" }} />
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
