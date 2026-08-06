@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Save, Eye, EyeOff, FileText, Upload, DownloadCloud } from "lucide-react";
+import { Plus, Trash2, Save, Eye, EyeOff, FileText, Upload, DownloadCloud, RefreshCw } from "lucide-react";
 import { defaultBlogPosts, type BlogPost } from "@/data/blogPosts";
 
 const input =
@@ -84,6 +84,30 @@ export default function AdminBlog() {
     setMsg(`${missing.length} added — press Save all to keep them.`);
   }
 
+  // Refreshes the writing on posts that exist in both places, keeping the
+  // cover image, date and published state the admin has set.
+  function refreshText() {
+    const bySlug = new Map(defaultBlogPosts.map((p) => [p.slug, p]));
+    const changed = posts.filter((p) => {
+      const d = bySlug.get(p.slug);
+      return d && (d.title !== p.title || d.summary !== p.summary || d.body !== p.body);
+    });
+    if (!changed.length) {
+      setMsg("Nothing to refresh — the writing is already up to date.");
+      return;
+    }
+    if (!confirm(`Refresh the writing on ${changed.length} post${changed.length > 1 ? "s" : ""}?\n\n${changed.map((p) => "• " + p.title).join("\n")}\n\nYour cover images, dates and published settings are kept. Any wording you typed yourself on these posts will be replaced.`)) return;
+    setPosts(
+      posts.map((p) => {
+        const d = bySlug.get(p.slug);
+        if (!d) return p;
+        // Keep what the admin controls; take the writing from the defaults.
+        return { ...d, cover: p.cover, date: p.date, published: p.published };
+      })
+    );
+    setMsg(`${changed.length} refreshed — press Save all to keep them.`);
+  }
+
   function removePost(i: number) {
     if (!confirm(`Delete "${posts[i].title || "this post"}"? This cannot be undone once saved.`)) return;
     setPosts(posts.filter((_, j) => j !== i));
@@ -123,6 +147,13 @@ export default function AdminBlog() {
             className="flex items-center gap-1 rounded-lg border border-navy/20 px-3 py-2 text-xs font-semibold text-navy hover:bg-navy/5"
           >
             <DownloadCloud className="h-3.5 w-3.5" /> Get new posts
+          </button>
+          <button
+            onClick={refreshText}
+            title="Update the writing on existing posts, keeping your images and dates"
+            className="flex items-center gap-1 rounded-lg border border-navy/20 px-3 py-2 text-xs font-semibold text-navy hover:bg-navy/5"
+          >
+            <RefreshCw className="h-3.5 w-3.5" /> Refresh text
           </button>
           <button
             onClick={addPost}
