@@ -27,7 +27,8 @@ const uiTranslations = {
     heroSub: "Every package is built around quality, honesty, and on-time delivery. Choose what fits your vision.",
     youSelected: "You selected",
     packageSuffix: "Package",
-    inclGST: "(GST extra)",
+    inclGST: "+ GST",
+    gstNote: "All prices are base rates. GST at 18% is charged extra on the base amount.",
     perSqft: "per sqft",
     popular: "Popular",
     getQuote: "Get Free Quote →",
@@ -43,7 +44,8 @@ const uiTranslations = {
     heroSub: "प्रत्येक पॅकेज दर्जा, प्रामाणिकता आणि वेळेवर डिलिव्हरीवर आधारित आहे. तुमच्या दृष्टीनुसार योग्य ते निवडा.",
     youSelected: "तुम्ही निवडले",
     packageSuffix: "पॅकेज",
-    inclGST: "(GST अतिरिक्त)",
+    inclGST: "+ GST",
+    gstNote: "सर्व दर हे मूळ दर आहेत. मूळ रकमेवर १८% जीएसटी अतिरिक्त आकारला जातो.",
     perSqft: "प्रति चौ.फू.",
     popular: "लोकप्रिय",
     getQuote: "मोफत कोटेशन →",
@@ -230,8 +232,11 @@ export default function Packages({ initial }: { initial: PackagesData }) {
               <h2 className="text-2xl font-bold text-navy mt-1">
                 {pkgInfo?.name} {ui.packageSuffix}
                 <span className="ml-3 text-lg font-semibold text-amber">₹{pkgInfo?.price}/sqft</span>
-                <span className="ml-1 text-sm text-navy/40 font-normal">{ui.inclGST}</span>
+                <span className="ml-1 text-sm text-navy/50 font-normal">{ui.inclGST}</span>
               </h2>
+              {/* Stated plainly so crawlers and AI summaries cannot mistake the
+                  rate for a GST-inclusive price. */}
+              <p className="mt-2 text-sm text-navy/60">{ui.gstNote}</p>
             </div>
             <Link
               href="/contact"
