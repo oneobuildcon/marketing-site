@@ -27,6 +27,7 @@ import {
 import { useLanguage } from "@/lib/LanguageContext";
 import InstagramFeed from "@/components/InstagramFeed";
 import GoogleReviews from "@/components/GoogleReviews";
+import FeaturableReviews from "@/components/FeaturableReviews";
 import FAQ from "@/components/FAQ";
 import CraneAnimation from "@/components/CraneAnimation";
 
@@ -659,9 +660,9 @@ export default function Home() {
               <Star className="h-4 w-4 fill-navy-dark" /> {lang === "en" ? "Review us on Google" : "Google वर रिव्ह्यू द्या"}
             </a>
           </motion.div>
-          {/* Live from the Google Business Profile when the Places API is set up. */}
+          {/* Live from the Google Business Profile, via Featurable's embed. */}
           <div className="mt-10">
-            <GoogleReviews lang={lang} onLoaded={setHasLiveReviews} />
+            <FeaturableReviews onLoaded={setHasLiveReviews} />
           </div>
 
           {/* Shown until live reviews are available, so the section is never empty. */}
