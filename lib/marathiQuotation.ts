@@ -132,6 +132,14 @@ export const TERMS: Record<string, string> = {
   "Before Painting": "रंगकामापूर्वी",
   "On Handover / Possession": "ताबा देताना",
   "Not included.": "समाविष्ट नाही.",
+
+  // ── Specification lines translated by hand ──
+  // Digits stay in ASCII, as they do in the measurements on every other
+  // specification line (12 मिमी, 600 x 600).
+  "Floor-to-floor height considered as 10 feet.":
+    "मजल्यापासून मजल्यापर्यंतची उंची 10 फूट मानली जाते.",
+  "Floor-to-floor height considered as 11 feet.":
+    "मजल्यापासून मजल्यापर्यंतची उंची 11 फूट मानली जाते.",
 };
 
 /**

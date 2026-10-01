@@ -60,6 +60,7 @@ const basePresets: QuotationPreset[] = [
     sections: [
       { title: "RCC WORK", items: [
         "As per the architect's drawing, with plate shuttering for slabs.",
+        "Floor-to-floor height considered as 10 feet.",
       ]},
       { title: "BRICKWORK, PLASTER & WATERPROOFING", items: [
         `Brick work as per the architect's drawing, in red brick. All walls 6".`,
@@ -133,6 +134,7 @@ const basePresets: QuotationPreset[] = [
     sections: [
       { title: "RCC WORK", items: [
         "As per the architect's drawing, with plate shuttering for slabs.",
+        "Floor-to-floor height considered as 10 feet.",
       ]},
       { title: "BRICKWORK, PLASTER & WATERPROOFING", items: [
         `Brick work as per the architect's drawing, in red brick. Outer walls 9", internal walls 6".`,
