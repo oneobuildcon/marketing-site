@@ -1151,6 +1151,22 @@ export default function AdminQuotation() {
   // Machine translations are reused across rebuilds — the specs rarely change
   // between pressing Preview and pressing WhatsApp.
   const mrCache = useRef<Record<string, string>>({});
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const MR_CACHE_KEY = "oneo_quotation_mr_cache";
+
+  // Translations survive a page reload, so re-issuing a quotation is instant.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(MR_CACHE_KEY);
+      if (saved) mrCache.current = JSON.parse(saved) || {};
+    } catch {}
+  }, []);
+
+  function saveCache() {
+    try {
+      localStorage.setItem(MR_CACHE_KEY, JSON.stringify(mrCache.current));
+    } catch {}
+  }
 
   // Headings, stage names and floor labels come from a hand-written dictionary
   // so they read the way a builder in Pune would say them. A trailing "(50%)"
@@ -1164,7 +1180,12 @@ export default function AdminQuotation() {
     return null;
   }
 
-  /** Translates everything not in the dictionary, in one batched request. */
+  /**
+   * Translates everything not in the dictionary. Sent in small batches rather
+   * than one large request, because a long translation exceeds the serverless
+   * timeout and the whole thing is lost. Results are cached in the browser, so
+   * the second build of the same quotation needs no network at all.
+   */
   async function toMarathi(strings: string[]): Promise<Record<string, string>> {
     const out: Record<string, string> = {};
     const need: string[] = [];
@@ -1176,20 +1197,56 @@ export default function AdminQuotation() {
       else if (mrCache.current[src]) out[src] = mrCache.current[src];
       else if (!need.includes(src)) need.push(src);
     }
-    if (need.length) {
-      const res = await fetch("/api/admin/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: need }),
-      });
-      const d = await res.json();
-      if (!res.ok) throw new Error(d?.error || "Translation failed");
-      need.forEach((src, i) => {
-        const mr = polish((d.items?.[i] || src).toString());
+    if (!need.length) return out;
+
+    const BATCH = 15;
+    const batches: string[][] = [];
+    for (let i = 0; i < need.length; i += BATCH) batches.push(need.slice(i, i + BATCH));
+
+    let done = 0;
+    setProgress({ done: 0, total: batches.length });
+
+    // Three at a time: fast enough on a phone, gentle enough that the free
+    // translation endpoint does not start refusing bursts.
+    const results: (string[] | null)[] = new Array(batches.length).fill(null);
+    let next = 0;
+    async function worker() {
+      while (next < batches.length) {
+        const idx = next++;
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 45_000);
+        try {
+          const res = await fetch("/api/admin/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ items: batches[idx] }),
+            signal: ctrl.signal,
+          });
+          const d = await res.json();
+          if (!res.ok) throw new Error(d?.error || "Translation failed");
+          results[idx] = d.items;
+        } catch (e: any) {
+          throw new Error(
+            e?.name === "AbortError"
+              ? "Translation timed out. Please check your connection and try again."
+              : e?.message || "Translation failed"
+          );
+        } finally {
+          clearTimeout(timer);
+          setProgress({ done: ++done, total: batches.length });
+        }
+      }
+    }
+    await Promise.all([worker(), worker(), worker()]);
+
+    batches.forEach((batch, bi) => {
+      batch.forEach((src, i) => {
+        const mr = polish((results[bi]?.[i] || src).toString());
         mrCache.current[src] = mr;
         out[src] = mr;
       });
-    }
+    });
+    saveCache();
     return out;
   }
 
@@ -1237,6 +1294,7 @@ export default function AdminQuotation() {
       return await buildMarathiDoc();
     } finally {
       setTranslating(false);
+      setProgress(null);
     }
   }
 
@@ -1272,8 +1330,17 @@ export default function AdminQuotation() {
       else window.open(url, "_blank"); // popups blocked outright — try anyway
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } catch (e: any) {
-      tab?.close();
-      alert(e?.message || "Could not generate the PDF. Please try again.");
+      const msg = e?.message || "Could not generate the PDF. Please try again.";
+      // The message has to land in the tab being looked at, not behind it.
+      if (tab && !tab.closed) {
+        tab.document.body.innerHTML =
+          '<div style="font-family:system-ui;color:#171e30;padding:40px;max-width:40rem;margin:auto">' +
+          "<h2>Could not generate the quotation</h2><p>" +
+          msg.replace(/[<>&]/g, "") +
+          "</p></div>";
+      } else {
+        alert(msg);
+      }
     }
   }
 
@@ -1353,7 +1420,9 @@ export default function AdminQuotation() {
         </button>
       ))}
       {translating && (
-        <span className="px-2 text-[11px] font-semibold text-navy/50">तयार होत आहे…</span>
+        <span className="px-2 text-[11px] font-semibold text-navy/50">
+          तयार होत आहे… {progress && progress.total > 1 ? `${progress.done}/${progress.total}` : ""}
+        </span>
       )}
     </div>
   );

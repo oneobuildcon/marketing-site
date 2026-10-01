@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
+// Translation is several sequential round-trips; the default serverless
+// timeout is short enough to cut a long batch off mid-way.
+export const maxDuration = 60;
 
 const ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
 

@@ -65,11 +65,17 @@ async function ensureFont() {
     document.head.appendChild(link);
   }
   try {
-    await Promise.all([
-      (document as any).fonts?.load('400 14px "Noto Sans Devanagari"'),
-      (document as any).fonts?.load('700 14px "Noto Sans Devanagari"'),
+    // Capped, so a slow or blocked font host cannot stall the whole build.
+    await Promise.race([
+      (async () => {
+        await Promise.all([
+          (document as any).fonts?.load('400 14px "Noto Sans Devanagari"'),
+          (document as any).fonts?.load('700 14px "Noto Sans Devanagari"'),
+        ]);
+        await (document as any).fonts?.ready;
+      })(),
+      new Promise((r) => setTimeout(r, 8000)),
     ]);
-    await (document as any).fonts?.ready;
   } catch {
     // Font unavailable (offline, blocked) — the layout still renders in a
     // fallback face rather than failing outright.
