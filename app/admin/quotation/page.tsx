@@ -9,6 +9,7 @@ import {
   type RateGroup,
 } from "@/data/quotationSpecs";
 import { TERMS, polish } from "@/lib/marathiQuotation";
+import { GLOSSARY } from "@/lib/marathiGlossary";
 import { buildMarathiPDF } from "@/lib/renderMarathiQuotation";
 
 // Header + bank details rarely change, so they persist in localStorage.
@@ -1196,6 +1197,10 @@ export default function AdminQuotation() {
     if (TERMS[t]) return TERMS[t];
     const m = t.match(/^(.*?)\s*\((\d+(?:\.\d+)?%)\)$/);
     if (m && TERMS[m[1].trim()]) return `${TERMS[m[1].trim()]} (${m[2]})`;
+    // Every unedited package line was translated once at build time, so a
+    // Marathi quotation normally needs no network at all. polish() runs over it
+    // so later corrections reach these lines without regenerating the file.
+    if (GLOSSARY[t]) return polish(GLOSSARY[t]);
     return null;
   }
 

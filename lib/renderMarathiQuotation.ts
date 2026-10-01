@@ -81,25 +81,28 @@ async function shrink(mark: Mark, targetW: number): Promise<Mark> {
 const esc = (s: string) =>
   String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
+const FONT_HREF =
+  "https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap";
+
 /** Loads the Devanagari webfont and waits for it, so nothing rasterises in a fallback face. */
-async function ensureFont() {
+async function ensureFont(doc: Document) {
   const ID = "noto-devanagari-quotation";
-  if (!document.getElementById(ID)) {
-    const link = document.createElement("link");
+  if (!doc.getElementById(ID)) {
+    const link = doc.createElement("link");
     link.id = ID;
     link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap";
-    document.head.appendChild(link);
+    link.href = FONT_HREF;
+    doc.head.appendChild(link);
   }
   try {
     // Capped, so a slow or blocked font host cannot stall the whole build.
     await Promise.race([
       (async () => {
         await Promise.all([
-          (document as any).fonts?.load('400 14px "Noto Sans Devanagari"'),
-          (document as any).fonts?.load('700 14px "Noto Sans Devanagari"'),
+          (doc as any).fonts?.load('400 14px "Noto Sans Devanagari"'),
+          (doc as any).fonts?.load('700 14px "Noto Sans Devanagari"'),
         ]);
-        await (document as any).fonts?.ready;
+        await (doc as any).fonts?.ready;
       })(),
       new Promise((r) => setTimeout(r, 8000)),
     ]);
@@ -107,6 +110,41 @@ async function ensureFont() {
     // Font unavailable (offline, blocked) — the layout still renders in a
     // fallback face rather than failing outright.
   }
+}
+
+/**
+ * The pages are laid out inside a bare iframe rather than on the admin page.
+ * html2canvas clones the whole document each time it rasterises, and the admin
+ * page is a very large form — cloning it once per page was the slowest part of
+ * building a Marathi quotation. An empty document costs almost nothing.
+ */
+async function openStage(): Promise<{ host: HTMLElement; close: () => void }> {
+  const frame = document.createElement("iframe");
+  frame.setAttribute("aria-hidden", "true");
+  frame.style.cssText =
+    `position:fixed;left:-20000px;top:0;width:${PAGE_W}px;height:${PAGE_H}px;border:0;visibility:hidden;`;
+  document.body.appendChild(frame);
+
+  const fdoc = frame.contentDocument;
+  // No same-document fallback is possible if the iframe is blocked, so the
+  // caller gets the error rather than a half-rendered quotation.
+  if (!fdoc) {
+    frame.remove();
+    throw new Error("Could not prepare the page for rendering.");
+  }
+  fdoc.open();
+  fdoc.write(
+    `<!doctype html><html><head><meta charset="utf-8">` +
+      `<style>html,body{margin:0;padding:0;background:#fff;}</style>` +
+      `</head><body></body></html>`
+  );
+  fdoc.close();
+
+  const host = fdoc.body;
+  host.style.cssText =
+    `width:${PAGE_W}px;background:#fff;font-family:"Noto Sans Devanagari",sans-serif;color:${NAVY};`;
+  await ensureFont(fdoc);
+  return { host, close: () => frame.remove() };
 }
 
 /** One block of the document: an element plus whether it must start a page. */
@@ -353,7 +391,8 @@ async function paginate(blocks: Block[], host: HTMLElement): Promise<HTMLElement
   // them let the running total drift below the real one, so the last block on a
   // page ran over the footer.
   const heights = blocks.map((b) => {
-    const cs = getComputedStyle(b.el);
+    // Measured through the stage's own window — the blocks live in the iframe.
+    const cs = (b.el.ownerDocument.defaultView || window).getComputedStyle(b.el);
     return b.el.offsetHeight + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
   });
 
@@ -413,13 +452,7 @@ export async function buildMarathiPDF(
     import("jspdf"),
     import("html2canvas").then((m) => m.default),
   ]);
-  await ensureFont();
-
-  const host = document.createElement("div");
-  host.style.cssText =
-    `position:fixed;left:-20000px;top:0;width:${PAGE_W}px;background:#fff;z-index:-1;` +
-    `font-family:"Noto Sans Devanagari",sans-serif;color:${NAVY};`;
-  document.body.appendChild(host);
+  const { host, close } = await openStage();
 
   try {
     const [logo, stamp, sign] = await Promise.all([
@@ -455,6 +488,6 @@ export async function buildMarathiPDF(
     }
     return doc;
   } finally {
-    host.remove();
+    close();
   }
 }

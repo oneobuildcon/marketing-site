@@ -37,7 +37,7 @@ export const L = {
   amount: "रक्कम",
   total: "एकूण",
   sqft: "चौ.फूट",
-  gstNote: "मूळ रकमेवर १८% जीएसटी अतिरिक्त, विशेष सूचनांनुसार.",
+  gstNote: "मूळ रकमेवर 18% जीएसटी अतिरिक्त, विशेष सूचनांनुसार.",
   paymentSchedule: "टप्प्यानुसार पेमेंट शेड्यूल",
   srNo: "अ.क्र.",
   stageOfWork: "कामाचा टप्पा",
@@ -122,7 +122,7 @@ export const TERMS: Record<string, string> = {
   "After 5th RCC Slab": "पाचव्या आरसीसी स्लॅबनंतर",
   "After 6th RCC Slab": "सहाव्या आरसीसी स्लॅबनंतर",
   "After Brickwork (all floors)": "विटकामानंतर (सर्व मजले)",
-  "After Brickwork (2 Floors)": "विटकामानंतर (२ मजले)",
+  "After Brickwork (2 Floors)": "विटकामानंतर (2 मजले)",
   "After Plaster (all floors)": "प्लास्टरनंतर (सर्व मजले)",
   "After Tile & Plumbing Work": "टाइल व प्लंबिंग कामानंतर",
   "After Electrical & POP Work": "इलेक्ट्रिकल व पीओपी कामानंतर",
@@ -132,6 +132,10 @@ export const TERMS: Record<string, string> = {
   "Before Painting": "रंगकामापूर्वी",
   "On Handover / Possession": "ताबा देताना",
   "Not included.": "समाविष्ट नाही.",
+
+  // ── Header defaults ──
+  "15 days": "15 दिवस",
+  "Approx. 12 months from date of commencement": "काम सुरू झाल्यापासून अंदाजे 12 महिने",
 
   // ── Specification lines translated by hand ──
   // Digits stay in ASCII, as they do in the measurements on every other
@@ -173,8 +177,10 @@ const FIXES: Array<[RegExp, string]> = [
   [/एकूण — चुरा/g, "खडी — चुरा"],
   // A raft foundation, not a floating raft.
   [/तराफा/g, "राफ्ट"],
-  // The translator leaves the English unit in rate lines.
+  // The translator leaves the English unit in rate lines, and sometimes drops
+  // the ट off the Marathi one.
   [/\bsq\.?\s?ft\b/gi, "चौ.फूट"],
+  [/चौ\.फू(?!ट)/g, "चौ.फूट"],
   // The rest of the quotation says ग्राहक, so the notes should too. The
   // inflected forms are listed first, because ग्राहक takes an extra ा.
   [/क्लायंटच्या/g, "ग्राहकाच्या"],
@@ -192,7 +198,10 @@ const FIXES: Array<[RegExp, string]> = [
 export function polish(text: string): string {
   let out = text;
   for (const [re, to] of FIXES) out = out.replace(re, to);
-  return out;
+  // The translator converts some figures to Devanagari digits and leaves others
+  // alone, so one quotation could show both ३०० x ३०० and 600 x 600. Every
+  // measurement on the quotation is written in ASCII, so these follow.
+  return out.replace(/[०-९]/g, (d) => String(d.charCodeAt(0) - 0x0966));
 }
 
 /**
