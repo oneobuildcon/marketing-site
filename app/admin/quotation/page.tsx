@@ -1305,6 +1305,12 @@ export default function AdminQuotation() {
       ...payments.map((p) => p.stage),
       validity,
       duration,
+      // The client's own details are written in the quotation's language too,
+      // so a Marathi quotation does not open with an English name. The phone
+      // number is left alone — digits are digits.
+      clientName,
+      location,
+      address,
     ];
     const mr = await toMarathi(strings);
     const t = (x: string) => mr[x] ?? x;
@@ -1319,7 +1325,7 @@ export default function AdminQuotation() {
       logo,
       stamp: marks.stamp,
       sign: marks.sign,
-      client: { name: clientName, phone: clientPhone, location, address },
+      client: { name: t(clientName), phone: clientPhone, location: t(location), address: t(address) },
       meta: { no: quotationNo, date, validity: t(validity), duration: t(duration) },
       rate: rateNum,
       sections: sections.map((g) => ({ title: t(g.title), items: g.items.map(t) })),

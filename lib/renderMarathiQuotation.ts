@@ -113,38 +113,23 @@ async function ensureFont(doc: Document) {
 }
 
 /**
- * The pages are laid out inside a bare iframe rather than on the admin page.
- * html2canvas clones the whole document each time it rasterises, and the admin
- * page is a very large form — cloning it once per page was the slowest part of
- * building a Marathi quotation. An empty document costs almost nothing.
+ * The pages are laid out on this page, off to one side.
+ *
+ * Laying them out in a bare iframe was quicker — html2canvas clones the whole
+ * document for every page, and this admin page is a very large form — but the
+ * webfont then loaded separately inside that frame, and html2canvas measured
+ * the text in one face and painted it in another. Words ran together. Correct
+ * spacing matters more than the seconds it saved.
  */
 async function openStage(): Promise<{ host: HTMLElement; close: () => void }> {
-  const frame = document.createElement("iframe");
-  frame.setAttribute("aria-hidden", "true");
-  frame.style.cssText =
-    `position:fixed;left:-20000px;top:0;width:${PAGE_W}px;height:${PAGE_H}px;border:0;visibility:hidden;`;
-  document.body.appendChild(frame);
-
-  const fdoc = frame.contentDocument;
-  // No same-document fallback is possible if the iframe is blocked, so the
-  // caller gets the error rather than a half-rendered quotation.
-  if (!fdoc) {
-    frame.remove();
-    throw new Error("Could not prepare the page for rendering.");
-  }
-  fdoc.open();
-  fdoc.write(
-    `<!doctype html><html><head><meta charset="utf-8">` +
-      `<style>html,body{margin:0;padding:0;background:#fff;}</style>` +
-      `</head><body></body></html>`
-  );
-  fdoc.close();
-
-  const host = fdoc.body;
+  await ensureFont(document);
+  const host = document.createElement("div");
+  host.setAttribute("aria-hidden", "true");
   host.style.cssText =
-    `width:${PAGE_W}px;background:#fff;font-family:"Noto Sans Devanagari",sans-serif;color:${NAVY};`;
-  await ensureFont(fdoc);
-  return { host, close: () => frame.remove() };
+    `position:fixed;left:-20000px;top:0;width:${PAGE_W}px;background:#fff;z-index:-1;` +
+    `font-family:"Noto Sans Devanagari",sans-serif;color:${NAVY};`;
+  document.body.appendChild(host);
+  return { host, close: () => host.remove() };
 }
 
 /** One block of the document: an element plus whether it must start a page. */
