@@ -120,7 +120,8 @@ function h(html: string, opts: Omit<Block, "el"> = {}): Block {
 }
 
 function sectionTitle(text: string) {
-  return `<div style="margin:14px 0 6px;padding:7px 10px;background:${NAVY};color:#fff;font-weight:700;font-size:13px;letter-spacing:.4px;">${esc(text)}</div>`;
+  // Centred, to match the navy bars in the English quotation.
+  return `<div style="margin:14px 0 6px;padding:7px 10px;background:${NAVY};color:#fff;font-weight:700;font-size:13px;letter-spacing:.4px;text-align:center;">${esc(text)}</div>`;
 }
 
 function numberedRow(n: number, text: string) {
@@ -348,7 +349,13 @@ async function paginate(blocks: Block[], host: HTMLElement): Promise<HTMLElement
       img.complete ? Promise.resolve() : img.decode().catch(() => undefined)
     )
   );
-  const heights = blocks.map((b) => b.el.offsetHeight);
+  // Headings carry a top margin, and offsetHeight leaves margins out. Ignoring
+  // them let the running total drift below the real one, so the last block on a
+  // page ran over the footer.
+  const heights = blocks.map((b) => {
+    const cs = getComputedStyle(b.el);
+    return b.el.offsetHeight + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
+  });
 
   const pages: HTMLElement[] = [];
   let page: HTMLElement | null = null;
