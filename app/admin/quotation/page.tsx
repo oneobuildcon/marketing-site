@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { FileText, Plus, Trash2, Download, RotateCcw, Package, Eye, Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { FileText, Plus, Trash2, Download, RotateCcw, Package, Eye, Send, Languages } from "lucide-react";
 import {
   quotationPresets,
   defaultSpecialNotes,
   type SpecSection,
   type RateGroup,
 } from "@/data/quotationSpecs";
+import { TERMS, polish } from "@/lib/marathiQuotation";
+import { buildMarathiPDF } from "@/lib/renderMarathiQuotation";
 
 // Header + bank details rarely change, so they persist in localStorage.
 // Specs/notes/rates load from the selected package preset and are fully
@@ -1142,16 +1144,112 @@ export default function AdminQuotation() {
     return doc;
   }
 
+  // ── Marathi edition ──────────────────────────────────────────────────────
+  // Preview / Download / WhatsApp all follow this toggle.
+  const [docLang, setDocLang] = useState<"en" | "mr">("en");
+  const [translating, setTranslating] = useState(false);
+  // Machine translations are reused across rebuilds — the specs rarely change
+  // between pressing Preview and pressing WhatsApp.
+  const mrCache = useRef<Record<string, string>>({});
+
+  // Headings, stage names and floor labels come from a hand-written dictionary
+  // so they read the way a builder in Pune would say them. A trailing "(50%)"
+  // is kept aside so "Plinth (50%)" still matches "Plinth".
+  function fromDictionary(src: string): string | null {
+    const t = src.trim();
+    if (!t) return "";
+    if (TERMS[t]) return TERMS[t];
+    const m = t.match(/^(.*?)\s*\((\d+(?:\.\d+)?%)\)$/);
+    if (m && TERMS[m[1].trim()]) return `${TERMS[m[1].trim()]} (${m[2]})`;
+    return null;
+  }
+
+  /** Translates everything not in the dictionary, in one batched request. */
+  async function toMarathi(strings: string[]): Promise<Record<string, string>> {
+    const out: Record<string, string> = {};
+    const need: string[] = [];
+    for (const raw of strings) {
+      const src = (raw ?? "").toString();
+      if (!src.trim() || out[src] !== undefined) continue;
+      const dict = fromDictionary(src);
+      if (dict !== null) out[src] = dict;
+      else if (mrCache.current[src]) out[src] = mrCache.current[src];
+      else if (!need.includes(src)) need.push(src);
+    }
+    if (need.length) {
+      const res = await fetch("/api/admin/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: need }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d?.error || "Translation failed");
+      need.forEach((src, i) => {
+        const mr = polish((d.items?.[i] || src).toString());
+        mrCache.current[src] = mr;
+        out[src] = mr;
+      });
+    }
+    return out;
+  }
+
+  async function buildMarathiDoc() {
+    const groups = [...sections, ...notes];
+    const rateGroups = [...rates, ...brands];
+    const strings = [
+      ...groups.flatMap((g) => [g.title, ...g.items]),
+      ...rateGroups.flatMap((g) => [g.work, ...g.items]),
+      ...areaRows.map((r) => r.label),
+      ...payments.map((p) => p.stage),
+      validity,
+      duration,
+    ];
+    const mr = await toMarathi(strings);
+    const t = (x: string) => mr[x] ?? x;
+
+    const [logo, marks] = await Promise.all([loadLogo(), loadMarks()]);
+    return buildMarathiPDF({
+      header,
+      bank,
+      logo,
+      stamp: marks.stamp,
+      sign: marks.sign,
+      client: { name: clientName, phone: clientPhone, location, address },
+      meta: { no: quotationNo, date, validity: t(validity), duration: t(duration) },
+      rate: rateNum,
+      sections: sections.map((g) => ({ title: t(g.title), items: g.items.map(t) })),
+      notes: notes.map((g) => ({ title: t(g.title), items: g.items.map(t) })),
+      rates: rates.map((g) => ({ work: t(g.work), items: g.items.map(t) })),
+      brands: brands.map((g) => ({ work: t(g.work), items: g.items.map(t) })),
+      areaRows: areaRows.map((r) => ({ label: t(r.label), area: r.area })),
+      totalArea,
+      totalAmount,
+      payments: payments.map((p) => ({ stage: t(p.stage), percent: p.percent })),
+      floorCount: floorRows.filter((r) => (parseFloat(r.slab) || 0) > 0).length,
+    });
+  }
+
+  /** The document in whichever language is selected. */
+  async function buildDoc() {
+    if (docLang === "en") return buildPDF();
+    setTranslating(true);
+    try {
+      return await buildMarathiDoc();
+    } finally {
+      setTranslating(false);
+    }
+  }
+
   const fileName = () => `Quotation-${(clientName.trim() || quotationNo).replace(/\s+/g, "-")}.pdf`;
 
   async function downloadPDF() {
-    const doc = await buildPDF();
+    const doc = await buildDoc();
     doc.save(fileName());
   }
 
   // Open the PDF in a new tab so it can be checked before sending.
   async function previewPDF() {
-    const doc = await buildPDF();
+    const doc = await buildDoc();
     const url = URL.createObjectURL(doc.output("blob"));
     window.open(url, "_blank");
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
@@ -1160,6 +1258,14 @@ export default function AdminQuotation() {
   // WhatsApp can't accept a file through a link, so download the PDF and open
   // the chat with a ready message — the admin just attaches the saved file.
   function whatsAppMessage() {
+    if (docLang === "mr") {
+      return (
+        `नमस्कार ${[clientName.trim(), honorific === "Mam" ? "मॅडम" : honorific ? "सर" : ""].filter(Boolean).join(" ") || "सर/मॅडम"},\n\n` +
+        `*वन ओ बिल्डकॉन* मध्ये स्वारस्य दाखवल्याबद्दल धन्यवाद. तुमच्या${location.trim() ? ` ${location.trim()} येथील` : ""} बांधकाम प्रकल्पासाठी आमचे कोटेशन सोबत जोडले आहे.\n\n` +
+        `काही शंका असल्यास कृपया नि:संकोच फोन करा किंवा मेसेज करा. तसेच काही बदल करायचे असल्यास किंवा नवीन काही समाविष्ट करायचे असल्यास आम्हाला कळवा — आम्ही तुमच्या गरजेनुसार बदल करून देऊ.\n\n` +
+        `धन्यवाद,\nटीम वन ओ बिल्डकॉन`
+      );
+    }
     return (
       `Hello ${[clientName.trim(), honorific].filter(Boolean).join(" ") || "Sir/Madam"},\n\n` +
       `Thank you for your interest in *One O Buildcon*. Please find attached our quotation for your construction project${location.trim() ? ` at ${location.trim()}` : ""}.\n\n` +
@@ -1185,7 +1291,7 @@ export default function AdminQuotation() {
     const chat = canShareFile ? null : window.open(`https://wa.me/${to}?text=${encodeURIComponent(msg)}`, "_blank");
 
     try {
-      const doc = await buildPDF();
+      const doc = await buildDoc();
       if (canShareFile) {
         // Phone: hand the PDF straight to the share sheet — pick WhatsApp, pick
         // the contact, send. Nothing is written to storage.
@@ -1205,6 +1311,31 @@ export default function AdminQuotation() {
   const label = "block text-xs font-semibold text-navy/60 mb-1";
   const payTotal = payments.reduce((s, p) => s + (parseFloat(p.percent) || 0), 0);
 
+  // Shown beside the actions in both button rows.
+  const langToggle = (
+    <div className="col-span-3 flex items-center gap-1 rounded-xl border border-navy/15 p-1 sm:col-span-1">
+      {([
+        ["en", "English"],
+        ["mr", "मराठी"],
+      ] as const).map(([v, label]) => (
+        <button
+          key={v}
+          onClick={() => setDocLang(v)}
+          className={`flex-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+            docLang === v ? "bg-navy text-white" : "text-navy/70 hover:bg-navy/5"
+          }`}
+          title="Language of the generated PDF"
+        >
+          {v === "mr" && <Languages className="mr-1 inline h-3 w-3" />}
+          {label}
+        </button>
+      ))}
+      {translating && (
+        <span className="px-2 text-[11px] font-semibold text-navy/50">तयार होत आहे…</span>
+      )}
+    </div>
+  );
+
   return (
     <div className="mx-auto max-w-4xl px-3 py-6 sm:px-4 sm:py-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -1212,6 +1343,7 @@ export default function AdminQuotation() {
           <FileText className="h-6 w-6 text-amber" /> Quotation Generator
         </h1>
         <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
+          {langToggle}
           <button onClick={previewPDF} className="flex items-center justify-center gap-2 rounded-xl border border-navy/20 px-3 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5 transition">
             <Eye className="h-4 w-4" /> Preview
           </button>
@@ -1555,6 +1687,7 @@ export default function AdminQuotation() {
         <div className="mt-5 flex flex-col gap-3 pb-10 sm:flex-row sm:items-center sm:justify-between">
           <button onClick={saveTemplate} className="flex items-center gap-2 rounded-xl border border-navy/20 px-4 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5"><RotateCcw className="h-4 w-4" /> Save header &amp; bank</button>
           <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
+            {langToggle}
             <button onClick={previewPDF} className="flex items-center justify-center gap-2 rounded-xl border border-navy/20 px-3 py-3 text-sm font-semibold text-navy hover:bg-navy/5 transition"><Eye className="h-4 w-4" /> Preview</button>
             <button onClick={downloadPDF} className="flex items-center justify-center gap-2 rounded-xl bg-amber px-3 py-3 text-sm font-semibold text-navy-dark hover:bg-amber-light transition"><Download className="h-4 w-4" /> Download</button>
             <button onClick={sendWhatsApp} className="flex items-center justify-center gap-2 rounded-xl bg-green-500 px-3 py-3 text-sm font-semibold text-white hover:bg-green-600 transition"><Send className="h-4 w-4" /> WhatsApp</button>

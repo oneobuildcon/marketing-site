@@ -47,9 +47,31 @@ async function translate(text: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { title = '', summary = '', body = '' } = (await req.json()) as {
-      title?: string; summary?: string; body?: string;
+    const payload = (await req.json()) as {
+      title?: string; summary?: string; body?: string; items?: string[];
     };
+
+    // Batch form, used by the Marathi quotation: many short strings at once.
+    // They are joined with a separator the translator leaves alone, so the
+    // whole set costs one request per chunk rather than one per string.
+    if (Array.isArray(payload.items)) {
+      const SEP = '\n@@\n';
+      const items = payload.items.map((s) => (s ?? '').toString());
+      const joined = items.map((s) => s.trim() || '-').join(SEP);
+      const out = await translate(joined);
+      let parts = out.split(/\s*@@\s*/);
+      // If the separator did not survive, fall back to translating one by one
+      // so the caller always gets an answer of the right length.
+      if (parts.length !== items.length) {
+        parts = [];
+        for (const it of items) parts.push(it.trim() ? await translate(it) : '');
+      }
+      return NextResponse.json({
+        items: items.map((src, i) => (src.trim() ? (parts[i] ?? src).trim() : '')),
+      });
+    }
+
+    const { title = '', summary = '', body = '' } = payload;
     if (!title && !summary && !body) {
       return NextResponse.json({ error: 'Nothing to translate' }, { status: 400 });
     }
