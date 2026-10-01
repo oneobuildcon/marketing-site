@@ -1243,16 +1243,38 @@ export default function AdminQuotation() {
   const fileName = () => `Quotation-${(clientName.trim() || quotationNo).replace(/\s+/g, "-")}.pdf`;
 
   async function downloadPDF() {
-    const doc = await buildDoc();
-    doc.save(fileName());
+    try {
+      const doc = await buildDoc();
+      doc.save(fileName());
+    } catch (e: any) {
+      alert(e?.message || "Could not generate the PDF. Please try again.");
+    }
   }
 
   // Open the PDF in a new tab so it can be checked before sending.
   async function previewPDF() {
-    const doc = await buildDoc();
-    const url = URL.createObjectURL(doc.output("blob"));
-    window.open(url, "_blank");
-    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    // The tab has to be opened inside the click. Building the Marathi edition
+    // takes a few seconds — translation, then rasterising each page — and by
+    // the time it finishes the browser no longer treats window.open as
+    // user-initiated and blocks it.
+    const tab = window.open("", "_blank");
+    if (tab && docLang === "mr") {
+      tab.document.write(
+        '<title>Loading…</title><body style="margin:0;display:flex;align-items:center;' +
+        'justify-content:center;height:100vh;font-family:system-ui;color:#171e30">' +
+        "<p>कोटेशन तयार होत आहे…</p></body>"
+      );
+    }
+    try {
+      const doc = await buildDoc();
+      const url = URL.createObjectURL(doc.output("blob"));
+      if (tab && !tab.closed) tab.location.href = url;
+      else window.open(url, "_blank"); // popups blocked outright — try anyway
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (e: any) {
+      tab?.close();
+      alert(e?.message || "Could not generate the PDF. Please try again.");
+    }
   }
 
   // WhatsApp can't accept a file through a link, so download the PDF and open

@@ -300,13 +300,21 @@ function buildBlocks(d: MrQuotationInput): Block[] {
 }
 
 /** Lays blocks into fixed-height A4 pages, measuring each one in the DOM. */
-function paginate(blocks: Block[], host: HTMLElement): HTMLElement[] {
+async function paginate(blocks: Block[], host: HTMLElement): Promise<HTMLElement[]> {
   // Measure first: every block is rendered at the final content width so its
   // height is exactly what it will be on the page.
   const measure = document.createElement("div");
   measure.style.cssText = `position:absolute;left:0;top:0;width:${CONTENT_W}px;visibility:hidden;`;
   host.appendChild(measure);
   blocks.forEach((b) => measure.appendChild(b.el));
+
+  // The logo, stamp and signature set a width and leave height to the image,
+  // so heights are only correct once they have decoded.
+  await Promise.all(
+    Array.from(measure.querySelectorAll("img")).map((img) =>
+      img.complete ? Promise.resolve() : img.decode().catch(() => undefined)
+    )
+  );
   const heights = blocks.map((b) => b.el.offsetHeight);
 
   const pages: HTMLElement[] = [];
@@ -371,7 +379,7 @@ export async function buildMarathiPDF(d: MrQuotationInput) {
   document.body.appendChild(host);
 
   try {
-    const pages = paginate(buildBlocks(d), host);
+    const pages = await paginate(buildBlocks(d), host);
     addFooters(pages, d);
 
     const doc = new jsPDF({ unit: "mm", format: "a4" });
