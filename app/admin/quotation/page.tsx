@@ -1195,7 +1195,9 @@ export default function AdminQuotation() {
       if (!src.trim() || out[src] !== undefined) continue;
       const dict = fromDictionary(src);
       if (dict !== null) out[src] = dict;
-      else if (mrCache.current[src]) out[src] = mrCache.current[src];
+      // Polished again on the way out, so corrections added to the dictionary
+      // reach lines that were translated and cached before them.
+      else if (mrCache.current[src]) out[src] = polish(mrCache.current[src]);
       else if (!need.includes(src)) need.push(src);
     }
     if (!need.length) return out;

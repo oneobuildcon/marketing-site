@@ -93,6 +93,10 @@ export const TERMS: Record<string, string> = {
   Waterproofing: "वॉटरप्रूफिंग",
   "Electrical Work": "इलेक्ट्रिकल काम",
   Painting: "रंगकाम",
+  POP: "पीओपी",
+  "Plaster Sand": "प्लास्टर वाळू",
+  Aggregate: "खडी",
+  "Plaster Reinforcement": "प्लास्टर रिइन्फोर्समेंट",
 
   // ── Floor and area labels ──
   "Ground Floor": "तळमजला",
@@ -145,6 +149,27 @@ const FIXES: Array<[RegExp, string]> = [
   [/टार-फिनिश/g, "taar फिनिश"],
   [/वीट बॅट/g, "ब्रिकबॅट"],
   [/छतावरील/g, "टेरेसवरील"],
+
+  // Curing concrete came out as उपचार — medical treatment. On site it is
+  // simply क्युरिंग.
+  [/उपचार/g, "क्युरिंग"],
+  // "Aggregate" was read as the everyday "total".
+  [/एकूण — चुरा/g, "खडी — चुरा"],
+  // A raft foundation, not a floating raft.
+  [/तराफा/g, "राफ्ट"],
+  // The translator leaves the English unit in rate lines.
+  [/\bsq\.?\s?ft\b/gi, "चौ.फूट"],
+  // The rest of the quotation says ग्राहक, so the notes should too. The
+  // inflected forms are listed first, because ग्राहक takes an extra ा.
+  [/क्लायंटच्या/g, "ग्राहकाच्या"],
+  [/क्लायंटने/g, "ग्राहकाने"],
+  [/क्लायंटला/g, "ग्राहकाला"],
+  [/क्लायंटद्वारे/g, "ग्राहकाकडून"],
+  [/क्लायंटकडून/g, "ग्राहकाकडून"],
+  [/क्लायंट/g, "ग्राहक"],
+  // "In the client's scope" reads as a responsibility, not a work area.
+  [/च्या कार्यक्षेत्रात आहेत/g, "च्या जबाबदारीत आहेत"],
+  [/च्या कार्यक्षेत्रात आहे/g, "च्या जबाबदारीत आहे"],
 ];
 
 /** Applies the corrections above to a machine-translated string. */
