@@ -1172,6 +1172,8 @@ export default function AdminQuotation() {
   const mrCache = useRef<Record<string, string>>({});
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [untranslated, setUntranslated] = useState(0);
+  // Holds a finished preview the browser would not open by itself.
+  const [pendingPreview, setPendingPreview] = useState<string | null>(null);
   const MR_CACHE_KEY = "oneo_quotation_mr_cache";
 
   // Translations survive a page reload, so re-issuing a quotation is instant.
@@ -1357,37 +1359,32 @@ export default function AdminQuotation() {
 
   // Open the PDF in a new tab so it can be checked before sending.
   async function previewPDF() {
-    // The tab has to be opened inside the click. Building the Marathi edition
-    // takes a few seconds — translation, then rasterising each page — and by
-    // the time it finishes the browser no longer treats window.open as
-    // user-initiated and blocks it.
-    const tab = window.open("", "_blank");
-    if (tab && docLang === "mr") {
-      tab.document.write(
-        '<title>Loading…</title><body style="margin:0;display:flex;align-items:center;' +
-        'justify-content:center;height:100vh;font-family:system-ui;color:#171e30">' +
-        "<p>कोटेशन तयार होत आहे…</p></body>"
-      );
-    }
+    // The quotation is built in this tab, and a browser freezes a tab as soon
+    // as it goes to the background. Opening the preview first did exactly
+    // that — the build crawled until the admin tab was brought back. So the
+    // document is built while this tab still has the screen, and the preview
+    // is opened only once there is something to show.
     try {
       const doc = await buildDoc();
       const url = URL.createObjectURL(doc.output("blob"));
-      if (tab && !tab.closed) tab.location.href = url;
-      else window.open(url, "_blank"); // popups blocked outright — try anyway
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      const tab = window.open(url, "_blank");
+      // A browser may refuse a pop-up opened this long after the click. The
+      // quotation is ready either way, so it is offered as a button — one tap,
+      // and no waiting behind it.
+      if (!tab) setPendingPreview(url);
+      else setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } catch (e: any) {
-      const msg = e?.message || "Could not generate the PDF. Please try again.";
-      // The message has to land in the tab being looked at, not behind it.
-      if (tab && !tab.closed) {
-        tab.document.body.innerHTML =
-          '<div style="font-family:system-ui;color:#171e30;padding:40px;max-width:40rem;margin:auto">' +
-          "<h2>Could not generate the quotation</h2><p>" +
-          msg.replace(/[<>&]/g, "") +
-          "</p></div>";
-      } else {
-        alert(msg);
-      }
+      alert(e?.message || "Could not generate the PDF. Please try again.");
     }
+  }
+
+  /** Opens a preview the browser blocked, from a fresh tap. */
+  function openPendingPreview() {
+    if (!pendingPreview) return;
+    window.open(pendingPreview, "_blank");
+    const url = pendingPreview;
+    setPendingPreview(null);
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
   }
 
   // WhatsApp can't accept a file through a link, so download the PDF and open
@@ -1480,6 +1477,16 @@ export default function AdminQuotation() {
     </div>
   );
 
+  // Only appears when the browser refused to open a finished preview itself.
+  const pendingPreviewButton = pendingPreview ? (
+    <button
+      onClick={openPendingPreview}
+      className="col-span-3 flex items-center justify-center gap-2 rounded-xl bg-navy px-3 py-2.5 text-sm font-semibold text-white hover:bg-navy/90 transition sm:col-span-1"
+    >
+      <Eye className="h-4 w-4" /> कोटेशन उघडा
+    </button>
+  ) : null;
+
   return (
     <div className="mx-auto max-w-4xl px-3 py-6 sm:px-4 sm:py-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -1488,6 +1495,7 @@ export default function AdminQuotation() {
         </h1>
         <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
           {langToggle}
+          {pendingPreviewButton}
           <button onClick={previewPDF} className="flex items-center justify-center gap-2 rounded-xl border border-navy/20 px-3 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5 transition">
             <Eye className="h-4 w-4" /> Preview
           </button>
@@ -1832,6 +1840,7 @@ export default function AdminQuotation() {
           <button onClick={saveTemplate} className="flex items-center gap-2 rounded-xl border border-navy/20 px-4 py-2.5 text-sm font-semibold text-navy hover:bg-navy/5"><RotateCcw className="h-4 w-4" /> Save header &amp; bank</button>
           <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
             {langToggle}
+            {pendingPreviewButton}
             <button onClick={previewPDF} className="flex items-center justify-center gap-2 rounded-xl border border-navy/20 px-3 py-3 text-sm font-semibold text-navy hover:bg-navy/5 transition"><Eye className="h-4 w-4" /> Preview</button>
             <button onClick={downloadPDF} className="flex items-center justify-center gap-2 rounded-xl bg-amber px-3 py-3 text-sm font-semibold text-navy-dark hover:bg-amber-light transition"><Download className="h-4 w-4" /> Download</button>
             <button onClick={sendWhatsApp} className="flex items-center justify-center gap-2 rounded-xl bg-green-500 px-3 py-3 text-sm font-semibold text-white hover:bg-green-600 transition"><Send className="h-4 w-4" /> WhatsApp</button>
