@@ -158,6 +158,14 @@ const FIXES: Array<[RegExp, string]> = [
   [/वीट बॅट/g, "ब्रिकबॅट"],
   [/छतावरील/g, "टेरेसवरील"],
 
+  // "Architect" came back as वास्तुविशारद in some packages and आर्किटेक्ट in
+  // others. Everyone on site says आर्किटेक्ट, so every package uses it. The
+  // inflected forms come first, because the stem loses its final ा.
+  [/वास्तुविशारदाच्या/g, "आर्किटेक्टच्या"],
+  [/वास्तुविशारदाने/g, "आर्किटेक्टने"],
+  [/वास्तुविशारदाकडून/g, "आर्किटेक्टकडून"],
+  [/वास्तुविशारदाला/g, "आर्किटेक्टला"],
+  [/वास्तुविशारद/g, "आर्किटेक्ट"],
   // Curing concrete came out as उपचार — medical treatment. On site it is
   // simply क्युरिंग.
   [/उपचार/g, "क्युरिंग"],

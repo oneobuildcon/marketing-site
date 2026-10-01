@@ -411,6 +411,24 @@ function pkgName(id: string): string {
   return p ? p.label.split(" — ")[0] : id;
 }
 
+const FLOOR_HEIGHT_LINE = "Floor-to-floor height considered as 10 feet.";
+
+/**
+ * Saved package specs replace the defaults outright, so a package saved before
+ * a default line existed would never show it. The floor-to-floor height is the
+ * assumption the whole rate rests on and belongs on every quotation, so it is
+ * added back to RCC work when a saved package has no height line of its own.
+ */
+function withFloorHeight(sections: SpecSection[]): SpecSection[] {
+  const i = sections.findIndex((s) => s.title.trim().toUpperCase() === "RCC WORK");
+  if (i === -1) return sections;
+  const has = sections[i].items.some((it) => /floor[-\s]?to[-\s]?floor|मजल्यापासून/i.test(it));
+  if (has) return sections;
+  const next = [...sections];
+  next[i] = { ...next[i], items: [...next[i].items, FLOOR_HEIGHT_LINE] };
+  return next;
+}
+
 export default function AdminQuotation() {
   // Persisted template bits
   const [header, setHeader] = useState(defaultHeader);
@@ -492,7 +510,7 @@ export default function AdminQuotation() {
     return {
       ...p,
       rate: typeof o.rate === "number" && o.rate > 0 ? o.rate : p.rate,
-      sections: o.sections ?? p.sections,
+      sections: withFloorHeight(o.sections ?? p.sections),
       rates: o.rates ?? p.rates,
       brands: o.brands ?? p.brands,
       notes: o.notes ?? p.notes ?? defaultSpecialNotes,
