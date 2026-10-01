@@ -48,6 +48,21 @@ async function translate(text: string): Promise<string> {
   return parts.join('\n');
 }
 
+/**
+ * Self-test. Opening this route in the browser says whether the server can
+ * reach the translation service at all, and how long it takes — the quickest
+ * way to tell a hosting problem from a problem in the quotation code.
+ */
+export async function GET() {
+  const started = Date.now();
+  try {
+    const sample = await translateChunk('Kitchen platform in quartz.');
+    return NextResponse.json({ ok: true, ms: Date.now() - started, sample });
+  } catch (e: any) {
+    return NextResponse.json({ ok: false, ms: Date.now() - started, error: e?.message ?? String(e) });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const payload = (await req.json()) as {

@@ -1152,6 +1152,7 @@ export default function AdminQuotation() {
   // between pressing Preview and pressing WhatsApp.
   const mrCache = useRef<Record<string, string>>({});
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const [untranslated, setUntranslated] = useState(0);
   const MR_CACHE_KEY = "oneo_quotation_mr_cache";
 
   // Translations survive a page reload, so re-issuing a quotation is instant.
@@ -1206,15 +1207,24 @@ export default function AdminQuotation() {
     let done = 0;
     setProgress({ done: 0, total: batches.length });
 
-    // Three at a time: fast enough on a phone, gentle enough that the free
-    // translation endpoint does not start refusing bursts.
+    // A failed or slow batch leaves those lines in English rather than taking
+    // the whole quotation down with it — a quotation with some English lines
+    // is still usable; a button that hangs is not.
+    const deadline = Date.now() + 60_000;
     const results: (string[] | null)[] = new Array(batches.length).fill(null);
+    let failures = 0;
     let next = 0;
+
     async function worker() {
       while (next < batches.length) {
         const idx = next++;
+        if (Date.now() > deadline) {
+          failures++;
+          setProgress({ done: ++done, total: batches.length });
+          continue;
+        }
         const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 45_000);
+        const timer = setTimeout(() => ctrl.abort(), 20_000);
         try {
           const res = await fetch("/api/admin/translate", {
             method: "POST",
@@ -1223,14 +1233,11 @@ export default function AdminQuotation() {
             signal: ctrl.signal,
           });
           const d = await res.json();
-          if (!res.ok) throw new Error(d?.error || "Translation failed");
+          if (!res.ok) throw new Error(d?.error || `Translation failed (${res.status})`);
           results[idx] = d.items;
         } catch (e: any) {
-          throw new Error(
-            e?.name === "AbortError"
-              ? "Translation timed out. Please check your connection and try again."
-              : e?.message || "Translation failed"
-          );
+          failures++;
+          console.warn("Marathi quotation: a batch could not be translated —", e?.message || e);
         } finally {
           clearTimeout(timer);
           setProgress({ done: ++done, total: batches.length });
@@ -1239,13 +1246,24 @@ export default function AdminQuotation() {
     }
     await Promise.all([worker(), worker(), worker()]);
 
+    let untranslated = 0;
     batches.forEach((batch, bi) => {
       batch.forEach((src, i) => {
-        const mr = polish((results[bi]?.[i] || src).toString());
+        const got = results[bi]?.[i];
+        if (!got) {
+          untranslated++;
+          out[src] = src; // left in English, not cached
+          return;
+        }
+        const mr = polish(got.toString());
         mrCache.current[src] = mr;
         out[src] = mr;
       });
     });
+    setUntranslated(untranslated);
+    if (failures) {
+      console.warn(`Marathi quotation: ${untranslated} line(s) stayed in English (${failures} batch(es) failed).`);
+    }
     saveCache();
     return out;
   }
@@ -1265,6 +1283,9 @@ export default function AdminQuotation() {
     const t = (x: string) => mr[x] ?? x;
 
     const [logo, marks] = await Promise.all([loadLogo(), loadMarks()]);
+    // Rasterising the pages takes about as long as translating them, so the
+    // counter switches over to pages rather than sitting still.
+    const onPage = (done: number, total: number) => setProgress({ done, total });
     return buildMarathiPDF({
       header,
       bank,
@@ -1283,7 +1304,7 @@ export default function AdminQuotation() {
       totalAmount,
       payments: payments.map((p) => ({ stage: t(p.stage), percent: p.percent })),
       floorCount: floorRows.filter((r) => (parseFloat(r.slab) || 0) > 0).length,
-    });
+    }, onPage);
   }
 
   /** The document in whichever language is selected. */
@@ -1419,11 +1440,18 @@ export default function AdminQuotation() {
           {label}
         </button>
       ))}
-      {translating && (
+      {translating ? (
         <span className="px-2 text-[11px] font-semibold text-navy/50">
           तयार होत आहे… {progress && progress.total > 1 ? `${progress.done}/${progress.total}` : ""}
         </span>
-      )}
+      ) : untranslated > 0 ? (
+        <span
+          className="px-2 text-[11px] font-semibold text-red-500"
+          title="The translation service could not be reached for these lines, so they were left in English."
+        >
+          {untranslated} line(s) in English
+        </span>
+      ) : null}
     </div>
   );
 

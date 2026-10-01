@@ -51,6 +51,33 @@ const GOLD = "#c69630";
 const LINE = "#e1e1e1";
 
 const inr = (n: number) => n.toLocaleString("en-IN");
+
+/**
+ * The logo, stamp and signature arrive at up to 1600px but are drawn at
+ * around 150px. Rasterising the full-size originals into every page is the
+ * slowest part of the build, so they are reduced to roughly what the page
+ * needs before they ever reach html2canvas.
+ */
+async function shrink(mark: Mark, targetW: number): Promise<Mark> {
+  if (!mark) return null;
+  try {
+    const img = new Image();
+    img.src = mark.data;
+    await img.decode();
+    const w = Math.min(img.width, Math.round(targetW * 3)); // 3x for print
+    if (w >= img.width) return mark;
+    const h = Math.max(1, Math.round((w / img.width) * img.height));
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext("2d");
+    if (!ctx) return mark;
+    ctx.drawImage(img, 0, 0, w, h);
+    return { data: c.toDataURL("image/png"), ratio: mark.ratio };
+  } catch {
+    return mark;
+  }
+}
 const esc = (s: string) =>
   String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
@@ -371,7 +398,10 @@ function addFooters(pages: HTMLElement[], d: MrQuotationInput) {
 }
 
 /** Builds the Marathi quotation and returns it as a jsPDF document. */
-export async function buildMarathiPDF(d: MrQuotationInput) {
+export async function buildMarathiPDF(
+  d: MrQuotationInput,
+  onPage?: (done: number, total: number) => void
+) {
   const [{ jsPDF }, html2canvas] = await Promise.all([
     import("jspdf"),
     import("html2canvas").then((m) => m.default),
@@ -385,22 +415,36 @@ export async function buildMarathiPDF(d: MrQuotationInput) {
   document.body.appendChild(host);
 
   try {
-    const pages = await paginate(buildBlocks(d), host);
+    const [logo, stamp, sign] = await Promise.all([
+      shrink(d.logo, 90),
+      shrink(d.stamp, 120),
+      shrink(d.sign, 150),
+    ]);
+    const pages = await paginate(buildBlocks({ ...d, logo, stamp, sign }), host);
     addFooters(pages, d);
 
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     for (let i = 0; i < pages.length; i++) {
-      // 2.5x gives roughly 240dpi — sharp enough that a black-and-white
-      // printout stays crisp, without an unmanageable file size.
+      // 2x is about 190dpi — still crisp in a black-and-white printout, and
+      // far quicker to produce than 2.5x, which matters on a phone.
       const canvas = await html2canvas(pages[i], {
-        scale: 2.5,
+        scale: 2,
         backgroundColor: "#ffffff",
         useCORS: true,
         logging: false,
         windowWidth: PAGE_W,
       });
       if (i > 0) doc.addPage();
-      doc.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297, undefined, "FAST");
+      // JPEG rather than PNG: encoding is much faster and the file far
+      // smaller, which is what gets shared over WhatsApp.
+      doc.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, 210, 297, undefined, "FAST");
+      // Release the bitmap straight away; five full-page canvases held at once
+      // is enough to stall a phone.
+      canvas.width = 0;
+      canvas.height = 0;
+      onPage?.(i + 1, pages.length);
+      // Give the browser a frame to breathe between pages.
+      await new Promise((r) => setTimeout(r, 0));
     }
     return doc;
   } finally {
